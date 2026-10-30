@@ -25,13 +25,13 @@ package com.shatteredpixel.shatteredpixeldungeon.items.armor.ego;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
+import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 
 //E.G.O armor, based on the suits extracted from abnormalities in Lobotomy Corporation
 //The wearer takes damage of each type scaled by the armor's multiplier for that type
 public abstract class EgoArmor extends Armor {
 
-	//null for standard-issue equipment
-	protected RiskLevel risk = null;
+	protected RiskLevel risk = RiskLevel.ZAYIN;
 	//RED, WHITE, BLACK, PALE
 	protected float[] damageMultipliers = DamageType.neutralMultipliers();
 
@@ -47,8 +47,18 @@ public abstract class EgoArmor extends Armor {
 		return damageMultipliers[type.ordinal()];
 	}
 
+	//risk level replaces the tier in the absorb line, tier is kept for balancing
 	@Override
-	public String info() {
-		return super.info() + "\n\n" + RiskLevel.desc(risk) + "\n" + DamageType.multipliersDesc(damageMultipliers);
+	protected String absorbLine(boolean known) {
+		if (known){
+			return Messages.get(EgoArmor.class, "curr_absorb", risk.title(), DRMin(), DRMax(), STRReq());
+		} else {
+			return Messages.get(EgoArmor.class, "avg_absorb", risk.title(), DRMin(0), DRMax(0), STRReq(0));
+		}
+	}
+
+	@Override
+	protected String statsInfo() {
+		return DamageType.multipliersDesc(damageMultipliers);
 	}
 }

@@ -97,6 +97,12 @@ public class FloatingText extends RenderedTextBlock {
 	public static int CORRUPTION= 16;
 	public static int AMULET    = 17;
 
+	//lobotomy damage type icons
+	public static int RED_DMG   = 90;
+	public static int WHITE_DMG = 91;
+	public static int BLACK_DMG = 92;
+	public static int PALE_DMG  = 93;
+
 	//positive icons
 	public static int HEALING   = 18;
 	public static int SHIELDING = 19;

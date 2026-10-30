@@ -23,13 +23,34 @@
 package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 
 //Lobotomy Corporation's four damage types. Each Char takes a multiplier of the final damage
 //(after armor) for each type, e.g. 1.5x RED / 1.0x WHITE / 0.5x BLACK / 2.0x PALE.
 //Damage without a type, such as from regular non-E.G.O weapons, is unaffected.
 public enum DamageType {
-	RED, WHITE, BLACK, PALE;
+	RED     (FloatingText.RED_DMG,   0xCA2844),
+	WHITE   (FloatingText.WHITE_DMG, 0xEEECC0),
+	BLACK   (FloatingText.BLACK_DMG, 0xA46EAC),
+	PALE    (FloatingText.PALE_DMG,  0x40CDBE);
+
+	private final int icon;
+	private final int color;
+
+	DamageType(int icon, int color){
+		this.icon = icon;
+		this.color = color;
+	}
+
+	//icon and number color of the damage popup
+	public int icon(){
+		return icon;
+	}
+
+	public int color(){
+		return color;
+	}
 
 	public static float[] neutralMultipliers(){
 		return new float[]{1f, 1f, 1f, 1f};
@@ -37,6 +58,7 @@ public enum DamageType {
 
 	public static int apply(Char defender, DamageType type, int damage){
 		if (type == null) return damage;
+		defender.incomingDamageType = type;
 		return Math.max(0, Math.round(damage * defender.damageMultiplier(type)));
 	}
 
@@ -47,13 +69,13 @@ public enum DamageType {
 		return true;
 	}
 
-	//e.g. "RED x1.5 / WHITE x1 / BLACK x0.5 / PALE x2"
+	//e.g. "내성: RED 1.5 / WHITE 1.0 / BLACK 0.5 / PALE 2.0"
 	public static String multipliersDesc(float[] multipliers){
 		StringBuilder sb = new StringBuilder();
 		for (DamageType t : values()){
 			if (sb.length() > 0) sb.append(" / ");
-			sb.append(t.name()).append(" x").append(Messages.decimalFormat("#.##", multipliers[t.ordinal()]));
+			sb.append(t.name()).append(" ").append(Messages.decimalFormat("0.0#", multipliers[t.ordinal()]));
 		}
-		return Messages.get(DamageType.class, "multipliers", sb.toString());
+		return Messages.get(DamageType.class, "resistance", sb.toString());
 	}
 }

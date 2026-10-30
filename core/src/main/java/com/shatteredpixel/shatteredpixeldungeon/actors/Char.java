@@ -180,6 +180,9 @@ public abstract class Char extends Actor {
 		return damageMultipliers[type.ordinal()];
 	}
 
+	//damage type of the hit currently being dealt to this char, used for the damage popup
+	public DamageType incomingDamageType = null;
+
 	public float[] damageMultipliers(){
 		float[] result = new float[DamageType.values().length];
 		for (DamageType t : DamageType.values()){
@@ -388,6 +391,8 @@ public abstract class Char extends Actor {
 	public boolean attack( Char enemy, float dmgMulti, float dmgBonus, float accMulti ) {
 
 		if (enemy == null) return false;
+
+		enemy.incomingDamageType = null;
 		
 		boolean visibleFight = Dungeon.level.heroFOV[pos] || Dungeon.level.heroFOV[enemy.pos];
 
@@ -522,10 +527,12 @@ public abstract class Char extends Actor {
 			// If the enemy is already dead, interrupt the attack.
 			// This matters as defence procs can sometimes inflict self-damage, such as armor glyphs.
 			if (!enemy.isAlive()){
+				enemy.incomingDamageType = null;
 				return true;
 			}
 
 			enemy.damage( effectiveDamage, this );
+			enemy.incomingDamageType = null;
 
 			if (buff(FireImbue.class) != null)  buff(FireImbue.class).proc(enemy);
 			if (buff(FrostImbue.class) != null) buff(FrostImbue.class).proc(enemy);
@@ -1079,7 +1086,14 @@ public abstract class Char extends Actor {
 			}
 			hitMissIcon = -1;
 
-			sprite.showStatusWithIcon(CharSprite.NEGATIVE, Integer.toString(dmg + shielded), icon);
+			//typed damage from an attack shows its own icon and color, other damage (e.g. enchantment procs) is unchanged
+			int color = CharSprite.NEGATIVE;
+			if (incomingDamageType != null && src instanceof Char){
+				icon = incomingDamageType.icon();
+				color = incomingDamageType.color();
+			}
+
+			sprite.showStatusWithIcon(color, Integer.toString(dmg + shielded), icon);
 		}
 
 		if (HP < 0) HP = 0;

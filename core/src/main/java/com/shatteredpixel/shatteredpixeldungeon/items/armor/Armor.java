@@ -580,24 +580,41 @@ public class Armor extends EquipableItem {
 		}
 	}
 	
+	//the tier, armor and strength line of the item description
+	protected String absorbLine(boolean known){
+		if (known){
+			return Messages.get(Armor.class, "curr_absorb", tier, DRMin(), DRMax(), STRReq());
+		} else {
+			return Messages.get(Armor.class, "avg_absorb", tier, DRMin(0), DRMax(0), STRReq(0));
+		}
+	}
+
+	//extra stats shown below the absorb line, none by default
+	protected String statsInfo(){
+		return "";
+	}
+
 	@Override
 	public String info() {
 		String info = super.info();
 		
 		if (levelKnown) {
 
-			info += "\n\n" + Messages.get(Armor.class, "curr_absorb", tier, DRMin(), DRMax(), STRReq());
+			info += "\n\n" + absorbLine(true);
 			
 			if (Dungeon.hero != null && STRReq() > Dungeon.hero.STR()) {
 				info += " " + Messages.get(Armor.class, "too_heavy");
 			}
 		} else {
-			info += "\n\n" + Messages.get(Armor.class, "avg_absorb", tier, DRMin(0), DRMax(0), STRReq(0));
+			info += "\n\n" + absorbLine(false);
 
 			if (Dungeon.hero != null && STRReq(0) > Dungeon.hero.STR()) {
 				info += " " + Messages.get(Armor.class, "probably_too_heavy");
 			}
 		}
+
+		String statsInfo = statsInfo();
+		if (!statsInfo.isEmpty()) info += "\n\n" + statsInfo;
 
 		switch (augment) {
 			case EVASION:

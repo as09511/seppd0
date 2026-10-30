@@ -35,8 +35,7 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 //Each one deals a damage type, which is scaled by the target's multiplier for that type
 public abstract class EgoWeapon extends MeleeWeapon {
 
-	//null for standard-issue equipment
-	protected RiskLevel risk = null;
+	protected RiskLevel risk = RiskLevel.ZAYIN;
 	protected DamageType damageType = DamageType.RED;
 
 	public RiskLevel risk(){
@@ -100,14 +99,13 @@ public abstract class EgoWeapon extends MeleeWeapon {
 		return augment.damageFactor(min(level)+dmgBoost) + "-" + augment.damageFactor(max(level)+dmgBoost);
 	}
 
+	//risk level and damage type replace the tier in the stats line, tier is kept for balancing
 	@Override
-	public String statsInfo() {
-		String info = RiskLevel.desc(risk);
-		info += "\n" + Messages.get(DamageType.class, "weapon_type", damageType.name());
-		String own = Messages.get(this, "stats_desc");
-		if (!own.isEmpty() && !own.equals(Messages.NO_TEXT_FOUND)){
-			info += "\n\n" + own;
+	protected String statsLine(boolean known) {
+		if (known){
+			return Messages.get(EgoWeapon.class, "stats_known", risk.title(), augment.damageFactor(min()), augment.damageFactor(max()), damageType.name(), STRReq());
+		} else {
+			return Messages.get(EgoWeapon.class, "stats_unknown", risk.title(), min(0), max(0), damageType.name(), STRReq(0));
 		}
-		return info;
 	}
 }

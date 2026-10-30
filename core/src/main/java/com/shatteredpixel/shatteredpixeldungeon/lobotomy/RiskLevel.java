@@ -25,16 +25,11 @@ package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 
 //Lobotomy Corporation's risk levels, used by abnormalities and their E.G.O
+//This is only the displayed grade, item power is still balanced by tier
 public enum RiskLevel {
 	ZAYIN, TETH, HE, WAW, ALEPH;
 
-	public int tier(){
-		return ordinal()+1;
-	}
-
-	//equipment without a risk level is standard-issue gear, such as the suit and baton
-	public static String desc(RiskLevel risk){
-		String name = Messages.get(RiskLevel.class, risk == null ? "standard" : risk.name());
-		return Messages.get(RiskLevel.class, "risk", name);
+	public String title(){
+		return Messages.get(RiskLevel.class, name());
 	}
 }

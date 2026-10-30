@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.armor.ego;
 
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
 //standard-issue suit, same stats as cloth armor
@@ -30,6 +31,7 @@ public class Suit extends EgoArmor {
 	{
 		image = ItemSpriteSheet.SUIT;
 
+		risk = RiskLevel.ZAYIN;
 		damageMultipliers = new float[]{1f, 1f, 1.5f, 2f};
 
 		bones = false;

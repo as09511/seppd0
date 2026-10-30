@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Sword;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
 //standard-issue baton, same stats as the worn shortsword
@@ -37,6 +38,7 @@ public class Baton extends EgoWeapon {
 		hitSound = Assets.Sounds.HIT_CRUSH;
 		hitSoundPitch = 1.1f;
 
+		risk = RiskLevel.ZAYIN;
 		damageType = DamageType.RED;
 		tier = 1;
 
