@@ -53,6 +53,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfRegrowth;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfWarding;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.MagicBullet;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Notes;
 import com.shatteredpixel.shatteredpixeldungeon.levels.CavesBossLevel;
 import com.shatteredpixel.shatteredpixeldungeon.levels.CavesLevel;
@@ -988,6 +989,14 @@ public class Dungeon {
 			BArray.or( level.visited, level.heroFOV, a.pos - 1, 3, level.visited );
 			BArray.or( level.visited, level.heroFOV, a.pos - 1 + level.width(), 3, level.visited );
 			GameScene.updateFog(a.pos, 2);
+		}
+
+		for (MagicBullet.Flare f : hero.buffs(MagicBullet.Flare.class)){
+			if (Dungeon.depth != f.depth || Dungeon.branch != f.branch) continue;
+			for (int cell : f.cells){
+				level.visited[cell] = level.visited[cell] || level.heroFOV[cell];
+				GameScene.updateFog(cell, 1);
+			}
 		}
 
 		for (Char ch : Actor.chars()){

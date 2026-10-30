@@ -956,7 +956,9 @@ public class Badges {
 				badge = Badge.MASTERY_CLERIC;
 				break;
 		}
-		
+
+		//the testing class has no badges
+		if (badge == null) return;
 		unlock(badge);
 	}
 

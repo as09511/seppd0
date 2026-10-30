@@ -838,7 +838,7 @@ public class HeroSelectScene extends PixelScene {
 							HeroClass randomCls;
 							do {
 								randomCls = Random.oneOf(HeroClass.values());
-							} while (!randomCls.isUnlocked());
+							} while (!randomCls.isUnlocked() || randomCls == HeroClass.TESTER);
 							setSelectedHero(randomCls);
 							GamesInProgress.randomizedClass = true;
 						}
@@ -938,7 +938,7 @@ public class HeroSelectScene extends PixelScene {
 							HeroClass randomCls;
 							do {
 								randomCls = Random.oneOf(HeroClass.values());
-							} while (!randomCls.isUnlocked());
+							} while (!randomCls.isUnlocked() || randomCls == HeroClass.TESTER);
 							setSelectedHero(randomCls);
 							GamesInProgress.randomizedClass = true;
 						} else {
