@@ -306,11 +306,19 @@ public class ItemSpriteSheet {
 	public static final int PENITENCE            = EGO_WEAPONS+1;
 	public static final int LIFE_FOR_A_DAREDEVIL = EGO_WEAPONS+2;
 	public static final int MAGIC_BULLET         = EGO_WEAPONS+3;
+	public static final int RED_EYES             = EGO_WEAPONS+4;
+	public static final int BEAK                 = EGO_WEAPONS+5;
+	public static final int FRAGMENTS_FROM_SOMEWHERE = EGO_WEAPONS+6;
+	public static final int REGRET               = EGO_WEAPONS+7;
 	static{
 		assignItemRect(BATON,                16, 16);
 		assignItemRect(PENITENCE,            16, 16);
 		assignItemRect(LIFE_FOR_A_DAREDEVIL, 16, 16);
 		assignItemRect(MAGIC_BULLET,         16, 16);
+		assignItemRect(RED_EYES,             16, 16);
+		assignItemRect(BEAK,                 16, 16);
+		assignItemRect(FRAGMENTS_FROM_SOMEWHERE, 16, 16);
+		assignItemRect(REGRET,               16, 16);
 	}
 
 	private static final int MISSILE_WEP    =                               xy(1, 10);  //16 slots. 3 per tier + bow

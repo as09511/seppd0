@@ -176,9 +176,13 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WarHammer;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WarScythe;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Whip;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Baton;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Beak;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.FragmentsFromSomewhere;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.LifeForADaredevil;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.MagicBullet;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Penitence;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyes;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Regret;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.Bolas;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.FishingSpear;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ForceCube;
@@ -437,9 +441,13 @@ public class Generator {
 					Dirk.class,
 					Sickle.class,
 					Pickaxe.class,
-					Penitence.class
+					Penitence.class,
+					RedEyes.class,
+					Beak.class,
+					FragmentsFromSomewhere.class,
+					Regret.class
 			};
-			WEP_T2.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 0, 1 };
+			WEP_T2.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 0, 1, 1, 1, 1, 1 };
 			WEP_T2.probs = WEP_T2.defaultProbs.clone();
 			
 			WEP_T3.classes = new Class<?>[]{

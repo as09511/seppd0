@@ -33,7 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.watabou.utils.Bundle;
 
-//ZAYIN, from 'One Sin and Hundreds of Good Deeds'
+//ZAYIN
 public class Penitence extends EgoWeapon {
 
 	{

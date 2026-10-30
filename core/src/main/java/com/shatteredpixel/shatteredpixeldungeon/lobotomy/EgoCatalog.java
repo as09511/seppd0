@@ -25,9 +25,13 @@ package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Baton;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Beak;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.FragmentsFromSomewhere;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.LifeForADaredevil;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.MagicBullet;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Penitence;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyes;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Regret;
 
 //every E.G.O equipment in the mod, add new E.G.O here
 public class EgoCatalog {
@@ -38,7 +42,11 @@ public class EgoCatalog {
 			Suit.class,
 			Penitence.class,
 			LifeForADaredevil.class,
-			MagicBullet.class
+			MagicBullet.class,
+			RedEyes.class,
+			Beak.class,
+			FragmentsFromSomewhere.class,
+			Regret.class
 	};
 
 }

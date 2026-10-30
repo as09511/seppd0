@@ -30,7 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
-//HE, from 'Life for a Daredevil', same stats as the sword
+//HE, same stats as the sword
 public class LifeForADaredevil extends EgoWeapon {
 
 	{

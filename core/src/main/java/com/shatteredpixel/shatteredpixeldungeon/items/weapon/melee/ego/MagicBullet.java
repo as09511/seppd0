@@ -28,17 +28,13 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Beam;
-import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting;
-import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTilemap;
@@ -49,13 +45,10 @@ import com.watabou.utils.Random;
 
 import java.util.ArrayList;
 
-//WAW, from 'Der Freischütz'
+//WAW
 //A gun: weak melee attacks, plus 7 bullets that pierce through every character and door in their path.
 //The 7th bullet always hits a random character on the floor instead, possibly even the wielder.
-public class MagicBullet extends EgoWeapon {
-
-	public static final String AC_SHOOT  = "SHOOT";
-	public static final String AC_RELOAD = "RELOAD";
+public class MagicBullet extends EgoGun {
 
 	private static final int MAX_AMMO = 7;
 	private static final float RELOAD_TIME = 3f;
@@ -72,8 +65,6 @@ public class MagicBullet extends EgoWeapon {
 		tier = 4;
 	}
 
-	private int ammo = MAX_AMMO;
-
 	@Override
 	public int min(int lvl) {
 		return  4 +             //4 base
@@ -86,98 +77,43 @@ public class MagicBullet extends EgoWeapon {
 				4*lvl;          //+4 per level, down from +5
 	}
 
+	@Override
+	public int maxAmmo() {
+		return MAX_AMMO;
+	}
+
+	@Override
+	public float reloadTime() {
+		return RELOAD_TIME;
+	}
+
+	@Override
 	public int shotMin(int lvl){
 		return  6 +             //6 base
 				lvl;            //+1 per level
 	}
 
+	@Override
 	public int shotMax(int lvl){
 		return  22 +            //22 base
 				5*lvl;          //+5 per level
 	}
 
 	@Override
-	public ArrayList<String> actions(Hero hero) {
-		ArrayList<String> actions = super.actions(hero);
-		if (isEquipped(hero)){
-			actions.add(AC_SHOOT);
-			actions.add(AC_RELOAD);
-		}
-		return actions;
-	}
-
-	@Override
-	public String defaultAction() {
-		return AC_SHOOT;
-	}
-
-	@Override
-	public void execute(Hero hero, String action) {
-		super.execute(hero, action);
-
-		if (action.equals(AC_SHOOT)){
-			if (!isEquipped(hero)){
-				GLog.w(Messages.get(this, "need_equip"));
-			} else if (ammo <= 0){
-				//trying to fire an empty gun reloads it instead
-				reload(hero);
-			} else {
-				usesTargeting = true;
-				GameScene.selectCell(shooter);
-			}
-		} else if (action.equals(AC_RELOAD)){
-			if (!isEquipped(hero)){
-				GLog.w(Messages.get(this, "need_equip"));
-			} else if (ammo >= MAX_AMMO){
-				GLog.i(Messages.get(this, "already_loaded"));
-			} else {
-				reload(hero);
-			}
-		}
-	}
-
-	private void reload(Hero hero){
-		ammo = MAX_AMMO;
-		updateQuickslot();
-		hero.sprite.operate(hero.pos);
-		Sample.INSTANCE.play(Assets.Sounds.UNLOCK);
-		GLog.i(Messages.get(this, "reloaded"));
-		hero.spendAndNext(RELOAD_TIME);
-	}
-
-	private final CellSelector.Listener shooter = new CellSelector.Listener() {
-		@Override
-		public void onSelect(Integer cell) {
-			if (cell != null && cell != Dungeon.hero.pos) {
-				fire(Dungeon.hero, cell);
-			}
-		}
-
-		@Override
-		public String prompt() {
-			return Messages.get(MagicBullet.class, "prompt");
-		}
-	};
-
-	private void fire(Hero hero, int target){
+	protected void fireShot(Hero hero, int target){
 		//shooting is affected by attack speed, just like melee attacks
 		float delay = hero.attackDelay();
-
-		hero.busy();
-		hero.sprite.zap(target);
 		Sample.INSTANCE.play(Assets.Sounds.RAY);
 
-		ammo--;
 		if (ammo <= 0){
 			finalShot(hero);
 			//the gun is instantly reloaded after the 7th bullet
 			ammo = MAX_AMMO;
+			updateQuickslot();
 		} else {
 			normalShot(hero, target);
 		}
-		updateQuickslot();
 
-		Invisibility.dispel();
 		hero.spendAndNext(delay);
 	}
 
@@ -258,132 +194,17 @@ public class MagicBullet extends EgoWeapon {
 				GLog.n(Messages.get(this, "ondeath"));
 			}
 		} else if (ch.isAlive()) {
-			//bullets count as thrown weapons and never miss
+			//magic bullets never miss
 			hero.belongings.thrownWeapon = shot;
 			hero.attack(ch, 1, 0, Char.INFINITE_ACCURACY);
 			hero.belongings.thrownWeapon = null;
 		}
 	}
 
-	@Override
-	public String status() {
-		return ammo + "/" + MAX_AMMO;
-	}
-
 	//the quote always goes at the very bottom of the description
 	@Override
 	public String info() {
 		return super.info() + "\n\n" + Messages.get(this, "quote");
-	}
-
-	@Override
-	public String statsInfo() {
-		int lvl = levelKnown ? buffedLvl() : 0;
-		return Messages.get(this, "stats_desc", augment.damageFactor(shotMin(lvl)), augment.damageFactor(shotMax(lvl)), DamageType.BLACK.coloredName());
-	}
-
-	//duelist ability: instantly reload
-	@Override
-	public String targetingPrompt() {
-		return null;
-	}
-
-	@Override
-	protected void egoAbility(Hero hero, Integer target, int dmgBoost) {
-		beforeAbilityUsed(hero, null);
-		ammo = MAX_AMMO;
-		updateQuickslot();
-		hero.sprite.operate(hero.pos);
-		Sample.INSTANCE.play(Assets.Sounds.UNLOCK);
-		GLog.i(Messages.get(this, "reloaded"));
-		afterAbilityUsed(hero);
-	}
-
-	@Override
-	public String abilityInfo() {
-		return Messages.get(this, "ability_desc");
-	}
-
-	@Override
-	public String upgradeAbilityStat(int level) {
-		return null;
-	}
-
-	private static final String AMMO = "ammo";
-
-	@Override
-	public void storeInBundle(Bundle bundle) {
-		super.storeInBundle(bundle);
-		bundle.put(AMMO, ammo);
-	}
-
-	@Override
-	public void restoreFromBundle(Bundle bundle) {
-		super.restoreFromBundle(bundle);
-		if (bundle.contains(AMMO)) ammo = bundle.getInt(AMMO);
-	}
-
-	//a single bullet, which counts as a thrown weapon for things like armor and the sniper subclass
-	public static class Shot extends MissileWeapon {
-
-		private MagicBullet gun;
-
-		{
-			image = ItemSpriteSheet.MAGIC_BULLET;
-			tier = 4;
-		}
-
-		public Shot(){
-			this(new MagicBullet());
-		}
-
-		public Shot(MagicBullet gun){
-			this.gun = gun;
-			augment = gun.augment;
-			enchantment = gun.enchantment;
-		}
-
-		@Override
-		public int buffedLvl() {
-			return gun.buffedLvl();
-		}
-
-		//sharpshooting only adds flat damage, it does not boost the bullet's level
-		@Override
-		public int min() {
-			return gun.shotMin(buffedLvl());
-		}
-
-		@Override
-		public int max() {
-			return gun.shotMax(buffedLvl());
-		}
-
-		@Override
-		public int min(int lvl) {
-			return gun.shotMin(lvl);
-		}
-
-		@Override
-		public int max(int lvl) {
-			return gun.shotMax(lvl);
-		}
-
-		@Override
-		public int STRReq(int lvl) {
-			return gun.STRReq(lvl);
-		}
-
-		@Override
-		public int damageRoll(Char owner) {
-			return super.damageRoll(owner) + RingOfSharpshooting.levelDamageBonus(owner);
-		}
-
-		@Override
-		public int proc(Char attacker, Char defender, int damage) {
-			damage = DamageType.apply(defender, DamageType.BLACK, damage);
-			return super.proc(attacker, defender, damage);
-		}
 	}
 
 	//reveals the cells hit by the 7th bullet, see Level.updateFieldOfView and Dungeon.observe
