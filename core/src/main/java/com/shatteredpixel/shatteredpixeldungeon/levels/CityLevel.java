@@ -29,7 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LostInventory;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Imp;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ElmoParticle;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClothArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.EscapeCrystal;
 import com.shatteredpixel.shatteredpixeldungeon.levels.features.LevelTransition;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.CityPainter;
@@ -172,7 +172,7 @@ public class CityLevel extends RegularLevel {
 									crystal.storeHeroBelongings(Dungeon.hero);
 								}
 								crystal.collect();
-								hero.belongings.armor = new ClothArmor();
+								hero.belongings.armor = new Suit();
 								hero.belongings.armor.identify();
 								hero.updateHT( false );
 								CityLevel.super.activateTransition(hero, transition);

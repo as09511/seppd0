@@ -115,6 +115,9 @@ public class Assets {
 		public static final String SCENES   = "messages/scenes/scenes";
 		public static final String UI       = "messages/ui/ui";
 		public static final String WINDOWS  = "messages/windows/windows";
+
+		//mod strings
+		public static final String LOBOTOMY = "messages/lobotomy/lobotomy";
 	}
 
 	public static class Music {

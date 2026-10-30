@@ -141,6 +141,7 @@ import com.shatteredpixel.shatteredpixeldungeon.levels.features.Door;
 import com.shatteredpixel.shatteredpixeldungeon.levels.traps.GeyserTrap;
 import com.shatteredpixel.shatteredpixeldungeon.levels.traps.GnollRockfallTrap;
 import com.shatteredpixel.shatteredpixeldungeon.levels.traps.GrimTrap;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.plants.Earthroot;
@@ -171,7 +172,22 @@ public abstract class Char extends Actor {
 	
 	public int HT;
 	public int HP;
-	
+
+	//RED, WHITE, BLACK, PALE damage multipliers, see DamageType
+	protected float[] damageMultipliers = DamageType.neutralMultipliers();
+
+	public float damageMultiplier( DamageType type ){
+		return damageMultipliers[type.ordinal()];
+	}
+
+	public float[] damageMultipliers(){
+		float[] result = new float[DamageType.values().length];
+		for (DamageType t : DamageType.values()){
+			result[t.ordinal()] = damageMultiplier(t);
+		}
+		return result;
+	}
+
 	protected float baseSpeed	= 1;
 	protected PathFinder.Path path;
 

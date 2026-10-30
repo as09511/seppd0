@@ -301,7 +301,11 @@ public class ItemSpriteSheet {
 		assignItemRect(WAR_SCYTHE,  14, 15);
 	}
 
-	                                                                                    //8 free slots
+	private static final int EGO_WEAPONS    =                               xy(9, 9);   //8 slots
+	public static final int BATON           = EGO_WEAPONS+0;
+	static{
+		assignItemRect(BATON,       15, 15);
+	}
 
 	private static final int MISSILE_WEP    =                               xy(1, 10);  //16 slots. 3 per tier + bow
 	public static final int SPIRIT_BOW      = MISSILE_WEP+0;
@@ -393,6 +397,12 @@ public class ItemSpriteSheet {
 		assignItemRect(ARMOR_HUNTRESS,  13, 15);
 		assignItemRect(ARMOR_DUELIST,   12, 13);
 		assignItemRect(ARMOR_CLERIC,    13, 14);
+	}
+
+	private static final int EGO_ARMOR      =                               xy(12, 12); //5 slots
+	public static final int SUIT            = EGO_ARMOR+0;
+	static{
+		assignItemRect(SUIT,            16, 15);
 	}
 
 	                                                                                    //16 free slots
