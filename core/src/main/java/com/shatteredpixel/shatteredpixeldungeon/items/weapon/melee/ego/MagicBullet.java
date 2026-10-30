@@ -273,7 +273,7 @@ public class MagicBullet extends EgoWeapon {
 	@Override
 	public String statsInfo() {
 		int lvl = levelKnown ? buffedLvl() : 0;
-		return Messages.get(this, "stats_desc", augment.damageFactor(shotMin(lvl)), augment.damageFactor(shotMax(lvl)), ammo, MAX_AMMO);
+		return Messages.get(this, "stats_desc", augment.damageFactor(shotMin(lvl)), augment.damageFactor(shotMax(lvl)));
 	}
 
 	//duelist ability: instantly reload
@@ -397,10 +397,14 @@ public class MagicBullet extends EgoWeapon {
 
 		@Override
 		public void detach() {
+			super.detach();
+			//recalculate FOV right away so the cells go dark even if the hero is resting
+			if (target == Dungeon.hero && Dungeon.level != null){
+				Dungeon.observe();
+			}
 			for (int cell : cells){
 				GameScene.updateFog(cell, 1);
 			}
-			super.detach();
 		}
 
 		private static final String CELLS = "cells";
