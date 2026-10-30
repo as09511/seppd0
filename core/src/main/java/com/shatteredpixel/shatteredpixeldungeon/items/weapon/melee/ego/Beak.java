@@ -59,7 +59,7 @@ public class Beak extends EgoGun {
 	@Override
 	public int max(int lvl) {
 		return  9 +             //9 base, down from 15
-				2*lvl;          //+2 per level, down from +3
+				lvl*(tier+1);   //scaling unchanged
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class Beak extends EgoGun {
 	@Override
 	public int shotMax(int lvl) {
 		return  7 +             //7 base
-				2*lvl;          //+2 per level
+				lvl*(tier+1);   //+3 per level, same as other tier 2 weapons
 	}
 
 	@Override

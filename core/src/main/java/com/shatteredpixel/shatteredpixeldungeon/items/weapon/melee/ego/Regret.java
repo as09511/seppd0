@@ -57,9 +57,9 @@ public class Regret extends EgoWeapon {
 
 	@Override
 	protected int egoProc(Char attacker, Char defender, int damage) {
-		//half of the dealt damage splashes onto enemies in the 4 cells around the target
-		int splash = damage / 2;
-		if (splash > 0 && attacker == Dungeon.hero){
+		//enemies in the 4 cells around the target take half of the damage this weapon would deal to them,
+		//calculated separately for each of them (own damage roll, armor and damage multiplier)
+		if (attacker == Dungeon.hero){
 			ArrayList<Char> targets = new ArrayList<>();
 			for (int n : PathFinder.NEIGHBOURS4){
 				Char ch = Actor.findChar(defender.pos + n);
@@ -68,7 +68,11 @@ public class Regret extends EgoWeapon {
 				}
 			}
 			for (Char ch : targets){
-				ch.damage(DamageType.apply(ch, damageType, splash), attacker);
+				int splash = Math.max(0, attacker.damageRoll() - ch.drRoll());
+				splash = DamageType.apply(ch, damageType, splash) / 2;
+				if (splash > 0) {
+					ch.damage(splash, attacker);
+				}
 			}
 		}
 		return damage;
