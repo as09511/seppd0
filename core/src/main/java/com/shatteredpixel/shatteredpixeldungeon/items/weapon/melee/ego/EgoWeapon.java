@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.EgoText;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
@@ -102,10 +103,13 @@ public abstract class EgoWeapon extends MeleeWeapon {
 	//risk level and damage type replace the tier in the stats line, tier is kept for balancing
 	@Override
 	protected String statsLine(boolean known) {
+		//uses the game's own translated sentence, with the tier swapped for the risk level and the damage type added
+		String template = EgoText.withDamageType(EgoText.riskTemplate(
+				Messages.get(MeleeWeapon.class, known ? "stats_known" : "stats_unknown")));
 		if (known){
-			return Messages.get(EgoWeapon.class, "stats_known", risk.coloredTitle(), augment.damageFactor(min()), augment.damageFactor(max()), damageType.coloredName(), STRReq());
+			return Messages.format(template, risk.coloredTitle(), augment.damageFactor(min()), augment.damageFactor(max()), STRReq(), damageType.coloredName());
 		} else {
-			return Messages.get(EgoWeapon.class, "stats_unknown", risk.coloredTitle(), min(0), max(0), damageType.coloredName(), STRReq(0));
+			return Messages.format(template, risk.coloredTitle(), min(0), max(0), STRReq(0), damageType.coloredName());
 		}
 	}
 }

@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items.armor.ego;
 
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.EgoText;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 
@@ -50,10 +51,12 @@ public abstract class EgoArmor extends Armor {
 	//risk level replaces the tier in the absorb line, tier is kept for balancing
 	@Override
 	protected String absorbLine(boolean known) {
+		//uses the game's own translated sentence, with the tier swapped for the risk level
+		String template = EgoText.riskTemplate(Messages.get(Armor.class, known ? "curr_absorb" : "avg_absorb"));
 		if (known){
-			return Messages.get(EgoArmor.class, "curr_absorb", risk.coloredTitle(), DRMin(), DRMax(), STRReq());
+			return Messages.format(template, risk.coloredTitle(), DRMin(), DRMax(), STRReq());
 		} else {
-			return Messages.get(EgoArmor.class, "avg_absorb", risk.coloredTitle(), DRMin(0), DRMax(0), STRReq(0));
+			return Messages.format(template, risk.coloredTitle(), DRMin(0), DRMax(0), STRReq(0));
 		}
 	}
 
