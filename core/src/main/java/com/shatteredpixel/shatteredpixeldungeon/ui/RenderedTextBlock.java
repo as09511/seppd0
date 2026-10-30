@@ -29,6 +29,8 @@ import com.watabou.noosa.RenderedText;
 import com.watabou.noosa.ui.Component;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RenderedTextBlock extends Component {
 
@@ -40,6 +42,8 @@ public class RenderedTextBlock extends Component {
 	
 	protected String text;
 	protected String[] tokens = null;
+	//color of each token from {c:RRGGBB}text{/c} markup, -1 for none
+	protected int[] tokenColors = null;
 	protected ArrayList<RenderedText> words = new ArrayList<>();
 	protected boolean multiline = false;
 
@@ -69,9 +73,40 @@ public class RenderedTextBlock extends Component {
 
 		if (text != null && !text.equals("")) {
 			
-			tokens = Game.platform.splitforTextBlock(text, multiline);
+			splitColoredTokens(text);
 			
 			build();
+		}
+	}
+
+	//{c:RRGGBB}text{/c} colors the enclosed text, overriding highlighting
+	private static final Pattern COLOR_TAG = Pattern.compile("\\{c:([0-9a-fA-F]{6})\\}(.*?)\\{/c\\}", Pattern.DOTALL);
+
+	private void splitColoredTokens(String text){
+		ArrayList<String> toks = new ArrayList<>();
+		ArrayList<Integer> cols = new ArrayList<>();
+		Matcher m = COLOR_TAG.matcher(text);
+		int last = 0;
+		while (m.find()){
+			addTokens(text.substring(last, m.start()), -1, toks, cols);
+			addTokens(m.group(2), Integer.parseInt(m.group(1), 16), toks, cols);
+			last = m.end();
+		}
+		addTokens(text.substring(last), -1, toks, cols);
+
+		tokens = toks.toArray(new String[0]);
+		tokenColors = new int[cols.size()];
+		for (int i = 0; i < tokenColors.length; i++){
+			tokenColors[i] = cols.get(i);
+		}
+	}
+
+	private void addTokens(String segment, int color, ArrayList<String> toks, ArrayList<Integer> cols){
+		if (segment.isEmpty()) return;
+		for (String token : Game.platform.splitforTextBlock(segment, multiline)){
+			if (token.isEmpty()) continue;
+			toks.add(token);
+			cols.add(color);
 		}
 	}
 
@@ -84,6 +119,7 @@ public class RenderedTextBlock extends Component {
 		text = fullText.toString();
 
 		tokens = words;
+		tokenColors = null;
 		build();
 	}
 
@@ -115,7 +151,9 @@ public class RenderedTextBlock extends Component {
 		clear();
 		words = new ArrayList<>();
 		boolean highlighting = false;
-		for (String str : tokens){
+		for (int i = 0; i < tokens.length; i++){
+			String str = tokens[i];
+			int tokenColor = tokenColors != null && i < tokenColors.length ? tokenColors[i] : -1;
 
 			//if highlighting is enabled, '_' or '**' is used to toggle highlighting on or off
 			// the actual symbols are not rendered
@@ -128,7 +166,8 @@ public class RenderedTextBlock extends Component {
 			} else {
 				RenderedText word = new RenderedText(str, size);
 				
-				if (highlighting) word.hardlight(hightlightColor);
+				if (tokenColor != -1) word.hardlight(tokenColor);
+				else if (highlighting) word.hardlight(hightlightColor);
 				else if (color != -1) word.hardlight(color);
 				word.scale.set(zoom);
 				

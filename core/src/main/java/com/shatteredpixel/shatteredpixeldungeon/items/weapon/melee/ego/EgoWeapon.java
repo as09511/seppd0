@@ -103,9 +103,9 @@ public abstract class EgoWeapon extends MeleeWeapon {
 	@Override
 	protected String statsLine(boolean known) {
 		if (known){
-			return Messages.get(EgoWeapon.class, "stats_known", risk.title(), augment.damageFactor(min()), augment.damageFactor(max()), damageType.name(), STRReq());
+			return Messages.get(EgoWeapon.class, "stats_known", risk.coloredTitle(), augment.damageFactor(min()), augment.damageFactor(max()), damageType.coloredName(), STRReq());
 		} else {
-			return Messages.get(EgoWeapon.class, "stats_unknown", risk.title(), min(0), max(0), damageType.name(), STRReq(0));
+			return Messages.get(EgoWeapon.class, "stats_unknown", risk.coloredTitle(), min(0), max(0), damageType.coloredName(), STRReq(0));
 		}
 	}
 }

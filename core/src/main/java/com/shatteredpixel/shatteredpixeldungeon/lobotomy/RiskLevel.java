@@ -27,9 +27,28 @@ import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 //Lobotomy Corporation's risk levels, used by abnormalities and their E.G.O
 //This is only the displayed grade, item power is still balanced by tier
 public enum RiskLevel {
-	ZAYIN, TETH, HE, WAW, ALEPH;
+	ZAYIN   (0x8CE04A), //light green
+	TETH    (0x4A9CFF), //blue
+	HE      (0xFFE040), //yellow
+	WAW     (0xB060FF), //purple
+	ALEPH   (0xFF3030); //red
+
+	private final int color;
+
+	RiskLevel(int color){
+		this.color = color;
+	}
+
+	public int color(){
+		return color;
+	}
 
 	public String title(){
 		return Messages.get(RiskLevel.class, name());
+	}
+
+	//the title in its own color, see RenderedTextBlock
+	public String coloredTitle(){
+		return DamageType.colored(title(), color);
 	}
 }

@@ -56,6 +56,16 @@ public enum DamageType {
 		return new float[]{1f, 1f, 1f, 1f};
 	}
 
+	//text markup for RenderedTextBlock, colors the enclosed text
+	public static String colored(String text, int color){
+		return String.format("{c:%06X}%s{/c}", color & 0xFFFFFF, text);
+	}
+
+	//the type's name in its own color
+	public String coloredName(){
+		return colored(name(), color);
+	}
+
 	public static int apply(Char defender, DamageType type, int damage){
 		if (type == null) return damage;
 		defender.incomingDamageType = type;
@@ -69,12 +79,12 @@ public enum DamageType {
 		return true;
 	}
 
-	//e.g. "내성: RED 1.5 / WHITE 1.0 / BLACK 0.5 / PALE 2.0"
+	//e.g. "Resistance: RED 1.5 / WHITE 1.0 / BLACK 0.5 / PALE 2.0"
 	public static String multipliersDesc(float[] multipliers){
 		StringBuilder sb = new StringBuilder();
 		for (DamageType t : values()){
 			if (sb.length() > 0) sb.append(" / ");
-			sb.append(t.name()).append(" ").append(Messages.decimalFormat("0.0#", multipliers[t.ordinal()]));
+			sb.append(t.coloredName()).append(" ").append(Messages.decimalFormat("0.0#", multipliers[t.ordinal()]));
 		}
 		return Messages.get(DamageType.class, "resistance", sb.toString());
 	}

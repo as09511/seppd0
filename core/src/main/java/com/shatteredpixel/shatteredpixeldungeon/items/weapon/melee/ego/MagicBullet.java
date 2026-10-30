@@ -279,7 +279,7 @@ public class MagicBullet extends EgoWeapon {
 	@Override
 	public String statsInfo() {
 		int lvl = levelKnown ? buffedLvl() : 0;
-		return Messages.get(this, "stats_desc", augment.damageFactor(shotMin(lvl)), augment.damageFactor(shotMax(lvl)));
+		return Messages.get(this, "stats_desc", augment.damageFactor(shotMin(lvl)), augment.damageFactor(shotMax(lvl)), DamageType.BLACK.coloredName());
 	}
 
 	//duelist ability: instantly reload

@@ -51,9 +51,9 @@ public abstract class EgoArmor extends Armor {
 	@Override
 	protected String absorbLine(boolean known) {
 		if (known){
-			return Messages.get(EgoArmor.class, "curr_absorb", risk.title(), DRMin(), DRMax(), STRReq());
+			return Messages.get(EgoArmor.class, "curr_absorb", risk.coloredTitle(), DRMin(), DRMax(), STRReq());
 		} else {
-			return Messages.get(EgoArmor.class, "avg_absorb", risk.title(), DRMin(0), DRMax(0), STRReq(0));
+			return Messages.get(EgoArmor.class, "avg_absorb", risk.coloredTitle(), DRMin(0), DRMax(0), STRReq(0));
 		}
 	}
 
