@@ -270,6 +270,12 @@ public class MagicBullet extends EgoWeapon {
 		return ammo + "/" + MAX_AMMO;
 	}
 
+	//the quote always goes at the very bottom of the description
+	@Override
+	public String info() {
+		return super.info() + "\n\n" + Messages.get(this, "quote");
+	}
+
 	@Override
 	public String statsInfo() {
 		int lvl = levelKnown ? buffedLvl() : 0;
