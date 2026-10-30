@@ -82,6 +82,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingKn
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingSpike;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingStone;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DummySummoner;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.EgoExtractor;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.watabou.utils.DeviceCompat;
@@ -182,6 +183,10 @@ public enum HeroClass {
 		EgoExtractor extractor = new EgoExtractor();
 		extractor.collect();
 		Dungeon.quickslot.setSlot(0, extractor);
+
+		DummySummoner summoner = new DummySummoner();
+		summoner.collect();
+		Dungeon.quickslot.setSlot(1, summoner);
 	}
 
 	public Badges.Badge masteryBadge() {
