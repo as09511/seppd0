@@ -28,7 +28,6 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Spear;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
-import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
 //ALEPH, same as the glaive, eating whatever it kills to restore some health and hunger
@@ -74,10 +73,5 @@ public class Laughter extends EgoWeapon {
 	@Override
 	protected void egoAbility(Hero hero, Integer target, int dmgBoost) {
 		Spear.spikeAbility(hero, target, 1, dmgBoost, this);
-	}
-
-	@Override
-	public String statsInfo() {
-		return Messages.get(this, "stats_desc", healOnKill(levelKnown ? buffedLvl() : 0));
 	}
 }
