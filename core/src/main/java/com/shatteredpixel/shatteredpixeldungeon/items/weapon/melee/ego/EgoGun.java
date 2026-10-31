@@ -68,8 +68,8 @@ public abstract class EgoGun extends EgoWeapon {
 		Ballistica path = new Ballistica(hero.pos, target, Ballistica.PROJECTILE);
 		int cell = path.collisionPos;
 
-		//same sound as throwing a weapon
-		Sample.INSTANCE.play(Assets.Sounds.MISS, 0.6f, 0.6f, 1.5f);
+		//same sound as a throwing hammer hitting
+		Sample.INSTANCE.play(Assets.Sounds.HIT_CRUSH, 1f, 0.8f);
 		MagicMissile.boltFromChar(hero.sprite.parent, boltType(), hero.sprite, cell, new Callback() {
 			@Override
 			public void call() {
