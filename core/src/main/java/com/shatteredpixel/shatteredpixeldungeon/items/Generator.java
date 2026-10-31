@@ -193,6 +193,11 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SwordShar
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.InTheNameOfLoveAndHate;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Diffraction;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Lamp;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Justitia;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.GoldRush;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Mimicry;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.DaCapo;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Laughter;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.Bolas;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.FishingSpear;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ForceCube;
@@ -502,9 +507,14 @@ public class Generator {
 					Greataxe.class,
 					Greatshield.class,
 					Gauntlet.class,
-					WarScythe.class
+					WarScythe.class,
+					Justitia.class,
+					GoldRush.class,
+					Mimicry.class,
+					DaCapo.class,
+					Laughter.class
 			};
-			WEP_T5.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 2 };
+			WEP_T5.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1 };
 			WEP_T5.probs = WEP_T5.defaultProbs.clone();
 			
 			//see Generator.randomArmor

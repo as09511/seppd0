@@ -150,6 +150,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Sai;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Scimitar;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WornShortsword;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.EgoWeapon;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.GoldRush;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Lamp;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
@@ -673,6 +674,12 @@ public class Hero extends Char {
 		if (buff(HoldFast.class) != null){
 			dr += buff(HoldFast.class).armorBonus();
 		}
+
+		//the Golden Road trades armor for melee damage
+		GoldRush.GoldenRoad goldenRoad = buff(GoldRush.GoldenRoad.class);
+		if (goldenRoad != null){
+			dr = Math.max(0, dr - goldenRoad.armorPenalty());
+		}
 		
 		return dr;
 	}
@@ -691,6 +698,11 @@ public class Hero extends Char {
 			if (RingOfForce.unarmedGetsWeaponAugment(this)){
 				dmg = ((Weapon)belongings.attackingWeapon()).augment.damageFactor(dmg);
 			}
+		}
+
+		GoldRush.GoldenRoad goldenRoad = buff(GoldRush.GoldenRoad.class);
+		if (goldenRoad != null && !(wep instanceof MissileWeapon)){
+			dmg += goldenRoad.damageBonus();
 		}
 
 		PhysicalEmpower emp = buff(PhysicalEmpower.class);

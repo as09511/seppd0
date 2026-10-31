@@ -430,6 +430,11 @@ public class ItemSpriteSheet {
 	public static final int LOVE_AND_HATE        = EGO_WEAPONS_2+7;
 	public static final int DIFFRACTION          = EGO_WEAPONS_2+8;
 	public static final int LAMP                 = EGO_WEAPONS_2+9;
+	public static final int JUSTITIA             = EGO_WEAPONS_2+10;
+	public static final int GOLD_RUSH            = EGO_WEAPONS_2+11;
+	public static final int MIMICRY              = EGO_WEAPONS_2+12;
+	public static final int DA_CAPO              = EGO_WEAPONS_2+13;
+	public static final int LAUGHTER             = EGO_WEAPONS_2+14;
 	static{
 		assignItemRect(FROST_SPLINTER,       16, 16);
 		assignItemRect(LOGGING,              16, 16);
@@ -441,6 +446,11 @@ public class ItemSpriteSheet {
 		assignItemRect(LOVE_AND_HATE,        16, 16);
 		assignItemRect(DIFFRACTION,          16, 16);
 		assignItemRect(LAMP,                 16, 16);
+		assignItemRect(JUSTITIA,             16, 16);
+		assignItemRect(GOLD_RUSH,            16, 16);
+		assignItemRect(MIMICRY,              16, 16);
+		assignItemRect(DA_CAPO,              16, 16);
+		assignItemRect(LAUGHTER,             16, 16);
 	}
 
 	private static final int WANDS              =                           xy(1, 14);  //16 slots

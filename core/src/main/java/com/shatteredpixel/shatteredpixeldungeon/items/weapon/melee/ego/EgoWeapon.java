@@ -67,6 +67,11 @@ public abstract class EgoWeapon extends MeleeWeapon {
 	public void onAttackComplete(Hero hero, Char target, int targetPos, boolean hit){
 	}
 
+	//weapons that ignore the target's armor entirely, see Char.attack
+	public boolean ignoresArmor(){
+		return false;
+	}
+
 	//the damage type as shown in the description
 	protected String damageTypeName(){
 		return damageType.coloredName();

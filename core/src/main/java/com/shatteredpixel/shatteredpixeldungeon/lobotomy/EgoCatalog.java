@@ -42,6 +42,11 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SwordShar
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.InTheNameOfLoveAndHate;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Diffraction;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Lamp;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Justitia;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.GoldRush;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Mimicry;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.DaCapo;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Laughter;
 
 //every E.G.O equipment in the mod, add new E.G.O here
 public class EgoCatalog {
@@ -66,7 +71,12 @@ public class EgoCatalog {
 			SwordSharpenedWithTears.class,
 			InTheNameOfLoveAndHate.class,
 			Diffraction.class,
-			Lamp.class
+			Lamp.class,
+			Justitia.class,
+			GoldRush.class,
+			Mimicry.class,
+			DaCapo.class,
+			Laughter.class
 	};
 
 }
