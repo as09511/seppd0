@@ -441,58 +441,34 @@ public class Generator {
 			WEAPON.classes = new Class<?>[]{};
 			WEAPON.probs = new float[]{};
 			
+			//only E.G.O equipment drops, the original weapons and armor are kept in the VANILLA_ lists below
 			WEP_T1.classes = new Class<?>[]{
-					Baton.class,
-					MagesStaff.class,
-					Dagger.class,
-					Gloves.class,
-					Rapier.class,
-					Cudgel.class,
+					Baton.class
 			};
-			WEP_T1.defaultProbs = new float[]{ 2, 0, 2, 2, 2, 2 };
+			WEP_T1.defaultProbs = new float[]{ 1 };
 			WEP_T1.probs = WEP_T1.defaultProbs.clone();
 			
 			WEP_T2.classes = new Class<?>[]{
-					Shortsword.class,
-					HandAxe.class,
-					Spear.class,
-					Quarterstaff.class,
-					Dirk.class,
-					Sickle.class,
-					Pickaxe.class,
 					Penitence.class,
 					RedEyes.class,
 					Beak.class,
 					FragmentsFromSomewhere.class,
 					Regret.class
 			};
-			WEP_T2.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 0, 1, 1, 1, 1, 1 };
+			WEP_T2.defaultProbs = new float[]{ 1, 1, 1, 1, 1 };
 			WEP_T2.probs = WEP_T2.defaultProbs.clone();
 			
 			WEP_T3.classes = new Class<?>[]{
-					Sword.class,
-					Mace.class,
-					Scimitar.class,
-					RoundShield.class,
-					Sai.class,
-					Whip.class,
 					LifeForADaredevil.class,
 					FrostSplinter.class,
 					Logging.class,
 					Laetitia.class,
 					SolemnLament.class
 			};
-			WEP_T3.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1 };
+			WEP_T3.defaultProbs = new float[]{ 1, 1, 1, 1, 1 };
 			WEP_T3.probs = WEP_T3.defaultProbs.clone();
 			
 			WEP_T4.classes = new Class<?>[]{
-					Longsword.class,
-					BattleAxe.class,
-					Flail.class,
-					RunicBlade.class,
-					AssassinsBlade.class,
-					Crossbow.class,
-					Katana.class,
 					MagicBullet.class,
 					Hornet.class,
 					Echo.class,
@@ -501,41 +477,28 @@ public class Generator {
 					Diffraction.class,
 					Lamp.class
 			};
-			WEP_T4.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1 };
+			WEP_T4.defaultProbs = new float[]{ 1, 1, 1, 1, 1, 1, 1 };
 			WEP_T4.probs = WEP_T4.defaultProbs.clone();
 			
 			WEP_T5.classes = new Class<?>[]{
-					Greatsword.class,
-					WarHammer.class,
-					Glaive.class,
-					Greataxe.class,
-					Greatshield.class,
-					Gauntlet.class,
-					WarScythe.class,
 					Justitia.class,
 					GoldRush.class,
 					Mimicry.class,
 					DaCapo.class,
 					Laughter.class
 			};
-			WEP_T5.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1 };
+			WEP_T5.defaultProbs = new float[]{ 1, 1, 1, 1, 1 };
 			WEP_T5.probs = WEP_T5.defaultProbs.clone();
 			
-			//see Generator.randomArmor
+			//one armor per tier, see Generator.randomArmor and Generator.armorOfTier
 			ARMOR.classes = new Class<?>[]{
 					Suit.class,
-					LeatherArmor.class,
-					MailArmor.class,
-					ScaleArmor.class,
-					PlateArmor.class,
-					WarriorArmor.class,
-					MageArmor.class,
-					RogueArmor.class,
-					HuntressArmor.class,
-					DuelistArmor.class,
-					ClericArmor.class
+					RedEyesArmor.class,
+					MagicBulletArmor.class,
+					TearsArmor.class,
+					JustitiaArmor.class
 			};
-			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };
+			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1 };
 			
 			//see Generator.randomMissile
 			MISSILE.classes = new Class<?>[]{};
@@ -825,32 +788,42 @@ public class Generator {
 		return randomArmor(Dungeon.depth / 5);
 	}
 	
-	//E.G.O armor that can drop in place of the regular armor of each tier
-	private static final Class<?>[][] EGO_ARMOR_BY_TIER = new Class<?>[][]{
-			{},
-			{RedEyesArmor.class},
-			{MagicBulletArmor.class},
-			{TearsArmor.class},
-			{JustitiaArmor.class}
-	};
-
 	public static Armor randomArmor(int floorSet) {
 
 		floorSet = (int)GameMath.gate(0, floorSet, floorSetTierProbs.length-1);
-
-		int tier = Random.chances(floorSetTierProbs[floorSet]);
-		Class<?> cls = Category.ARMOR.classes[tier];
-		//the regular armor has a weight of 2, each E.G.O armor of that tier a weight of 1, like weapons
-		Class<?>[] ego = EGO_ARMOR_BY_TIER[tier];
-		int roll = Random.Int(2 + ego.length);
-		if (roll >= 2){
-			cls = ego[roll - 2];
-		}
-
-		Armor a = (Armor)Reflection.newInstance(cls);
+		
+		Armor a = (Armor)Reflection.newInstance(Category.ARMOR.classes[Random.chances(floorSetTierProbs[floorSet])]);
 		a.random();
 		return a;
 	}
+
+	//a new, unidentified armor of the given tier (1-5), used where the game used to create a specific armor
+	public static Armor armorOfTier(int tier){
+		tier = (int)GameMath.gate(1, tier, Category.ARMOR.classes.length);
+		return (Armor)Reflection.newInstance(Category.ARMOR.classes[tier-1]);
+	}
+
+	//the original Shattered Pixel Dungeon weapons and armor, no longer dropped or listed in the catalog
+	//kept here for reference
+	public static final Class<?>[] VANILLA_WEP_T1 = new Class<?>[]{
+			MagesStaff.class, Dagger.class, Gloves.class, Rapier.class, Cudgel.class
+	};
+	public static final Class<?>[] VANILLA_WEP_T2 = new Class<?>[]{
+			Shortsword.class, HandAxe.class, Spear.class, Quarterstaff.class, Dirk.class, Sickle.class, Pickaxe.class
+	};
+	public static final Class<?>[] VANILLA_WEP_T3 = new Class<?>[]{
+			Sword.class, Mace.class, Scimitar.class, RoundShield.class, Sai.class, Whip.class
+	};
+	public static final Class<?>[] VANILLA_WEP_T4 = new Class<?>[]{
+			Longsword.class, BattleAxe.class, Flail.class, RunicBlade.class, AssassinsBlade.class, Crossbow.class, Katana.class
+	};
+	public static final Class<?>[] VANILLA_WEP_T5 = new Class<?>[]{
+			Greatsword.class, WarHammer.class, Glaive.class, Greataxe.class, Greatshield.class, Gauntlet.class, WarScythe.class
+	};
+	public static final Class<?>[] VANILLA_ARMOR = new Class<?>[]{
+			LeatherArmor.class, MailArmor.class, ScaleArmor.class, PlateArmor.class,
+			WarriorArmor.class, MageArmor.class, RogueArmor.class, HuntressArmor.class, DuelistArmor.class, ClericArmor.class
+	};
 
 	public static final Category[] wepTiers = new Category[]{
 			Category.WEP_T1,

@@ -334,16 +334,16 @@ public class VaultLevel extends CityLevel {
 		switch (lootTier) {
 			default:
 			case 0:
-				loot = new LeatherArmor();
+				loot = Generator.armorOfTier(2);
 				break;
 			case 1:
-				loot = new MailArmor();
+				loot = Generator.armorOfTier(3);
 				break;
 			case 2:
-				loot = new ScaleArmor();
+				loot = Generator.armorOfTier(4);
 				break;
 			case 3:
-				loot = new PlateArmor();
+				loot = Generator.armorOfTier(5);
 				break;
 		}
 		//skip duplicate check, only 1 armor per tier atm anyway

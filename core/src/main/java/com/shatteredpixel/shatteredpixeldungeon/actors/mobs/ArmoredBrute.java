@@ -70,9 +70,9 @@ public class ArmoredBrute extends Brute {
 	@Override
 	public Item createLoot() {
 		if (Random.Int( 4 ) == 0) {
-			return new PlateArmor().random();
+			return Generator.armorOfTier(5).random();
 		}
-		return new ScaleArmor().random();
+		return Generator.armorOfTier(4).random();
 	}
 	
 	//similar to regular brute rate, but deteriorates much slower. 60 turns to death total.

@@ -229,25 +229,25 @@ public class ShopRoom extends SpecialRoom {
 		case 6: default:
 			w = (MeleeWeapon) Generator.random(Generator.wepTiers[1]);
 			m = (MissileWeapon) Generator.random(Generator.misTiers[1]);
-			itemsToSpawn.add( new LeatherArmor().identify(false) );
+			itemsToSpawn.add( Generator.armorOfTier(2).identify(false) );
 			break;
 			
 		case 11:
 			w = (MeleeWeapon) Generator.random(Generator.wepTiers[2]);
 			m = (MissileWeapon) Generator.random(Generator.misTiers[2]);
-			itemsToSpawn.add( new MailArmor().identify(false) );
+			itemsToSpawn.add( Generator.armorOfTier(3).identify(false) );
 			break;
 			
 		case 16:
 			w = (MeleeWeapon) Generator.random(Generator.wepTiers[3]);
 			m = (MissileWeapon) Generator.random(Generator.misTiers[3]);
-			itemsToSpawn.add( new ScaleArmor().identify(false) );
+			itemsToSpawn.add( Generator.armorOfTier(4).identify(false) );
 			break;
 
 		case 20: case 21:
 			w = (MeleeWeapon) Generator.random(Generator.wepTiers[4]);
 			m = (MissileWeapon) Generator.random(Generator.misTiers[4]);
-			itemsToSpawn.add( new PlateArmor().identify(false) );
+			itemsToSpawn.add( Generator.armorOfTier(5).identify(false) );
 			itemsToSpawn.add( new Torch() );
 			itemsToSpawn.add( new Torch() );
 			itemsToSpawn.add( new Torch() );
