@@ -415,8 +415,16 @@ public class ItemSpriteSheet {
 
 	private static final int EGO_ARMOR      =                               xy(12, 12); //5 slots
 	public static final int SUIT            = EGO_ARMOR+0;
+	public static final int RED_EYES_ARMOR  = EGO_ARMOR+1;
+	public static final int MAGIC_BULLET_ARMOR = EGO_ARMOR+2;
+	public static final int TEARS_ARMOR     = EGO_ARMOR+3;
+	public static final int JUSTITIA_ARMOR  = EGO_ARMOR+4;
 	static{
 		assignItemRect(SUIT,            16, 15);
+		assignItemRect(RED_EYES_ARMOR,  16, 15);
+		assignItemRect(MAGIC_BULLET_ARMOR, 16, 15);
+		assignItemRect(TEARS_ARMOR,     16, 15);
+		assignItemRect(JUSTITIA_ARMOR,  16, 15);
 	}
 
 	private static final int EGO_WEAPONS_2  =                               xy(1, 13);  //16 slots

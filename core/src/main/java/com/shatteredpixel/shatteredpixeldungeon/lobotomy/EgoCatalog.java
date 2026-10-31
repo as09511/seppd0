@@ -23,6 +23,10 @@
 package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.JustitiaArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MagicBulletArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.RedEyesArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.TearsArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Baton;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Beak;
@@ -58,7 +62,9 @@ public class EgoCatalog {
 			Penitence.class,
 			LifeForADaredevil.class,
 			MagicBullet.class,
+			MagicBulletArmor.class,
 			RedEyes.class,
+			RedEyesArmor.class,
 			Beak.class,
 			FragmentsFromSomewhere.class,
 			Regret.class,
@@ -69,10 +75,12 @@ public class EgoCatalog {
 			Hornet.class,
 			Echo.class,
 			SwordSharpenedWithTears.class,
+			TearsArmor.class,
 			InTheNameOfLoveAndHate.class,
 			Diffraction.class,
 			Lamp.class,
 			Justitia.class,
+			JustitiaArmor.class,
 			GoldRush.class,
 			Mimicry.class,
 			DaCapo.class,

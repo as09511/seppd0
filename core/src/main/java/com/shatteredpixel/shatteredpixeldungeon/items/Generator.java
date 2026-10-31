@@ -33,6 +33,10 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.PlateArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.RogueArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ScaleArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.WarriorArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.JustitiaArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MagicBulletArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.RedEyesArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.TearsArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
@@ -821,11 +825,29 @@ public class Generator {
 		return randomArmor(Dungeon.depth / 5);
 	}
 	
+	//E.G.O armor that can drop in place of the regular armor of each tier
+	private static final Class<?>[][] EGO_ARMOR_BY_TIER = new Class<?>[][]{
+			{},
+			{RedEyesArmor.class},
+			{MagicBulletArmor.class},
+			{TearsArmor.class},
+			{JustitiaArmor.class}
+	};
+
 	public static Armor randomArmor(int floorSet) {
 
 		floorSet = (int)GameMath.gate(0, floorSet, floorSetTierProbs.length-1);
-		
-		Armor a = (Armor)Reflection.newInstance(Category.ARMOR.classes[Random.chances(floorSetTierProbs[floorSet])]);
+
+		int tier = Random.chances(floorSetTierProbs[floorSet]);
+		Class<?> cls = Category.ARMOR.classes[tier];
+		//the regular armor has a weight of 2, each E.G.O armor of that tier a weight of 1, like weapons
+		Class<?>[] ego = EGO_ARMOR_BY_TIER[tier];
+		int roll = Random.Int(2 + ego.length);
+		if (roll >= 2){
+			cls = ego[roll - 2];
+		}
+
+		Armor a = (Armor)Reflection.newInstance(cls);
 		a.random();
 		return a;
 	}
