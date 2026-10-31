@@ -323,6 +323,11 @@ public class ItemSlot extends Button {
 		if (itemIcon != null) itemIcon.alpha( alpha );
 	}
 
+	//fades out just the item sprite, so any status text stays readable
+	public void dimSprite(){
+		sprite.alpha( DISABLED );
+	}
+
 	public void showExtraInfo( boolean show ){
 
 		if (show){

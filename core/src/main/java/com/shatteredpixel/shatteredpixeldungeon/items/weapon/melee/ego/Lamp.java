@@ -39,7 +39,9 @@ import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.Image;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 
@@ -92,6 +94,19 @@ public class Lamp extends EgoWeapon {
 			actions.add(AC_CHARM);
 		}
 		return actions;
+	}
+
+	//charming is used straight from the quickslot while equipped
+	@Override
+	public String defaultAction() {
+		if (Dungeon.hero != null && isEquipped(Dungeon.hero)){
+			return AC_CHARM;
+		}
+		return super.defaultAction();
+	}
+
+	public boolean onCooldown(){
+		return Dungeon.hero != null && Dungeon.hero.buff(CharmCooldown.class) != null;
 	}
 
 	@Override
@@ -156,13 +171,38 @@ public class Lamp extends EgoWeapon {
 		Mace.heavyBlowAbility(hero, target, 1, dmgBoost, this);
 	}
 
-	//counts down every turn so the number on the item stays current
+	//counts down every turn so the number on the item stays current, also shown as a buff icon
 	public static class CharmCooldown extends Buff {
 
 		private int left;
 
 		{
 			type = buffType.NEUTRAL;
+		}
+
+		@Override
+		public int icon() {
+			return BuffIndicator.HEART;
+		}
+
+		@Override
+		public void tintIcon(Image icon) {
+			icon.hardlight(0.6f, 0.6f, 0.6f);
+		}
+
+		@Override
+		public float iconFadePercent() {
+			return Math.max(0, (CHARM_COOLDOWN - left) / (float)CHARM_COOLDOWN);
+		}
+
+		@Override
+		public String iconTextDisplay() {
+			return Integer.toString(left);
+		}
+
+		@Override
+		public String desc() {
+			return Messages.get(this, "desc", left);
 		}
 
 		//the first turn of the cooldown passes one turn from now

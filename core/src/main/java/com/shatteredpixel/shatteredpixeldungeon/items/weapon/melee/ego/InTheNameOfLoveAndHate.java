@@ -38,9 +38,13 @@ import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTilemap;
+import com.shatteredpixel.shatteredpixeldungeon.ui.ActionIndicator;
+import com.shatteredpixel.shatteredpixeldungeon.ui.HeroIcon;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.Visual;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Callback;
@@ -176,6 +180,8 @@ public class InTheNameOfLoveAndHate extends EgoGun {
 		if (arcana < MAX_CHARGE){
 			arcana = Math.min(MAX_CHARGE, arcana + amount);
 			updateQuickslot();
+			ArcanaCharger charger = Dungeon.hero == null ? null : Dungeon.hero.buff(ArcanaCharger.class);
+			if (charger != null) charger.refreshAction();
 		}
 	}
 
@@ -286,6 +292,8 @@ public class InTheNameOfLoveAndHate extends EgoGun {
 
 		arcana = 0;
 		updateQuickslot();
+		ArcanaCharger charger = hero.buff(ArcanaCharger.class);
+		if (charger != null) charger.refreshAction();
 		Buff.prolong(hero, Weakness.class, WEAKNESS_DURATION);
 		Invisibility.dispel();
 		hero.spendAndNext(1f);
@@ -327,21 +335,77 @@ public class InTheNameOfLoveAndHate extends EgoGun {
 	}
 
 	//gives the equipped weapon 1 charge per turn, and goes away once it is no longer equipped
-	public static class ArcanaCharger extends Buff {
+	//once fully charged, the Arcana Slave can also be fired from the action button
+	public static class ArcanaCharger extends Buff implements ActionIndicator.Action {
 
 		{
 			type = buffType.NEUTRAL;
 		}
 
+		private InTheNameOfLoveAndHate weapon(){
+			if (target instanceof Hero && ((Hero) target).belongings.weapon() instanceof InTheNameOfLoveAndHate){
+				return (InTheNameOfLoveAndHate) ((Hero) target).belongings.weapon();
+			}
+			return null;
+		}
+
 		@Override
 		public boolean act() {
-			if (target instanceof Hero && ((Hero) target).belongings.weapon() instanceof InTheNameOfLoveAndHate){
-				((InTheNameOfLoveAndHate) ((Hero) target).belongings.weapon()).gainCharge(1);
+			InTheNameOfLoveAndHate wep = weapon();
+			if (wep != null){
+				wep.gainCharge(1);
+				refreshAction();
 				spend(TICK);
 			} else {
 				detach();
 			}
 			return true;
+		}
+
+		//shows the button while fully charged, without taking it over from another class ability
+		public void refreshAction(){
+			InTheNameOfLoveAndHate wep = weapon();
+			if (wep != null && wep.arcana >= MAX_CHARGE){
+				if (ActionIndicator.action == null) ActionIndicator.setAction(this);
+			} else {
+				ActionIndicator.clearAction(this);
+			}
+		}
+
+		@Override
+		public void fx(boolean on) {
+			if (on) refreshAction();
+		}
+
+		@Override
+		public void detach() {
+			super.detach();
+			ActionIndicator.clearAction(this);
+		}
+
+		@Override
+		public String actionName() {
+			return Messages.get(InTheNameOfLoveAndHate.class, "ac_arcana");
+		}
+
+		@Override
+		public Visual primaryVisual() {
+			InTheNameOfLoveAndHate wep = weapon();
+			if (wep == null) return new HeroIcon(this);
+			return new ItemSprite(wep);
+		}
+
+		@Override
+		public int indicatorColor() {
+			return 0xC8327E;
+		}
+
+		@Override
+		public void doAction() {
+			InTheNameOfLoveAndHate wep = weapon();
+			if (wep != null){
+				wep.execute((Hero) target, AC_ARCANA);
+			}
 		}
 	}
 

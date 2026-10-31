@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.Waterskin;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Lamp;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
@@ -303,8 +304,13 @@ public class QuickSlotButton extends Button {
 	}
 	
 	private void enableSlot() {
-		slot.enable(Dungeon.quickslot.isNonePlaceholder( slotNum )
-				&& (!Dungeon.hero.belongings.lostInventory() || Dungeon.quickslot.getItem(slotNum).keptThroughLostInventory()));
+		boolean enabled = Dungeon.quickslot.isNonePlaceholder( slotNum )
+				&& (!Dungeon.hero.belongings.lostInventory() || Dungeon.quickslot.getItem(slotNum).keptThroughLostInventory());
+		slot.enable(enabled);
+		//items with an ability on cooldown are dimmed, but can still be used to see how long is left
+		if (enabled && select(slotNum) instanceof Lamp && ((Lamp) select(slotNum)).onCooldown()){
+			slot.dimSprite();
+		}
 	}
 
 	public void slotMargins( int left, int top, int right, int bottom){
