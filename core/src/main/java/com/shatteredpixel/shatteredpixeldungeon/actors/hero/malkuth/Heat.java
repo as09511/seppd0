@@ -35,7 +35,7 @@ import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ActionIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
-import com.shatteredpixel.shatteredpixeldungeon.ui.HeroIcon;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIcon;
 import com.watabou.noosa.BitmapText;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.Visual;
@@ -137,9 +137,12 @@ public class Heat extends Buff implements ActionIndicator.Action {
 		return Messages.get(this, "action_name");
 	}
 
+	//a red arrow, like the adrenaline it gives
 	@Override
-	public int actionIcon() {
-		return HeroIcon.ELEMENTAL_STRIKE;
+	public Visual primaryVisual() {
+		BuffIcon icon = new BuffIcon(BuffIndicator.UPGRADE, true);
+		icon.hardlight(1f, 0f, 0f);
+		return icon;
 	}
 
 	@Override
@@ -153,7 +156,7 @@ public class Heat extends Buff implements ActionIndicator.Action {
 
 	@Override
 	public int indicatorColor() {
-		return 0xC8541E;
+		return 0xD8B020;
 	}
 
 	@Override

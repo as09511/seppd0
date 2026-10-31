@@ -889,6 +889,11 @@ public class Hero extends Char {
 		//calls to dungeon.observe will also update hero's local FOV.
 		fieldOfView = Dungeon.level.heroFOV;
 
+		//Malkuth's notebook recharges while carried
+		if (buff(MalkuthNotebook.NotebookRecharge.class) == null && belongings.getItem(MalkuthNotebook.class) != null){
+			Buff.affect(this, MalkuthNotebook.NotebookRecharge.class);
+		}
+
 		//Malkuth's subclass abilities
 		if (subClass == HeroSubClass.CONTROL_SEPHIRAH && buff(EmployeeCall.class) == null){
 			Buff.affect(this, EmployeeCall.class);

@@ -1033,8 +1033,8 @@ public abstract class Mob extends Char {
 
 		//worker bee: killing a burning enemy gives the notebook 0.1/0.2/0.3 of a charge
 		if (cause == Dungeon.hero && alignment == Alignment.ENEMY && Dungeon.hero.hasTalent(Talent.WORKER_BEE)
-				&& buff(Burning.class) != null && Dungeon.hero.belongings.artifact() instanceof MalkuthNotebook){
-			((MalkuthNotebook) Dungeon.hero.belongings.artifact()).directCharge(0.1f*Dungeon.hero.pointsInTalent(Talent.WORKER_BEE));
+				&& buff(Burning.class) != null && Dungeon.hero.belongings.getItem(MalkuthNotebook.class) != null){
+			Dungeon.hero.belongings.getItem(MalkuthNotebook.class).directCharge(0.1f*Dungeon.hero.pointsInTalent(Talent.WORKER_BEE));
 		}
 
 		//speed war: kills while hasted extend the haste by 1/2 turns

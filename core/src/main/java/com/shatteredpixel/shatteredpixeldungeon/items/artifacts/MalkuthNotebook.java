@@ -26,8 +26,8 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bless;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
@@ -38,16 +38,19 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.malkuth.EmployeeCall;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.malkuth.LCorpEmployee;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
-import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
+import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
+import com.watabou.utils.Bundle;
 
 import java.util.ArrayList;
 
 //Malkuth's starting item: grants a short burst of haste and a longer blessing
-public class MalkuthNotebook extends Artifact {
+//not an artifact, it works from the backpack and recharges while the hero carries it
+//(kept in the artifacts package so older saves still load it)
+public class MalkuthNotebook extends Item {
 
 	public static final String AC_USE = "USE";
 
@@ -56,14 +59,12 @@ public class MalkuthNotebook extends Artifact {
 	public static final int BASE_CHARGES = 2;
 	public static final int RECHARGE_TURNS = 50;
 
+	private int charge = BASE_CHARGES;
+	private float partialCharge = 0;
+	private int chargeCap = BASE_CHARGES;
+
 	{
 		image = ItemSpriteSheet.MALKUTH_NOTEBOOK;
-
-		levelCap = 0;
-
-		charge = BASE_CHARGES;
-		partialCharge = 0;
-		chargeCap = BASE_CHARGES;
 
 		defaultAction = AC_USE;
 
@@ -74,7 +75,7 @@ public class MalkuthNotebook extends Artifact {
 	@Override
 	public ArrayList<String> actions( Hero hero ) {
 		ArrayList<String> actions = super.actions( hero );
-		if (isEquipped( hero ) && !cursed && hero.buff(MagicImmune.class) == null) {
+		if (hero.buff(MagicImmune.class) == null) {
 			actions.add(AC_USE);
 		}
 		return actions;
@@ -89,17 +90,15 @@ public class MalkuthNotebook extends Artifact {
 
 		if (action.equals(AC_USE)) {
 
-			if (!isEquipped(hero))      GLog.i( Messages.get(Artifact.class, "need_to_equip") );
-			else if (cursed)            GLog.i( Messages.get(this, "cursed") );
-			else if (charge <= 0)       GLog.i( Messages.get(this, "no_charge") );
-			else {
+			if (charge <= 0) {
+				GLog.i( Messages.get(this, "no_charge") );
+			} else {
 				charge--;
 				updateQuickslot();
 
 				applyEffect(hero);
 				Sample.INSTANCE.play(Assets.Sounds.READ);
 				hero.sprite.operate(hero.pos);
-				Talent.onArtifactUsed(hero);
 
 				//TT2 protocol: no time spent, and +2/+3 also clears slowness, cripple and roots
 				int tt2 = hero.pointsInTalent(Talent.TT2_PROTOCOL);
@@ -177,12 +176,17 @@ public class MalkuthNotebook extends Artifact {
 		}
 	}
 
-	@Override
-	protected ArtifactBuff passiveBuff() {
-		return new NotebookRecharge();
+	//called every turn by the hero's recharge buff while the notebook is carried
+	public void recharge(Hero hero){
+		chargeCap = maxCharges(hero);
+		if (charge < chargeCap && hero.buff(MagicImmune.class) == null && Regeneration.regenOn()) {
+			directCharge(1f / rechargeTurns(hero));
+		} else if (charge >= chargeCap) {
+			partialCharge = 0;
+		}
 	}
 
-	//partial charges from talents like the worker bee
+	//partial charges from recharging and talents like the worker bee
 	public void directCharge(float amount){
 		if (charge < chargeCap) {
 			partialCharge += amount;
@@ -199,21 +203,18 @@ public class MalkuthNotebook extends Artifact {
 	}
 
 	@Override
-	public void charge(Hero target, float amount) {
-		if (cursed || target.buff(MagicImmune.class) != null) return;
+	public boolean isUpgradable() {
+		return false;
+	}
 
-		if (charge < chargeCap) {
-			partialCharge += 0.25f*amount;
-			while (partialCharge >= 1f) {
-				charge++;
-				partialCharge--;
-			}
-			if (charge >= chargeCap){
-				partialCharge = 0;
-				charge = chargeCap;
-			}
-			updateQuickslot();
-		}
+	@Override
+	public boolean isIdentified() {
+		return true;
+	}
+
+	@Override
+	public String status() {
+		return Messages.format( "%d/%d", charge, chargeCap );
 	}
 
 	@Override
@@ -225,22 +226,46 @@ public class MalkuthNotebook extends Artifact {
 		return desc;
 	}
 
-	public class NotebookRecharge extends ArtifactBuff {
+	@Override
+	public int value() {
+		return 0;
+	}
+
+	private static final String CHARGE = "charge";
+	private static final String PARTIAL = "partial_charge";
+	private static final String CHARGE_CAP = "charge_cap";
+
+	@Override
+	public void storeInBundle( Bundle bundle ) {
+		super.storeInBundle(bundle);
+		bundle.put(CHARGE, charge);
+		bundle.put(PARTIAL, partialCharge);
+		bundle.put(CHARGE_CAP, chargeCap);
+	}
+
+	@Override
+	public void restoreFromBundle( Bundle bundle ) {
+		super.restoreFromBundle(bundle);
+		if (bundle.contains(CHARGE_CAP)) chargeCap = bundle.getInt(CHARGE_CAP);
+		charge = bundle.getInt(CHARGE);
+		partialCharge = bundle.getFloat(PARTIAL);
+	}
+
+	//recharges any carried notebook every turn
+	public static class NotebookRecharge extends Buff {
+
+		{
+			type = buffType.NEUTRAL;
+			revivePersists = true;
+		}
 
 		@Override
 		public boolean act() {
-			chargeCap = maxCharges(target instanceof Hero ? (Hero) target : null);
-			if (charge < chargeCap && !cursed && target.buff(MagicImmune.class) == null && Regeneration.regenOn()) {
-				partialCharge += RingOfEnergy.artifactChargeMultiplier(target) / rechargeTurns(target instanceof Hero ? (Hero) target : null);
-				while (partialCharge >= 1f) {
-					charge++;
-					partialCharge--;
+			if (target instanceof Hero){
+				MalkuthNotebook notebook = ((Hero) target).belongings.getItem(MalkuthNotebook.class);
+				if (notebook != null){
+					notebook.recharge((Hero) target);
 				}
-				if (charge >= chargeCap){
-					partialCharge = 0;
-					charge = chargeCap;
-				}
-				updateQuickslot();
 			}
 			spend( TICK );
 			return true;

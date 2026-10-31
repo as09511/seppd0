@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.ui;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
+import com.watabou.noosa.ColorBlock;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.RenderedText;
 import com.watabou.noosa.ui.Component;
@@ -44,7 +45,12 @@ public class RenderedTextBlock extends Component {
 	protected String[] tokens = null;
 	//color of each token from {c:RRGGBB}text{/c} markup, -1 for none
 	protected int[] tokenColors = null;
+	//whether each token is inside {s}text{/s} markup, drawn with a line through it
+	protected boolean[] tokenStrikes = null;
 	protected ArrayList<RenderedText> words = new ArrayList<>();
+	//struck words and the lines drawn through them
+	private ArrayList<RenderedText> struckWords = new ArrayList<>();
+	private ArrayList<ColorBlock> strikeLines = new ArrayList<>();
 	protected boolean multiline = false;
 
 	private int size;
@@ -81,32 +87,49 @@ public class RenderedTextBlock extends Component {
 
 	//{c:RRGGBB}text{/c} colors the enclosed text, overriding highlighting
 	private static final Pattern COLOR_TAG = Pattern.compile("\\{c:([0-9a-fA-F]{6})\\}(.*?)\\{/c\\}", Pattern.DOTALL);
+	//{s}text{/s} draws a line through the enclosed text
+	private static final Pattern STRIKE_TAG = Pattern.compile("\\{s\\}(.*?)\\{/s\\}", Pattern.DOTALL);
 
 	private void splitColoredTokens(String text){
 		ArrayList<String> toks = new ArrayList<>();
 		ArrayList<Integer> cols = new ArrayList<>();
-		Matcher m = COLOR_TAG.matcher(text);
+		ArrayList<Boolean> strikes = new ArrayList<>();
+		Matcher s = STRIKE_TAG.matcher(text);
 		int last = 0;
-		while (m.find()){
-			addTokens(text.substring(last, m.start()), -1, toks, cols);
-			addTokens(m.group(2), Integer.parseInt(m.group(1), 16), toks, cols);
-			last = m.end();
+		while (s.find()){
+			addColoredTokens(text.substring(last, s.start()), false, toks, cols, strikes);
+			addColoredTokens(s.group(1), true, toks, cols, strikes);
+			last = s.end();
 		}
-		addTokens(text.substring(last), -1, toks, cols);
+		addColoredTokens(text.substring(last), false, toks, cols, strikes);
 
 		tokens = toks.toArray(new String[0]);
 		tokenColors = new int[cols.size()];
+		tokenStrikes = new boolean[strikes.size()];
 		for (int i = 0; i < tokenColors.length; i++){
 			tokenColors[i] = cols.get(i);
+			tokenStrikes[i] = strikes.get(i);
 		}
 	}
 
-	private void addTokens(String segment, int color, ArrayList<String> toks, ArrayList<Integer> cols){
+	private void addColoredTokens(String text, boolean strike, ArrayList<String> toks, ArrayList<Integer> cols, ArrayList<Boolean> strikes){
+		Matcher m = COLOR_TAG.matcher(text);
+		int last = 0;
+		while (m.find()){
+			addTokens(text.substring(last, m.start()), -1, strike, toks, cols, strikes);
+			addTokens(m.group(2), Integer.parseInt(m.group(1), 16), strike, toks, cols, strikes);
+			last = m.end();
+		}
+		addTokens(text.substring(last), -1, strike, toks, cols, strikes);
+	}
+
+	private void addTokens(String segment, int color, boolean strike, ArrayList<String> toks, ArrayList<Integer> cols, ArrayList<Boolean> strikes){
 		if (segment.isEmpty()) return;
 		for (String token : Game.platform.splitforTextBlock(segment, multiline)){
 			if (token.isEmpty()) continue;
 			toks.add(token);
 			cols.add(color);
+			strikes.add(strike);
 		}
 	}
 
@@ -120,6 +143,7 @@ public class RenderedTextBlock extends Component {
 
 		tokens = words;
 		tokenColors = null;
+		tokenStrikes = null;
 		build();
 	}
 
@@ -150,6 +174,8 @@ public class RenderedTextBlock extends Component {
 		
 		clear();
 		words = new ArrayList<>();
+		struckWords.clear();
+		strikeLines.clear();
 		boolean highlighting = false;
 		for (int i = 0; i < tokens.length; i++){
 			String str = tokens[i];
@@ -173,6 +199,13 @@ public class RenderedTextBlock extends Component {
 				
 				words.add(word);
 				add(word);
+
+				if (tokenStrikes != null && i < tokenStrikes.length && tokenStrikes[i]){
+					struckWords.add(word);
+					ColorBlock line = new ColorBlock(1, 1, 0xFFFFFFFF);
+					strikeLines.add(line);
+					add(line);
+				}
 				
 				if (height < word.height()) height = word.height();
 			}
@@ -192,6 +225,9 @@ public class RenderedTextBlock extends Component {
 		this.color = color;
 		for (RenderedText word : words) {
 			if (word != null) word.hardlight( color );
+		}
+		for (ColorBlock line : strikeLines) {
+			line.hardlight( color );
 		}
 	}
 	
@@ -319,6 +355,16 @@ public class RenderedTextBlock extends Component {
 					}
 				}
 			}
+		}
+
+		//lines through struck words, across the middle of each word
+		for (int i = 0; i < struckWords.size(); i++){
+			RenderedText word = struckWords.get(i);
+			ColorBlock line = strikeLines.get(i);
+			float thickness = Math.max(0.5f, word.height()/10f);
+			line.size(word.width(), thickness);
+			line.x = word.x;
+			line.y = word.y + word.height()*0.55f - thickness/2f;
 		}
 	}
 }

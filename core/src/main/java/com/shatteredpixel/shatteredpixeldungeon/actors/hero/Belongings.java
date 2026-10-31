@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.KindOfWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.KindofMisc;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MalkuthNotebook;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
@@ -41,6 +42,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.utils.Bundlable;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
 
@@ -198,10 +200,23 @@ public class Belongings implements Iterable<Item> {
 		armor = (Armor)bundle.get( ARMOR );
 		if (armor() != null)        armor().activate( owner );
 
-		artifact = (Artifact) bundle.get(ARTIFACT);
+		//Malkuth's notebook used to be an artifact, older saves may still have it equipped
+		Bundlable artifactItem = bundle.get(ARTIFACT);
+		if (artifactItem instanceof MalkuthNotebook){
+			backpack.items.add((MalkuthNotebook) artifactItem);
+			artifact = null;
+		} else {
+			artifact = (Artifact) artifactItem;
+		}
 		if (artifact() != null)     artifact().activate(owner);
 
-		misc = (KindofMisc) bundle.get(MISC);
+		Bundlable miscItem = bundle.get(MISC);
+		if (miscItem instanceof MalkuthNotebook){
+			backpack.items.add((MalkuthNotebook) miscItem);
+			misc = null;
+		} else {
+			misc = (KindofMisc) miscItem;
+		}
 		if (misc() != null)         misc().activate( owner );
 
 		ring = (Ring) bundle.get(RING);
