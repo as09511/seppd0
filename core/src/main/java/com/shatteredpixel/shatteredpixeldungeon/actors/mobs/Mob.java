@@ -52,6 +52,10 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.malkuth.Hornet;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.malkuth.WorkerBee;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bleeding;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MalkuthNotebook;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Burning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
@@ -1077,8 +1081,20 @@ public abstract class Mob extends Char {
 		}
 
 		boolean soulMarked = buff(SoulMark.class) != null;
+		//queen bee: enemies that bleed out after a hornet dash may rise as allied worker bees
+		boolean queenBee = alignment == Alignment.ENEMY && !(this instanceof Bee)
+				&& Dungeon.hero.hasTalent(Talent.QUEEN_BEE)
+				&& buff(Hornet.HornetSting.class) != null && buff(Bleeding.class) != null
+				&& Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.QUEEN_BEE);
 
 		super.die( cause );
+
+		if (queenBee){
+			WorkerBee bee = WorkerBee.spawnAt(pos);
+			if (bee != null && Dungeon.level.heroFOV[pos]){
+				bee.sprite.emitter().burst(Speck.factory(Speck.HEALING), 4);
+			}
+		}
 
 		if (!(this instanceof Wraith)
 				&& soulMarked

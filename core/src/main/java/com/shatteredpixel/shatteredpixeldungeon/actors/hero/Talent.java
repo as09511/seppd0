@@ -210,6 +210,12 @@ public enum Talent {
 	MOBILE_COMMAND(78, 3), SPEARHEAD_CHARGE(137, 3), TT2_PROTOCOL(80, 3),
 	//History Floor Librarian T3
 	MATCH_FLAME(53, 3), SPORE(110, 3), WORKER_BEE(44, 3),
+	//Muster Call T4
+	EMERGENCY_MUSTER(121, 4), MORALE_BOOST(146, 4), ALL_HANDS_MOVE(57, 4),
+	//Hornet T4
+	VENOM_STING(120, 4), WINGBEAT(145, 4), QUEEN_BEE(89, 4),
+	//Fourth Match T4
+	SPREADING_FLAMES(49, 4), UNDYING_EMBERS(50, 4), FADING_FLAME(84, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -487,6 +493,8 @@ public enum Talent {
 					return 154;
 				case CLERIC:
 					return 186;
+				case MALKUTH:
+					return 154; //borrowed for now
 			}
 		} else {
 			return icon;

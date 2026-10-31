@@ -38,6 +38,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.duelist.Fe
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.NaturesPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpectralBlades;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpiritHawk;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.malkuth.FourthMatch;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.malkuth.Hornet;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.malkuth.MusterCall;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.ElementalBlast;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.WarpBeacon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.WildMagic;
@@ -345,6 +348,8 @@ public enum HeroClass {
 				return new ArmorAbility[]{new Challenge(), new ElementalStrike(), new Feint()};
 			case CLERIC:
 				return new ArmorAbility[]{new AscendedForm(), new Trinity(), new PowerOfMany()};
+			case MALKUTH:
+				return new ArmorAbility[]{new MusterCall(), new Hornet(), new FourthMatch()};
 		}
 	}
 
