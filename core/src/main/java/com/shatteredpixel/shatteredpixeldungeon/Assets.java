@@ -280,6 +280,7 @@ public class Assets {
 		public static final String DUELIST  = "sprites/duelist.png";
 		public static final String CLERIC   = "sprites/cleric.png";
 		public static final String MALKUTH  = "sprites/malkuth.png";
+		public static final String LCORP_EMPLOYEE = "sprites/lcorp_employee.png";
 		public static final String AVATARS  = "sprites/avatars.png";
 		public static final String PET      = "sprites/pet.png";
 		public static final String AMULET   = "sprites/amulet.png";

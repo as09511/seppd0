@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 
 public class Bless extends FlavourBuff {
@@ -40,6 +42,32 @@ public class Bless extends FlavourBuff {
 	@Override
 	public float iconFadePercent() {
 		return Math.max(0, (DURATION - visualcooldown()) / DURATION);
+	}
+
+	//gaining bless from any source, see Buff.affect and Buff.prolong
+	@Override
+	protected void spend(float time) {
+		super.spend(time);
+		onGained(time);
+	}
+
+	@Override
+	protected void postpone(float time) {
+		super.postpone(time);
+		onGained(time);
+	}
+
+	private void onGained(float time){
+		//match flame: imbued with fire for 33/66/100% of the bless gained
+		if (time > 0 && target instanceof Hero && ((Hero) target).hasTalent(Talent.MATCH_FLAME)){
+			float duration = time * ((Hero) target).pointsInTalent(Talent.MATCH_FLAME) / 3f;
+			FireImbue imbue = target.buff(FireImbue.class);
+			if (imbue == null){
+				Buff.affect(target, FireImbue.class).set(duration);
+			} else {
+				imbue.set(Math.max(duration, imbue.remaining()));
+			}
+		}
 	}
 
 }

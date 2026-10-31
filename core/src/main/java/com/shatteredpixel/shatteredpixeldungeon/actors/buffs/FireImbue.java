@@ -58,6 +58,10 @@ public class FireImbue extends Buff {
 		left = bundle.getFloat( LEFT );
 	}
 
+	public float remaining(){
+		return left;
+	}
+
 	public void set( float duration ) {
 		this.left = duration;
 	}

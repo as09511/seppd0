@@ -26,12 +26,17 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bless;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Slow;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.malkuth.EmployeeCall;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.malkuth.LCorpEmployee;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -95,14 +100,39 @@ public class MalkuthNotebook extends Artifact {
 				Sample.INSTANCE.play(Assets.Sounds.READ);
 				hero.sprite.operate(hero.pos);
 				Talent.onArtifactUsed(hero);
-				hero.spendAndNext(1f);
+
+				//TT2 protocol: no time spent, and +2/+3 also clears slowness, cripple and roots
+				int tt2 = hero.pointsInTalent(Talent.TT2_PROTOCOL);
+				if (tt2 >= 2){
+					Buff.detach(hero, Slow.class);
+					Buff.detach(hero, Cripple.class);
+				}
+				if (tt2 >= 3){
+					Buff.detach(hero, Roots.class);
+				}
+				if (tt2 > 0){
+					hero.next();
+				} else {
+					hero.spendAndNext(1f);
+				}
 			}
 
 		}
 	}
 
 	public static float hasteDuration(Hero hero){
-		return HASTE_DURATION;
+		//+1/+2/+3 turns from the extra approval talent
+		return HASTE_DURATION + hero.pointsInTalent(Talent.EXTRA_APPROVAL);
+	}
+
+	//3 charges at +3 extra approval
+	public static int maxCharges(Hero hero){
+		return hero != null && hero.pointsInTalent(Talent.EXTRA_APPROVAL) >= 3 ? BASE_CHARGES + 1 : BASE_CHARGES;
+	}
+
+	//45/40/35 turns per charge with the efficient work talent
+	public static int rechargeTurns(Hero hero){
+		return RECHARGE_TURNS - (hero == null ? 0 : 5*hero.pointsInTalent(Talent.EFFICIENT_WORK));
 	}
 
 	public static float blessDuration(Hero hero){
@@ -120,11 +150,18 @@ public class MalkuthNotebook extends Artifact {
 		float bless = blessDuration(hero);
 		empower(hero, haste, bless);
 
+		//the control team's sephirah always shares the effect with her employee
+		EmployeeCall call = hero.buff(EmployeeCall.class);
+		LCorpEmployee employee = call == null ? null : call.employee();
+		if (employee != null){
+			empower(employee, haste, bless);
+		}
+
 		//joint command: allies within 2/3 tiles get the same effect
 		if (hero.hasTalent(Talent.JOINT_COMMAND)){
 			int range = 1 + hero.pointsInTalent(Talent.JOINT_COMMAND);
 			for (Char ch : Actor.chars()){
-				if (ch != hero && ch.alignment == Char.Alignment.ALLY
+				if (ch != hero && ch != employee && ch.alignment == Char.Alignment.ALLY
 						&& Dungeon.level.distance(hero.pos, ch.pos) <= range){
 					empower(ch, haste, bless);
 				}
@@ -143,6 +180,22 @@ public class MalkuthNotebook extends Artifact {
 	@Override
 	protected ArtifactBuff passiveBuff() {
 		return new NotebookRecharge();
+	}
+
+	//partial charges from talents like the worker bee
+	public void directCharge(float amount){
+		if (charge < chargeCap) {
+			partialCharge += amount;
+			while (partialCharge >= 1f) {
+				charge++;
+				partialCharge--;
+			}
+			if (charge >= chargeCap){
+				partialCharge = 0;
+				charge = chargeCap;
+			}
+			updateQuickslot();
+		}
 	}
 
 	@Override
@@ -167,7 +220,7 @@ public class MalkuthNotebook extends Artifact {
 	public String desc() {
 		String desc = super.desc();
 		if (Dungeon.hero != null){
-			desc += "\n\n" + Messages.get(this, "effect", (int)hasteDuration(Dungeon.hero), (int)blessDuration(Dungeon.hero), chargeCap, RECHARGE_TURNS);
+			desc += "\n\n" + Messages.get(this, "effect", (int)hasteDuration(Dungeon.hero), (int)blessDuration(Dungeon.hero), maxCharges(Dungeon.hero), rechargeTurns(Dungeon.hero));
 		}
 		return desc;
 	}
@@ -176,8 +229,9 @@ public class MalkuthNotebook extends Artifact {
 
 		@Override
 		public boolean act() {
+			chargeCap = maxCharges(target instanceof Hero ? (Hero) target : null);
 			if (charge < chargeCap && !cursed && target.buff(MagicImmune.class) == null && Regeneration.regenOn()) {
-				partialCharge += RingOfEnergy.artifactChargeMultiplier(target) / RECHARGE_TURNS;
+				partialCharge += RingOfEnergy.artifactChargeMultiplier(target) / rechargeTurns(target instanceof Hero ? (Hero) target : null);
 				while (partialCharge >= 1f) {
 					charge++;
 					partialCharge--;

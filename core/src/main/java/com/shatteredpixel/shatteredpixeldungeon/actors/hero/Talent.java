@@ -34,6 +34,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bless;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bleeding;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Burning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LostInventory;
@@ -202,6 +204,12 @@ public enum Talent {
 	THOROUGH_RECORDS(1), SWIFT_RESPONSE(130), OVERTIME(168), SAFETY_PROTOCOL(35),
 	//Malkuth T2
 	WORK_SNACK(164), EMERGENCY_MANUAL(135), JOINT_COMMAND(175), SPEED_WAR(7), SCROLL_FILING(165),
+	//Malkuth T3
+	EFFICIENT_WORK(134, 3), EXTRA_APPROVAL(73, 3),
+	//Control Team Sephirah T3
+	MOBILE_COMMAND(78, 3), SPEARHEAD_CHARGE(137, 3), TT2_PROTOCOL(80, 3),
+	//History Floor Librarian T3
+	MATCH_FLAME(53, 3), SPORE(110, 3), WORKER_BEE(44, 3),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -888,15 +896,18 @@ public enum Talent {
 	}
 
 	public static void onItemCollected( Hero hero, Item item ){
-		if (hero.pointsInTalent(THOROUGH_RECORDS) == 2 && (item instanceof Weapon || item instanceof Armor)){
-			item.cursedKnown = true;
-		}
 		if (hero.pointsInTalent(THIEFS_INTUITION) == 2){
 			if (item instanceof Ring) ((Ring) item).setKnown();
 		}
 	}
 
 	public static int onAttackProc( Hero hero, Char enemy, int dmg ){
+
+		//spore: 10/20/30% of the damage as bleeding on burning enemies
+		if (hero.hasTalent(SPORE) && enemy.buff(Burning.class) != null && dmg > 0){
+			int bleed = Math.round(dmg * 0.1f * hero.pointsInTalent(SPORE));
+			if (bleed > 0) Buff.affect(enemy, Bleeding.class).set(bleed);
+		}
 
 		if (hero.hasTalent(Talent.PROVOKED_ANGER)
 			&& hero.buff(ProvokedAngerTracker.class) != null){
@@ -1090,7 +1101,7 @@ public enum Talent {
 				Collections.addAll(tierTalents, CLEANSE, LIGHT_READING);
 				break;
 			case MALKUTH:
-				//tier 3 talents come with the subclasses
+				Collections.addAll(tierTalents, EFFICIENT_WORK, EXTRA_APPROVAL);
 				break;
 		}
 		for (Talent talent : tierTalents){
@@ -1156,8 +1167,11 @@ public enum Talent {
 			case PALADIN:
 				Collections.addAll(tierTalents, LAY_ON_HANDS, AURA_OF_PROTECTION, WALL_OF_LIGHT);
 				break;
-			case CONTROL_SEPHIRAH: case HISTORY_LIBRARIAN:
-				//not added yet
+			case CONTROL_SEPHIRAH:
+				Collections.addAll(tierTalents, MOBILE_COMMAND, SPEARHEAD_CHARGE, TT2_PROTOCOL);
+				break;
+			case HISTORY_LIBRARIAN:
+				Collections.addAll(tierTalents, MATCH_FLAME, SPORE, WORKER_BEE);
 				break;
 		}
 		for (Talent talent : tierTalents){
