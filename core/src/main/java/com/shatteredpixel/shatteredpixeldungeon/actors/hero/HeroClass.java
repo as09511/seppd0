@@ -81,6 +81,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Baton;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingKnife;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingSpike;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingStone;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.darts.Dart;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DummySummoner;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.EgoExtractor;
@@ -179,6 +180,7 @@ public enum HeroClass {
 
 		new PotionOfStrength().quantity(10).identify().collect();
 		new ScrollOfUpgrade().quantity(10).identify().collect();
+		new Dart().quantity(1).identify().collect();
 
 		EgoExtractor extractor = new EgoExtractor();
 		extractor.collect();

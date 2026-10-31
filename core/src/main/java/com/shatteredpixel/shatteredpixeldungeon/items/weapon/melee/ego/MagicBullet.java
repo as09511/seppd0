@@ -117,11 +117,6 @@ public class MagicBullet extends EgoGun {
 		hero.spendAndNext(delay);
 	}
 
-	//the ray sound of the shot is all that is heard
-	@Override
-	protected void shotHitSound(float pitch) {
-	}
-
 	//pierces every character and door until it hits a wall or other obstacle
 	private void normalShot(Hero hero, int target){
 		Ballistica path = new Ballistica(hero.pos, target, Ballistica.STOP_SOLID | Ballistica.IGNORE_SOFT_SOLID);

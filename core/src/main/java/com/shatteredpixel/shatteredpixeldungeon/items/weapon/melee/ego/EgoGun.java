@@ -68,8 +68,7 @@ public abstract class EgoGun extends EgoWeapon {
 		Ballistica path = new Ballistica(hero.pos, target, Ballistica.PROJECTILE);
 		int cell = path.collisionPos;
 
-		//same sound as a throwing hammer hitting
-		Sample.INSTANCE.play(Assets.Sounds.HIT_CRUSH, 1f, 0.8f);
+		fireSound();
 		MagicMissile.boltFromChar(hero.sprite.parent, boltType(), hero.sprite, cell, new Callback() {
 			@Override
 			public void call() {
@@ -91,9 +90,25 @@ public abstract class EgoGun extends EgoWeapon {
 	protected void onShotHit(Hero hero, Char ch, boolean hit){
 	}
 
-	//the sound of a bullet hitting, same as a dart by default
+	//firearms and bows sound different, everything added so far is a firearm
+	protected boolean isBow(){
+		return false;
+	}
+
+	//firearms sound like a throwing hammer hitting, bows like throwing a dart
+	protected void fireSound(){
+		if (isBow()){
+			Sample.INSTANCE.play(Assets.Sounds.MISS, 0.6f, 0.6f, 1.5f);
+		} else {
+			Sample.INSTANCE.play(Assets.Sounds.HIT_CRUSH, 1f, 0.8f);
+		}
+	}
+
+	//only bows make a sound on hit, the same as a dart hitting
 	protected void shotHitSound(float pitch){
-		Sample.INSTANCE.play(Assets.Sounds.HIT_ARROW, 1, pitch * 1.3f);
+		if (isBow()){
+			Sample.INSTANCE.play(Assets.Sounds.HIT_ARROW, 1, pitch * 1.3f);
+		}
 	}
 
 	public int ammo(){
