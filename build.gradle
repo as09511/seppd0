@@ -12,7 +12,7 @@ allprojects {
 
     ext {
         //mod name and app id, separate from Shattered Pixel Dungeon so both can be installed
-        appName = 'Lobotomy Pixel Dungeon'
+        appName = 'Sefirot Pixel Dungeon'
         appPackageName = 'com.seppd0.lobotomypixeldungeon'
 
         //Full releases gets +2 on version code, needed for an F-Droid quirk

@@ -266,6 +266,8 @@ public class Assets {
 			public static final String BACK_CLUSTERS = "splashes/title/back_clusters.png";
 			public static final String MID_MIXED     = "splashes/title/mid_mixed.png";
 			public static final String FRONT_SMALL   = "splashes/title/front_small.png";
+			public static final String SEFIROT_TREE  = "splashes/title/sefirot_tree.png";
+			public static final String SEFIROT_GLOW  = "splashes/title/sefirot_glow.png";
 		}
 	}
 

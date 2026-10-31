@@ -168,6 +168,8 @@ public class DesktopLauncher {
 			baseFileType = Files.FileType.Absolute;
 		}
 
+		migrateOldSaves( basePath, baseFileType, title );
+
 		config.setPreferencesConfig( basePath, baseFileType );
 		SPDSettings.set( new Lwjgl3Preferences( new Lwjgl3FileHandle(basePath + SPDSettings.DEFAULT_PREFS_FILE, baseFileType) ));
 		FileUtils.setDefaultFileProperties( baseFileType, basePath );
@@ -190,5 +192,34 @@ public class DesktopLauncher {
 				"icons/icon_64.png", "icons/icon_128.png", "icons/icon_256.png");
 
 		new Lwjgl3Application(new ShatteredPixelDungeon(new DesktopPlatformSupport()), config);
+	}
+
+	//the mod used to be called Lobotomy Pixel Dungeon, its saves are copied over once if the new folder doesn't exist yet
+	private static final String OLD_TITLE = "Lobotomy Pixel Dungeon";
+
+	private static void migrateOldSaves( String basePath, Files.FileType type, String title ){
+		if (title == null || title.equals(OLD_TITLE)) return;
+		try {
+			String root = type == Files.FileType.External ? System.getProperty("user.home") + "/" : "";
+			java.nio.file.Path newDir = java.nio.file.Paths.get(root + basePath);
+			String oldBase = basePath
+					.replace(title, OLD_TITLE)
+					.replace(title.toLowerCase(Locale.ROOT).replace(" ", "-"), OLD_TITLE.toLowerCase(Locale.ROOT).replace(" ", "-"));
+			java.nio.file.Path oldDir = java.nio.file.Paths.get(root + oldBase);
+			if (java.nio.file.Files.exists(newDir) || !java.nio.file.Files.isDirectory(oldDir)) return;
+			try (java.util.stream.Stream<java.nio.file.Path> paths = java.nio.file.Files.walk(oldDir)) {
+				for (java.nio.file.Path src : (Iterable<java.nio.file.Path>) paths::iterator) {
+					java.nio.file.Path dst = newDir.resolve(oldDir.relativize(src).toString());
+					if (java.nio.file.Files.isDirectory(src)) {
+						java.nio.file.Files.createDirectories(dst);
+					} else {
+						java.nio.file.Files.copy(src, dst);
+					}
+				}
+			}
+		} catch (Exception e) {
+			//not worth crashing over, the game just starts with fresh saves
+			e.printStackTrace();
+		}
 	}
 }

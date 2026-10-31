@@ -31,7 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.services.news.NewsArticle;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ExitButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
-import com.shatteredpixel.shatteredpixeldungeon.ui.TitleBackground;
+import com.shatteredpixel.shatteredpixeldungeon.ui.SefirotBackground;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RedButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
@@ -64,7 +64,7 @@ public class NewsScene extends PixelScene {
 		int h = Camera.main.height;
 		RectF insets = getCommonInsets();
 
-		TitleBackground BG = new TitleBackground(w, h);
+		SefirotBackground BG = new SefirotBackground( w, h );
 		add(BG);
 
 		w -= insets.left + insets.right;

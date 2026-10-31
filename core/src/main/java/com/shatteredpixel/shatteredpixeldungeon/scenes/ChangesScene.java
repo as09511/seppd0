@@ -29,7 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ExitButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
-import com.shatteredpixel.shatteredpixeldungeon.ui.TitleBackground;
+import com.shatteredpixel.shatteredpixeldungeon.ui.SefirotBackground;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ScrollPane;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
@@ -84,7 +84,7 @@ public class ChangesScene extends PixelScene {
 
 		RectF insets = getCommonInsets();
 
-		TitleBackground BG = new TitleBackground(w, h);
+		SefirotBackground BG = new SefirotBackground( w, h );
 		//background added later
 
 		w -= insets.left + insets.right;
