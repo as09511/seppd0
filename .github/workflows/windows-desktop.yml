@@ -1,0 +1,30 @@
+name: Windows desktop build
+
+on:
+  push:
+    branches: [ 'claude/**', 'main', 'master' ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # builds a folder with an .exe and its own Java runtime, no Java install needed to play
+      - name: Build Windows app image
+        shell: bash
+        run: ./gradlew --no-daemon :desktop:jpackageImage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lobotomy-pixel-dungeon-windows
+          path: desktop/build/jpackage/
+          if-no-files-found: error

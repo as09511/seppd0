@@ -59,6 +59,10 @@ public abstract class EgoWeapon extends MeleeWeapon {
 		return damage;
 	}
 
+	//called when the hero kills a mob while this weapon is equipped
+	public void onKill(Hero hero, Char killed){
+	}
+
 	protected static void healAttacker(Char attacker, int amount){
 		amount = Math.min(amount, attacker.HT - attacker.HP);
 		if (amount > 0 && attacker.isAlive()){

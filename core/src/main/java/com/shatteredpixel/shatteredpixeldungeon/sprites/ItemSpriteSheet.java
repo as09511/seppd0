@@ -419,7 +419,17 @@ public class ItemSpriteSheet {
 		assignItemRect(SUIT,            16, 15);
 	}
 
-	                                                                                    //16 free slots
+	private static final int EGO_WEAPONS_2  =                               xy(1, 13);  //16 slots
+	public static final int FROST_SPLINTER       = EGO_WEAPONS_2+0;
+	public static final int LOGGING              = EGO_WEAPONS_2+1;
+	public static final int LAETITIA             = EGO_WEAPONS_2+2;
+	public static final int SOLEMN_LAMENT        = EGO_WEAPONS_2+3;
+	static{
+		assignItemRect(FROST_SPLINTER,       16, 16);
+		assignItemRect(LOGGING,              16, 16);
+		assignItemRect(LAETITIA,             16, 16);
+		assignItemRect(SOLEMN_LAMENT,        16, 16);
+	}
 
 	private static final int WANDS              =                           xy(1, 14);  //16 slots
 	public static final int WAND_MAGIC_MISSILE  = WANDS+0;

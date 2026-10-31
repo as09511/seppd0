@@ -23,16 +23,9 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
-import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
-import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
-import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
-import com.watabou.noosa.audio.Sample;
-import com.watabou.utils.Callback;
 
 //TETH, a small pistol whose bullets stop at the first character they hit
 public class Beak extends EgoGun {
@@ -82,26 +75,6 @@ public class Beak extends EgoGun {
 	public int shotMax(int lvl) {
 		return  7 +             //7 base
 				lvl*(tier+1);   //+3 per level, same as other tier 2 weapons
-	}
-
-	@Override
-	protected void fireShot(Hero hero, int target) {
-		//shooting is affected by attack speed, just like melee attacks
-		float delay = hero.attackDelay();
-		Ballistica path = new Ballistica(hero.pos, target, Ballistica.PROJECTILE);
-		int cell = path.collisionPos;
-
-		Sample.INSTANCE.play(Assets.Sounds.HIT_CRUSH, 1f, 1.6f);
-		MagicMissile.boltFromChar(hero.sprite.parent, MagicMissile.SHAMAN_RED, hero.sprite, cell, new Callback() {
-			@Override
-			public void call() {
-				Char ch = Actor.findChar(cell);
-				if (ch != null && ch != hero){
-					shoot(hero, ch);
-				}
-				hero.spendAndNext(delay);
-			}
-		});
 	}
 
 }

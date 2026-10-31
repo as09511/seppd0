@@ -80,6 +80,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Lucky;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.EgoWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.darts.Dart;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Bestiary;
@@ -1021,6 +1022,11 @@ public abstract class Mob extends Char {
 	
 	@Override
 	public void die( Object cause ) {
+
+		//lets E.G.O weapons react to kills made by the hero while they are equipped
+		if (cause == Dungeon.hero && Dungeon.hero.belongings.weapon() instanceof EgoWeapon){
+			((EgoWeapon) Dungeon.hero.belongings.weapon()).onKill(Dungeon.hero, this);
+		}
 
 		if (cause == Chasm.class){
 			//50% chance to round up, 50% to round down

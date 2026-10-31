@@ -24,18 +24,22 @@ package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
+import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
+import com.watabou.utils.Callback;
 
 import java.util.ArrayList;
 
@@ -56,8 +60,36 @@ public abstract class EgoGun extends EgoWeapon {
 
 	public abstract int shotMax(int lvl);
 
-	//fires one bullet at the target cell, the gun has already used up the ammo and will spend the hero's turn
-	protected abstract void fireShot(Hero hero, int target);
+	//fires one bullet at the target cell, the gun has already used up the ammo
+	//by default the bullet stops at the first character it reaches and uses normal thrown weapon accuracy
+	protected void fireShot(Hero hero, int target){
+		//shooting is affected by attack speed, just like melee attacks
+		float delay = hero.attackDelay();
+		Ballistica path = new Ballistica(hero.pos, target, Ballistica.PROJECTILE);
+		int cell = path.collisionPos;
+
+		//same sound as throwing a weapon
+		Sample.INSTANCE.play(Assets.Sounds.MISS, 0.6f, 0.6f, 1.5f);
+		MagicMissile.boltFromChar(hero.sprite.parent, boltType(), hero.sprite, cell, new Callback() {
+			@Override
+			public void call() {
+				Char ch = Actor.findChar(cell);
+				if (ch != null && ch != hero){
+					onShotHit(hero, ch, shoot(hero, ch));
+				}
+				hero.spendAndNext(delay);
+			}
+		});
+	}
+
+	//the visual of the bullet in flight
+	protected int boltType(){
+		return MagicMissile.SHAMAN_RED;
+	}
+
+	//called after a bullet reaches a character, hit says whether it landed
+	protected void onShotHit(Hero hero, Char ch, boolean hit){
+	}
 
 	public int ammo(){
 		return ammo;

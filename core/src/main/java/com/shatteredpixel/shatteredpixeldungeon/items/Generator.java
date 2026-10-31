@@ -178,11 +178,15 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Whip;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Baton;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Beak;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.FragmentsFromSomewhere;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.FrostSplinter;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Laetitia;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.LifeForADaredevil;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Logging;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.MagicBullet;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Penitence;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyes;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Regret;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SolemnLament;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.Bolas;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.FishingSpear;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ForceCube;
@@ -457,9 +461,13 @@ public class Generator {
 					RoundShield.class,
 					Sai.class,
 					Whip.class,
-					LifeForADaredevil.class
+					LifeForADaredevil.class,
+					FrostSplinter.class,
+					Logging.class,
+					Laetitia.class,
+					SolemnLament.class
 			};
-			WEP_T3.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 1 };
+			WEP_T3.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1 };
 			WEP_T3.probs = WEP_T3.defaultProbs.clone();
 			
 			WEP_T4.classes = new Class<?>[]{

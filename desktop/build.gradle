@@ -124,6 +124,7 @@ dependencies {
     implementation "org.lwjgl:lwjgl-tinyfd:3.3.3:natives-linux"
     implementation "org.lwjgl:lwjgl-tinyfd:3.3.3:natives-linux-arm64"
 
-    implementation project(':services:updates:githubUpdates')
-    implementation project(':services:news:shatteredNews')
+    //the mod doesn't use Shattered Pixel Dungeon's update checker or news feed
+    implementation project(':services:updates:debugUpdates')
+    implementation project(':services:news:debugNews')
 }
