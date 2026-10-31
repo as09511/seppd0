@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.AlbinoSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.SheepSprite;
 
 //testing target with fixed damage multipliers, it never acts
@@ -75,6 +76,15 @@ public abstract class TrainingDummy extends Mob {
 	public static class PaleWeak extends TrainingDummy {
 		{
 			damageMultipliers = new float[]{1f, 1f, 1f, 2f};
+		}
+	}
+
+	//an ally with 1.0 to every damage type, summoned at half health to test healing
+	public static class Ally extends TrainingDummy {
+		{
+			spriteClass = AlbinoSprite.class;
+			alignment = Alignment.ALLY;
+			HP = HT/2;
 		}
 	}
 

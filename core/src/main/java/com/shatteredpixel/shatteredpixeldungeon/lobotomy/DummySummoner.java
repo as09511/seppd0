@@ -48,7 +48,8 @@ public class DummySummoner extends Item {
 	private static final Class<? extends TrainingDummy>[] DUMMIES = new Class[]{
 			TrainingDummy.Resistant.class,
 			TrainingDummy.Weak.class,
-			TrainingDummy.PaleWeak.class
+			TrainingDummy.PaleWeak.class,
+			TrainingDummy.Ally.class
 	};
 
 	{
