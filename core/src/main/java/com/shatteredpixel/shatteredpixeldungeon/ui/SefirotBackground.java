@@ -28,7 +28,8 @@ import com.watabou.noosa.Game;
 import com.watabou.noosa.Group;
 import com.watabou.noosa.Image;
 
-//Sefirot Pixel Dungeon's menu background: a dark gradient with the tree of the sephirot glowing behind it
+//Sefirot Pixel Dungeon's menu background: a dark crimson gradient with the qliphoth tree
+// (the tree of the sephirot, inverted and corrupted) glowing behind it
 public class SefirotBackground extends Group {
 
 	private static final int TREE_HEIGHT = 168;
@@ -39,7 +40,7 @@ public class SefirotBackground extends Group {
 	public SefirotBackground( int width, int height ){
 		super();
 
-		Image gradient = new Image(TextureCache.createGradient(0xFF1C2438, 0xFF141A2A, 0xFF0D111C, 0xFF080A12, 0xFF050609));
+		Image gradient = new Image(TextureCache.createGradient(0xFF2A1218, 0xFF1C0C11, 0xFF12080B, 0xFF0A0507, 0xFF050304));
 		gradient.angle = 90;
 		gradient.x = width;
 		gradient.scale.x = height/5f;
@@ -49,14 +50,14 @@ public class SefirotBackground extends Group {
 		float scale = height * 0.92f / TREE_HEIGHT;
 		if (scale >= 1) scale = (float)Math.floor(scale);
 
-		Image tree = new Image(Assets.Splashes.Title.SEFIROT_TREE);
+		Image tree = new Image(Assets.Splashes.Title.QLIPHOTH_TREE);
 		tree.scale.set(scale);
 		tree.x = (width - tree.width()) / 2f;
 		tree.y = (height - tree.height()) / 2f;
-		tree.alpha(0.35f);
+		tree.alpha(0.55f);
 		add(tree);
 
-		Image glow = new Image(Assets.Splashes.Title.SEFIROT_GLOW){
+		Image glow = new Image(Assets.Splashes.Title.QLIPHOTH_GLOW){
 			@Override
 			public void update() {
 				super.update();
