@@ -52,11 +52,13 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Waterskin;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HolyTome;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MalkuthNotebook;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.MagicalHolster;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.PotionBandolier;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.ScrollHolder;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.VelvetPouch;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.Food;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHaste;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHealing;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfInvisibility;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLiquidFlame;
@@ -96,6 +98,9 @@ public enum HeroClass {
 	HUNTRESS( HeroSubClass.SNIPER, HeroSubClass.WARDEN ),
 	DUELIST( HeroSubClass.CHAMPION, HeroSubClass.MONK ),
 	CLERIC( HeroSubClass.PRIEST, HeroSubClass.PALADIN ),
+
+	//Malkuth, the Control Team's sephirah
+	MALKUTH( HeroSubClass.CONTROL_SEPHIRAH, HeroSubClass.HISTORY_LIBRARIAN ),
 
 	//testing class, uses the warrior's sprite, talents and subclasses
 	TESTER( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR );
@@ -154,6 +159,10 @@ public enum HeroClass {
 				initCleric( hero );
 				break;
 
+			case MALKUTH:
+				initMalkuth( hero );
+				break;
+
 			case TESTER:
 				initTester( hero );
 				break;
@@ -168,6 +177,17 @@ public enum HeroClass {
 			}
 		}
 
+	}
+
+	private static void initMalkuth( Hero hero ) {
+		MalkuthNotebook notebook = new MalkuthNotebook();
+		(hero.belongings.artifact = notebook).identify();
+		hero.belongings.artifact.activate( hero );
+
+		Dungeon.quickslot.setSlot(0, notebook);
+
+		new PotionOfHaste().identify();
+		new PotionOfLiquidFlame().identify();
 	}
 
 	private static void initTester( Hero hero ) {
@@ -341,6 +361,8 @@ public enum HeroClass {
 				return Assets.Sprites.DUELIST;
 			case CLERIC:
 				return Assets.Sprites.CLERIC;
+			case MALKUTH:
+				return Assets.Sprites.MALKUTH;
 		}
 	}
 
@@ -358,6 +380,8 @@ public enum HeroClass {
 				return Assets.Splashes.DUELIST;
 			case CLERIC:
 				return Assets.Splashes.CLERIC;
+			case MALKUTH:
+				return Assets.Splashes.MALKUTH;
 		}
 	}
 	

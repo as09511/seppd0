@@ -48,7 +48,11 @@ public enum HeroSubClass {
 	MONK(HeroIcon.MONK),
 
 	PRIEST(HeroIcon.PRIEST),
-	PALADIN(HeroIcon.PALADIN);
+	PALADIN(HeroIcon.PALADIN),
+
+	//Malkuth, icons are borrowed for now
+	CONTROL_SEPHIRAH(HeroIcon.FREERUNNER),
+	HISTORY_LIBRARIAN(HeroIcon.BATTLEMAGE);
 
 	int icon;
 

@@ -105,6 +105,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.EtherealChains;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HolyTome;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HornOfPlenty;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MalkuthNotebook;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MasterThievesArmband;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.SkeletonKey;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TalismanOfForesight;
@@ -703,6 +704,12 @@ public class Hero extends Char {
 		GoldRush.GoldenRoad goldenRoad = buff(GoldRush.GoldenRoad.class);
 		if (goldenRoad != null && !(wep instanceof MissileWeapon)){
 			dmg += goldenRoad.damageBonus();
+		}
+
+		//swift response: +1~2/+2~3 melee damage while blessed
+		if (hasTalent(Talent.SWIFT_RESPONSE) && buff(Bless.class) != null && !(wep instanceof MissileWeapon)){
+			int pts = pointsInTalent(Talent.SWIFT_RESPONSE);
+			dmg += Random.NormalIntRange(pts, pts+1);
 		}
 
 		PhysicalEmpower emp = buff(PhysicalEmpower.class);
@@ -1715,6 +1722,13 @@ public class Hero extends Char {
 		int effectiveDamage = preHP - postHP;
 
 		if (effectiveDamage <= 0) return;
+
+		//emergency manual: the notebook's effect when dropping below 30% health, 150/100 turn cooldown
+		if (isAlive() && HP < HT*0.3f && hasTalent(Talent.EMERGENCY_MANUAL)
+				&& buff(Talent.EmergencyManualCooldown.class) == null){
+			MalkuthNotebook.applyEffect(this);
+			Buff.affect(this, Talent.EmergencyManualCooldown.class, 200 - 50*pointsInTalent(Talent.EMERGENCY_MANUAL));
+		}
 
 		if (buff(Challenge.DuelParticipant.class) != null){
 			buff(Challenge.DuelParticipant.class).addDamage(effectiveDamage);

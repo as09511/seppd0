@@ -443,6 +443,7 @@ public class ItemSpriteSheet {
 	public static final int MIMICRY              = EGO_WEAPONS_2+12;
 	public static final int DA_CAPO              = EGO_WEAPONS_2+13;
 	public static final int LAUGHTER             = EGO_WEAPONS_2+14;
+	public static final int MALKUTH_NOTEBOOK     = EGO_WEAPONS_2+15;
 	static{
 		assignItemRect(FROST_SPLINTER,       16, 16);
 		assignItemRect(LOGGING,              16, 16);
@@ -459,6 +460,7 @@ public class ItemSpriteSheet {
 		assignItemRect(MIMICRY,              16, 16);
 		assignItemRect(DA_CAPO,              16, 16);
 		assignItemRect(LAUGHTER,             16, 16);
+		assignItemRect(MALKUTH_NOTEBOOK,     16, 16);
 	}
 
 	private static final int WANDS              =                           xy(1, 14);  //16 slots

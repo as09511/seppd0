@@ -50,6 +50,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Terror;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.cleric.PowerOfMany;
@@ -1026,6 +1027,12 @@ public abstract class Mob extends Char {
 		//lets E.G.O weapons react to kills made by the hero while they are equipped
 		if (cause == Dungeon.hero && Dungeon.hero.belongings.weapon() instanceof EgoWeapon){
 			((EgoWeapon) Dungeon.hero.belongings.weapon()).onKill(Dungeon.hero, this);
+		}
+
+		//speed war: kills while hasted extend the haste by 1/2 turns
+		if (cause == Dungeon.hero && alignment == Alignment.ENEMY && Dungeon.hero.hasTalent(Talent.SPEED_WAR)
+				&& Dungeon.hero.buff(Haste.class) != null){
+			Dungeon.hero.buff(Haste.class).extend(Dungeon.hero.pointsInTalent(Talent.SPEED_WAR));
 		}
 
 		if (cause == Chasm.class){

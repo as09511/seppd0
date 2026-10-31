@@ -33,6 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bless;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LostInventory;
@@ -197,6 +198,11 @@ public enum Talent {
 	//Power of Many T4
 	BEAMING_RAY(183, 4), LIFE_LINK(184, 4), STASIS(185, 4),
 
+	//Malkuth T1, icons are borrowed from other classes for now
+	THOROUGH_RECORDS(1), SWIFT_RESPONSE(130), OVERTIME(168), SAFETY_PROTOCOL(35),
+	//Malkuth T2
+	WORK_SNACK(164), EMERGENCY_MANUAL(135), JOINT_COMMAND(175), SPEED_WAR(7), SCROLL_FILING(165),
+
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
 	//Ratmogrify T4
@@ -208,6 +214,16 @@ public enum Talent {
 		public float iconFadePercent() { return Math.max(0, visualcooldown() / 50); }
 	};
 	public static class LethalMomentumTracker extends FlavourBuff{};
+	public static class EmergencyManualCooldown extends FlavourBuff{
+		public int icon() { return BuffIndicator.TIME; }
+		public void tintIcon(Image icon) { icon.hardlight(0.8f, 0.2f, 0.2f); }
+		public float iconFadePercent() {
+			float max = Dungeon.hero == null ? 150 : 200 - 50*Dungeon.hero.pointsInTalent(EMERGENCY_MANUAL);
+			return Math.max(0, visualcooldown() / max);
+		}
+		public String iconTextDisplay() { return Integer.toString((int)visualcooldown()); }
+		public String desc() { return Messages.get(this, "desc", dispTurns(visualcooldown())); }
+	};
 	public static class StrikingWaveTracker extends FlavourBuff{};
 	public static class WandPreservationCounter extends CounterBuff{{revivePersists = true;}};
 	public static class EmpoweredStrikeTracker extends FlavourBuff{
@@ -594,6 +610,10 @@ public enum Talent {
 
 			}
 		}
+		if (hero.hasTalent(WORK_SNACK)){
+			//5/8 turns of bless
+			Buff.prolong(hero, Bless.class, 2 + 3*hero.pointsInTalent(WORK_SNACK));
+		}
 		if (hero.hasTalent(IRON_STOMACH)){
 			if (hero.cooldown() > 0) {
 				Buff.affect(hero, WarriorFoodImmunity.class, hero.cooldown());
@@ -684,6 +704,10 @@ public enum Talent {
 		float factor = 1f;
 
 		// Affected by both Warrior(1.75x/2.5x) and Duelist(2.5x/inst.) talents
+		// Malkuth: 1.75x/2.5x for weapons and armor
+		if (item instanceof MeleeWeapon || item instanceof Armor){
+			factor *= 1f + 0.75f*hero.pointsInTalent(THOROUGH_RECORDS);
+		}
 		if (item instanceof MeleeWeapon){
 			factor *= 1f + 1.5f*hero.pointsInTalent(ADVENTURERS_INTUITION); //instant at +2 (see onItemEquipped)
 			factor *= 1f + 0.75f*hero.pointsInTalent(VETERANS_INTUITION);
@@ -760,6 +784,10 @@ public enum Talent {
 	}
 
 	public static void onScrollUsed( Hero hero, int pos, float factor, Class<?extends Item> cls ){
+		if (hero.hasTalent(SCROLL_FILING)){
+			// 5/8 turns of bless
+			Buff.prolong(hero, Bless.class, factor * (2 + 3*hero.pointsInTalent(SCROLL_FILING)));
+		}
 		if (hero.hasTalent(INSCRIBED_POWER)){
 			// 2/3 empowered wand zaps
 			Buff.affect(hero, ScrollEmpower.class).reset((int) (factor * (1 + hero.pointsInTalent(INSCRIBED_POWER))));
@@ -860,6 +888,9 @@ public enum Talent {
 	}
 
 	public static void onItemCollected( Hero hero, Item item ){
+		if (hero.pointsInTalent(THOROUGH_RECORDS) == 2 && (item instanceof Weapon || item instanceof Armor)){
+			item.cursedKnown = true;
+		}
 		if (hero.pointsInTalent(THIEFS_INTUITION) == 2){
 			if (item instanceof Ring) ((Ring) item).setKnown();
 		}
@@ -994,6 +1025,9 @@ public enum Talent {
 			case CLERIC:
 				Collections.addAll(tierTalents, SATIATED_SPELLS, HOLY_INTUITION, SEARING_LIGHT, SHIELD_OF_LIGHT);
 				break;
+			case MALKUTH:
+				Collections.addAll(tierTalents, THOROUGH_RECORDS, SWIFT_RESPONSE, OVERTIME, SAFETY_PROTOCOL);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1023,6 +1057,9 @@ public enum Talent {
 			case CLERIC:
 				Collections.addAll(tierTalents, ENLIGHTENING_MEAL, RECALL_INSCRIPTION, SUNRAY, DIVINE_SENSE, BLESS);
 				break;
+			case MALKUTH:
+				Collections.addAll(tierTalents, WORK_SNACK, EMERGENCY_MANUAL, JOINT_COMMAND, SPEED_WAR, SCROLL_FILING);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1051,6 +1088,9 @@ public enum Talent {
 				break;
 			case CLERIC:
 				Collections.addAll(tierTalents, CLEANSE, LIGHT_READING);
+				break;
+			case MALKUTH:
+				//tier 3 talents come with the subclasses
 				break;
 		}
 		for (Talent talent : tierTalents){
@@ -1115,6 +1155,9 @@ public enum Talent {
 				break;
 			case PALADIN:
 				Collections.addAll(tierTalents, LAY_ON_HANDS, AURA_OF_PROTECTION, WALL_OF_LIGHT);
+				break;
+			case CONTROL_SEPHIRAH: case HISTORY_LIBRARIAN:
+				//not added yet
 				break;
 		}
 		for (Talent talent : tierTalents){
