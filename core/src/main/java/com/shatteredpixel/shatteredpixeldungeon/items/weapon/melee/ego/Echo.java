@@ -27,7 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
-//WAW, a bow with a single heavy arrow
+//WAW, a crossbow with a single heavy arrow, uses the bow sounds
 public class Echo extends EgoGun {
 
 	private static final int MAX_AMMO = 1;

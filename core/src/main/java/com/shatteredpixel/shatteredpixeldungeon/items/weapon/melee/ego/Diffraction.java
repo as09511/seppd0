@@ -32,13 +32,13 @@ import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
-//WAW, same stats as the assassin's blade
+//WAW, a hammer with a transparent head, same stats as the assassin's blade
 public class Diffraction extends EgoWeapon {
 
 	{
 		image = ItemSpriteSheet.DIFFRACTION;
-		hitSound = Assets.Sounds.HIT_STAB;
-		hitSoundPitch = 0.9f;
+		hitSound = Assets.Sounds.HIT_CRUSH;
+		hitSoundPitch = 1f;
 
 		risk = RiskLevel.WAW;
 		damageType = DamageType.WHITE;
