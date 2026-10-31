@@ -187,6 +187,12 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Penitence
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyes;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Regret;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SolemnLament;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Hornet;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Echo;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SwordSharpenedWithTears;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.InTheNameOfLoveAndHate;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Diffraction;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Lamp;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.Bolas;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.FishingSpear;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ForceCube;
@@ -478,9 +484,15 @@ public class Generator {
 					AssassinsBlade.class,
 					Crossbow.class,
 					Katana.class,
-					MagicBullet.class
+					MagicBullet.class,
+					Hornet.class,
+					Echo.class,
+					SwordSharpenedWithTears.class,
+					InTheNameOfLoveAndHate.class,
+					Diffraction.class,
+					Lamp.class
 			};
-			WEP_T4.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 2, 1 };
+			WEP_T4.defaultProbs = new float[]{ 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1 };
 			WEP_T4.probs = WEP_T4.defaultProbs.clone();
 			
 			WEP_T5.classes = new Class<?>[]{

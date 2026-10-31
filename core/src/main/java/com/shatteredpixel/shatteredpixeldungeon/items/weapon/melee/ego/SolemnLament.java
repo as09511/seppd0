@@ -95,7 +95,7 @@ public class SolemnLament extends EgoGun {
 	public String statsInfo() {
 		int lvl = levelKnown ? buffedLvl() : 0;
 		return Messages.get(this, "stats_desc", augment.damageFactor(shotMin(lvl)), augment.damageFactor(shotMax(lvl)),
-				DamageType.WHITE.coloredName(), DamageType.BLACK.coloredName(), MAX_AMMO);
+				DamageType.WHITE.coloredName(), DamageType.BLACK.coloredName());
 	}
 
 	@Override

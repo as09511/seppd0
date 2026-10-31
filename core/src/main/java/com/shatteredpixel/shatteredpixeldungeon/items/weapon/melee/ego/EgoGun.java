@@ -29,6 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
+import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
@@ -36,6 +37,8 @@ import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.MissileSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
@@ -69,7 +72,7 @@ public abstract class EgoGun extends EgoWeapon {
 		int cell = path.collisionPos;
 
 		fireSound();
-		MagicMissile.boltFromChar(hero.sprite.parent, boltType(), hero.sprite, cell, new Callback() {
+		Callback onArrival = new Callback() {
 			@Override
 			public void call() {
 				Char ch = Actor.findChar(cell);
@@ -78,7 +81,12 @@ public abstract class EgoGun extends EgoWeapon {
 				}
 				hero.spendAndNext(delay);
 			}
-		});
+		};
+		if (isBow()){
+			((MissileSprite) hero.sprite.parent.recycle(MissileSprite.class)).reset(hero.sprite, cell, new ArrowVFX(), onArrival);
+		} else {
+			MagicMissile.boltFromChar(hero.sprite.parent, boltType(), hero.sprite, cell, onArrival);
+		}
 	}
 
 	//the visual of the bullet in flight
@@ -88,6 +96,21 @@ public abstract class EgoGun extends EgoWeapon {
 
 	//called after a bullet reaches a character, hit says whether it landed
 	protected void onShotHit(Hero hero, Char ch, boolean hit){
+	}
+
+	//the damage type of a bullet that hits
+	protected DamageType shotDamageType(){
+		return damageType;
+	}
+
+	//bullet-only on-hit effects, after the damage type is applied
+	protected int shotProc(Char attacker, Char defender, int damage){
+		return damage;
+	}
+
+	//guns without a magazine never run out and cannot be reloaded
+	protected boolean usesAmmo(){
+		return true;
 	}
 
 	//firearms and bows sound different, everything added so far is a firearm
@@ -120,7 +143,7 @@ public abstract class EgoGun extends EgoWeapon {
 		ArrayList<String> actions = super.actions(hero);
 		if (isEquipped(hero)){
 			actions.add(AC_SHOOT);
-			actions.add(AC_RELOAD);
+			if (usesAmmo()) actions.add(AC_RELOAD);
 		}
 		return actions;
 	}
@@ -137,14 +160,14 @@ public abstract class EgoGun extends EgoWeapon {
 		if (action.equals(AC_SHOOT)){
 			if (!isEquipped(hero)){
 				GLog.w(Messages.get(this, "need_equip"));
-			} else if (ammo <= 0){
+			} else if (usesAmmo() && ammo <= 0){
 				//trying to fire an empty gun reloads it instead
 				reload(hero);
 			} else {
 				usesTargeting = true;
 				GameScene.selectCell(shooter);
 			}
-		} else if (action.equals(AC_RELOAD)){
+		} else if (action.equals(AC_RELOAD) && usesAmmo()){
 			if (!isEquipped(hero)){
 				GLog.w(Messages.get(this, "need_equip"));
 			} else if (ammo >= maxAmmo()){
@@ -176,8 +199,10 @@ public abstract class EgoGun extends EgoWeapon {
 				Hero hero = Dungeon.hero;
 				hero.busy();
 				hero.sprite.zap(cell);
-				ammo--;
-				updateQuickslot();
+				if (usesAmmo()) {
+					ammo--;
+					updateQuickslot();
+				}
 				Invisibility.dispel();
 				fireShot(hero, cell);
 			}
@@ -196,13 +221,13 @@ public abstract class EgoGun extends EgoWeapon {
 
 	@Override
 	public String status() {
-		return ammo + "/" + maxAmmo();
+		return usesAmmo() ? ammo + "/" + maxAmmo() : null;
 	}
 
 	@Override
 	public String statsInfo() {
 		int lvl = levelKnown ? buffedLvl() : 0;
-		return Messages.get(this, "stats_desc", augment.damageFactor(shotMin(lvl)), augment.damageFactor(shotMax(lvl)), damageType.coloredName(), maxAmmo());
+		return Messages.get(this, "stats_desc", augment.damageFactor(shotMin(lvl)), augment.damageFactor(shotMax(lvl)), damageTypeName());
 	}
 
 	//duelist ability: instantly reload
@@ -297,13 +322,21 @@ public abstract class EgoGun extends EgoWeapon {
 
 		@Override
 		public int proc(Char attacker, Char defender, int damage) {
-			damage = DamageType.apply(defender, gun.damageType, damage);
+			damage = DamageType.apply(defender, gun.shotDamageType(), damage);
+			damage = gun.shotProc(attacker, defender, damage);
 			return super.proc(attacker, defender, damage);
 		}
 
 		@Override
 		public void hitSound(float pitch) {
 			gun.shotHitSound(pitch);
+		}
+	}
+
+	//only used to show an arrow in flight for bows
+	public static class ArrowVFX extends Item {
+		{
+			image = ItemSpriteSheet.SPIRIT_ARROW;
 		}
 	}
 }

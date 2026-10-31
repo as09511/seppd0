@@ -76,6 +76,20 @@ public class Beam extends Image {
 			super(s, e, Effects.Type.HEALTH_RAY, 0.75f);
 		}
 	}
+
+	//a pink death ray 3 tiles thick (the texture is 8px, a tile is 16px), for the Arcana Slave E.G.O skill
+	public static class ArcanaRay extends Beam{
+		public ArcanaRay(PointF s, PointF e){
+			super(s, e, Effects.Type.DEATH_RAY, 0.75f);
+			hardlight(1f, 0.45f, 0.8f);
+		}
+
+		@Override
+		public void update() {
+			super.update();
+			scale.y *= 6;
+		}
+	}
 	
 	@Override
 	public void update() {

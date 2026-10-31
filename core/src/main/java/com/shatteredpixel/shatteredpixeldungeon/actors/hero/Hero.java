@@ -150,6 +150,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Sai;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Scimitar;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WornShortsword;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.EgoWeapon;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Lamp;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Document;
@@ -758,6 +759,7 @@ public class Hero extends Char {
 		if (RingOfForce.fightingUnarmed(this))  return true;
 		if (STR() < ((Weapon)w).STRReq())       return false;
 		if (w instanceof Flail)                 return false;
+		if (w instanceof Lamp)                  return false;
 
 		return super.canSurpriseAttack();
 	}
@@ -2379,10 +2381,15 @@ public class Hero extends Char {
 		boolean wasEnemy = attackTarget.alignment == Alignment.ENEMY
 				|| (attackTarget instanceof Mimic && attackTarget.alignment == Alignment.NEUTRAL);
 
+		int targetPos = attackTarget.pos;
 		boolean hit = attack(attackTarget);
 		
 		Invisibility.dispel();
 		spend( attackDelay() );
+
+		if (belongings.attackingWeapon() instanceof EgoWeapon){
+			((EgoWeapon) belongings.attackingWeapon()).onAttackComplete(this, attackTarget, targetPos, hit);
+		}
 
 		if (hit && subClass == HeroSubClass.GLADIATOR && wasEnemy){
 			Buff.affect( this, Combo.class ).hit(attackTarget);

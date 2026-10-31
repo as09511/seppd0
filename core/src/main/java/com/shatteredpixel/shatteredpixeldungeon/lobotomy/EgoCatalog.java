@@ -36,6 +36,12 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Penitence
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyes;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Regret;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SolemnLament;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Hornet;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Echo;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SwordSharpenedWithTears;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.InTheNameOfLoveAndHate;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Diffraction;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Lamp;
 
 //every E.G.O equipment in the mod, add new E.G.O here
 public class EgoCatalog {
@@ -54,7 +60,13 @@ public class EgoCatalog {
 			FrostSplinter.class,
 			Logging.class,
 			Laetitia.class,
-			SolemnLament.class
+			SolemnLament.class,
+			Hornet.class,
+			Echo.class,
+			SwordSharpenedWithTears.class,
+			InTheNameOfLoveAndHate.class,
+			Diffraction.class,
+			Lamp.class
 	};
 
 }

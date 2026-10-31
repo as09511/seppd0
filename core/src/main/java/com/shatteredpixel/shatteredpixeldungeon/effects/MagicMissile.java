@@ -75,6 +75,7 @@ public class MagicMissile extends Emitter {
 	public static final int POISON          = 16;
 	public static final int LIGHT_MISSILE   = 17;
 	public static final int SHAMAN_WHITE_PURPLE = 18;
+	public static final int PINK_MISSILE    = 19;
 
 	public static final int MAGIC_MISS_CONE = 100;
 	public static final int FROST_CONE      = 101;
@@ -196,6 +197,10 @@ public class MagicMissile extends Emitter {
 			case SHAMAN_ELMO:
 				size( 2 );
 				pour( ShamanParticle.ELMO, 0.01f );
+				break;
+			case PINK_MISSILE:
+				size( 4 );
+				pour( WhiteParticle.PINK, 0.01f );
 				break;
 			case SHAMAN_WHITE_PURPLE:
 				size( 2 );
@@ -543,6 +548,17 @@ public class MagicMissile extends Emitter {
 			@Override
 			public void emit( Emitter emitter, int index, float x, float y ) {
 				((WhiteParticle)emitter.recycle( WhiteParticle.class )).reset( x, y, 1f, 1f, 0.25f );
+			}
+			@Override
+			public boolean lightMode() {
+				return true;
+			}
+		};
+
+		public static final Emitter.Factory PINK = new Factory() {
+			@Override
+			public void emit( Emitter emitter, int index, float x, float y ) {
+				((WhiteParticle)emitter.recycle( WhiteParticle.class )).reset( x, y, 1f, 0.45f, 0.75f );
 			}
 			@Override
 			public boolean lightMode() {

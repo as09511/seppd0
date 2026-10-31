@@ -63,6 +63,15 @@ public abstract class EgoWeapon extends MeleeWeapon {
 	public void onKill(Hero hero, Char killed){
 	}
 
+	//called after each regular melee attack by the hero, whether it hit or not
+	public void onAttackComplete(Hero hero, Char target, int targetPos, boolean hit){
+	}
+
+	//the damage type as shown in the description
+	protected String damageTypeName(){
+		return damageType.coloredName();
+	}
+
 	protected static void healAttacker(Char attacker, int amount){
 		amount = Math.min(amount, attacker.HT - attacker.HP);
 		if (amount > 0 && attacker.isAlive()){
@@ -111,9 +120,9 @@ public abstract class EgoWeapon extends MeleeWeapon {
 		String template = EgoText.withDamageType(EgoText.riskTemplate(
 				Messages.get(MeleeWeapon.class, known ? "stats_known" : "stats_unknown")));
 		if (known){
-			return Messages.format(template, risk.coloredTitle(), augment.damageFactor(min()), augment.damageFactor(max()), STRReq(), damageType.coloredName());
+			return Messages.format(template, risk.coloredTitle(), augment.damageFactor(min()), augment.damageFactor(max()), STRReq(), damageTypeName());
 		} else {
-			return Messages.format(template, risk.coloredTitle(), min(0), max(0), STRReq(0), damageType.coloredName());
+			return Messages.format(template, risk.coloredTitle(), min(0), max(0), STRReq(0), damageTypeName());
 		}
 	}
 }
