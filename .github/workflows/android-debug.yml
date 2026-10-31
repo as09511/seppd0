@@ -1,7 +1,8 @@
 name: Android debug APK
 
-#not needed for now, run it manually from the Actions tab when an APK is wanted
 on:
+  push:
+    branches: [ 'claude/**', 'main', 'master' ]
   workflow_dispatch:
 
 jobs:
