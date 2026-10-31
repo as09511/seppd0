@@ -24,7 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.sprites;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.watabou.noosa.TextureFilm;
 
-//an L Corp employee: a cleric in a black suit, using the hero sprite layout
+//an L Corp employee: a fresh hire in a black suit with a baton, using the hero sprite layout
 public class LCorpEmployeeSprite extends MobSprite {
 
 	private static final int FRAME_WIDTH	= 12;

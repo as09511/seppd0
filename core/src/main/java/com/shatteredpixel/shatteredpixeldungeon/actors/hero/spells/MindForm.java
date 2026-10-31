@@ -27,7 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.cleric.Trinity;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HolyTome;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.WondrousResin;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.CursedWand;
@@ -151,7 +151,7 @@ public class MindForm extends ClericSpell {
 											}
 										});
 							}
-							((ClassArmor)Dungeon.hero.belongings.armor()).charge -= Trinity.trinityChargeUsePerEffect(wand.getClass());
+							Dungeon.hero.belongings.getItem(AbilityCrown.class).charge -= Trinity.trinityChargeUsePerEffect(wand.getClass());
 							wand.wandUsed();
 						}
 					});
@@ -159,7 +159,7 @@ public class MindForm extends ClericSpell {
 			} else if (thrown() != null){
 				MissileWeapon thrown = thrown();
 				thrown.cast(Dungeon.hero, target);
-				((ClassArmor)Dungeon.hero.belongings.armor()).charge -= Trinity.trinityChargeUsePerEffect(thrown.getClass());
+				Dungeon.hero.belongings.getItem(AbilityCrown.class).charge -= Trinity.trinityChargeUsePerEffect(thrown.getClass());
 			}
 		}
 

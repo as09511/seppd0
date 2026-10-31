@@ -38,7 +38,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.SpiritForm;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Enchanting;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClothArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.ChaliceOfBlood;
@@ -88,7 +88,7 @@ public class Trinity extends ArmorAbility {
 	private Bundlable spiritForm = null;
 
 	@Override
-	protected void activate(ClassArmor armor, Hero hero, Integer target) {
+	protected void activate(AbilityCrown armor, Hero hero, Integer target) {
 
 		if (bodyForm == null && mindForm == null && spiritForm == null){
 			GLog.w(Messages.get(this, "no_imbue"));
@@ -108,7 +108,7 @@ public class Trinity extends ArmorAbility {
 
 	public class WndUseTrinity extends WndTitledMessage {
 
-		public WndUseTrinity(ClassArmor armor) {
+		public WndUseTrinity(AbilityCrown armor) {
 			super(new HeroIcon(Trinity.this),
 					Messages.titleCase(Trinity.this.name()),
 					Messages.get(WndUseTrinity.class, "text"));

@@ -94,6 +94,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Dewdrop;
 import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap.Type;
+import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.KindOfWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
@@ -356,6 +357,13 @@ public class Hero extends Char {
 		STR = bundle.getInt( STRENGTH );
 
 		belongings.restoreFromBundle( bundle );
+
+		//old saves: the armor ability's charge used to live in the class armor
+		if (armorAbility != null && belongings.getItem(AbilityCrown.class) == null){
+			AbilityCrown crown = new AbilityCrown();
+			crown.charge = belongings.armor instanceof ClassArmor ? ((ClassArmor) belongings.armor).charge : 50;
+			belongings.backpack.items.add(crown);
+		}
 	}
 	
 	public static void preview( GamesInProgress.Info info, Bundle bundle ) {
@@ -892,6 +900,11 @@ public class Hero extends Char {
 		//Malkuth's notebook recharges while carried
 		if (buff(MalkuthNotebook.NotebookRecharge.class) == null && belongings.getItem(MalkuthNotebook.class) != null){
 			Buff.affect(this, MalkuthNotebook.NotebookRecharge.class);
+		}
+
+		//the forced weight charges the armor ability while carried
+		if (buff(AbilityCrown.Charger.class) == null && belongings.getItem(AbilityCrown.class) != null){
+			Buff.affect(this, AbilityCrown.Charger.class);
 		}
 
 		//Malkuth's subclass abilities

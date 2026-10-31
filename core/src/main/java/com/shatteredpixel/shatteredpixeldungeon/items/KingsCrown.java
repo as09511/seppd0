@@ -23,17 +23,16 @@ package com.shatteredpixel.shatteredpixeldungeon.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.Ratmogrify;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
-import com.shatteredpixel.shatteredpixeldungeon.sprites.HeroSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndChooseAbility;
@@ -68,11 +67,7 @@ public class KingsCrown extends Item {
 		if (action.equals(AC_WEAR)) {
 
 			curUser = hero;
-			if (hero.belongings.armor() != null){
-				GameScene.show( new WndChooseAbility(this, hero.belongings.armor(), hero));
-			} else {
-				GLog.w( Messages.get(this, "naked"));
-			}
+			GameScene.show( new WndChooseAbility(this, hero.belongings.armor(), hero));
 			
 		}
 	}
@@ -96,34 +91,35 @@ public class KingsCrown extends Item {
 		hero.spend(Actor.TICK);
 		hero.busy();
 
-		if (armor != null){
-
-			if (ability instanceof Ratmogrify){
-				GLog.p(Messages.get(this, "ratgraded"));
-			} else {
-				GLog.p(Messages.get(this, "upgraded"));
-			}
-
-			ClassArmor classArmor = ClassArmor.upgrade(hero, armor);
-			if (hero.belongings.armor == armor) {
-
-				hero.belongings.armor = classArmor;
-				((HeroSprite) hero.sprite).updateArmor();
-				classArmor.activate(hero);
-
-			} else {
-
-				armor.detach(hero.belongings.backpack);
-				classArmor.collect(hero.belongings.backpack);
-
-			}
+		if (ability instanceof Ratmogrify){
+			GLog.p(Messages.get(this, "ratgraded"));
+		} else {
+			GLog.p(Messages.get(this, "upgraded"));
 		}
+
+		//the armor is left as it is, the ability's charge lives in the forced weight instead
+		giveAbilityCrown(hero);
 
 		hero.armorAbility = ability;
 		Talent.initArmorTalents(hero);
 
 		hero.sprite.operate( hero.pos );
 		Sample.INSTANCE.play( Assets.Sounds.MASTERY );
+	}
+
+	//gives the hero the item that holds their armor ability's charge, if they don't have one already
+	public static AbilityCrown giveAbilityCrown( Hero hero ){
+		AbilityCrown crown = hero.belongings.getItem(AbilityCrown.class);
+		if (crown == null){
+			crown = new AbilityCrown();
+			crown.charge = 50;
+			if (!crown.collect(hero.belongings.backpack)){
+				hero.belongings.backpack.items.add(crown);
+			}
+		}
+		Buff.affect(hero, AbilityCrown.Charger.class);
+		Item.updateQuickslot();
+		return crown;
 	}
 
 }

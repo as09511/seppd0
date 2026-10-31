@@ -35,7 +35,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.HeroIcon;
@@ -61,7 +61,7 @@ public class MusterCall extends ArmorAbility {
 	}
 
 	@Override
-	protected void activate(ClassArmor armor, Hero hero, Integer target) {
+	protected void activate(AbilityCrown armor, Hero hero, Integer target) {
 
 		armor.charge -= chargeUse(hero);
 		Item.updateQuickslot();
@@ -99,9 +99,9 @@ public class MusterCall extends ArmorAbility {
 			Buff.prolong(ch, Haste.class, hasteDuration(hero));
 			Buff.prolong(ch, Bless.class, blessDuration(hero));
 
-			//morale boost: heals 5%/10%/15%/20% of max health
+			//morale boost: heals 7.5%/15%/22.5%/30% of max health
 			if (hero.hasTalent(Talent.MORALE_BOOST)){
-				int heal = Math.round(ch.HT * 0.05f * hero.pointsInTalent(Talent.MORALE_BOOST));
+				int heal = Math.round(ch.HT * 0.075f * hero.pointsInTalent(Talent.MORALE_BOOST));
 				heal = Math.min(heal, ch.HT - ch.HP);
 				if (heal > 0){
 					ch.HP += heal;

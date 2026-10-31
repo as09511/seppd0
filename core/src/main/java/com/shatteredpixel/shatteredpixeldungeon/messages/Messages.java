@@ -63,7 +63,9 @@ public class Messages {
 	 * Setup Methods
 	 */
 
+	//the mod's strings come first, so they can override the original text
 	private static String[] prop_files = new String[]{
+			Assets.Messages.LOBOTOMY,
 			Assets.Messages.ACTORS,
 			Assets.Messages.ITEMS,
 			Assets.Messages.JOURNAL,
@@ -72,8 +74,7 @@ public class Messages {
 			Assets.Messages.PLANTS,
 			Assets.Messages.SCENES,
 			Assets.Messages.UI,
-			Assets.Messages.WINDOWS,
-			Assets.Messages.LOBOTOMY
+			Assets.Messages.WINDOWS
 	};
 
 	static{

@@ -30,7 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.cleric.Trinity;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Wraith;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
@@ -191,7 +191,7 @@ public class SpiritForm extends ClericSpell {
 
 	}
 
-	public static void applyActiveArtifactEffect(ClassArmor armor, Artifact effect){
+	public static void applyActiveArtifactEffect(AbilityCrown armor, Artifact effect){
 		if (effect instanceof AlchemistsToolkit){
 			Talent.onArtifactUsed(Dungeon.hero);
 			AlchemyScene.assignToolkit((AlchemistsToolkit) effect);

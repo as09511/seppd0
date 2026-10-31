@@ -34,7 +34,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -81,7 +81,7 @@ public class Hornet extends ArmorAbility {
 	}
 
 	@Override
-	protected void activate(ClassArmor armor, Hero hero, Integer target) {
+	protected void activate(AbilityCrown armor, Hero hero, Integer target) {
 		if (target == null){
 			return;
 		}
@@ -136,7 +136,7 @@ public class Hornet extends ArmorAbility {
 					if (!ch.isAlive()) continue;
 					hero.attack(ch, 1f, 0, Char.INFINITE_ACCURACY);
 					if (ch.isAlive()){
-						Buff.affect(ch, Bleeding.class).set(Math.max(1, hero.damageRoll()/2f), Hornet.class);
+						Buff.affect(ch, Bleeding.class).set(Math.max(1, hero.damageRoll()*0.33f), Hornet.class);
 						Buff.prolong(ch, HornetSting.class, HornetSting.DURATION);
 						if (hero.hasTalent(Talent.VENOM_STING)){
 							Buff.prolong(ch, Vulnerable.class, 2f*hero.pointsInTalent(Talent.VENOM_STING));

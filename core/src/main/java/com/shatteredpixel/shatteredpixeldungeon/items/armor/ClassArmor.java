@@ -32,7 +32,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.cleric.Trinity;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
+import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.KingsCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -194,17 +196,13 @@ abstract public class ClassArmor extends Armor {
 
 		if (action.equals(AC_ABILITY)){
 
+			//old saves only: the ability now lives in the forced weight, this just forwards to it
 			if (hero.armorAbility == null){
 				GameScene.show(new WndChooseAbility(null, this, hero));
-			} else if (!isEquipped( hero )) {
-				usesTargeting = false;
-				GLog.w( Messages.get(this, "not_equipped") );
-			} else if (charge < hero.armorAbility.chargeUse(hero)) {
-				usesTargeting = false;
-				GLog.w( Messages.get(this, "low_charge") );
-			} else  {
-				usesTargeting = hero.armorAbility.useTargeting();
-				hero.armorAbility.use(this, hero);
+			} else {
+				AbilityCrown crown = KingsCrown.giveAbilityCrown(hero);
+				crown.execute(hero, action);
+				usesTargeting = crown.usesTargeting;
 			}
 			
 		} else if (action.equals(AC_TRANSFER)){
