@@ -91,6 +91,11 @@ public abstract class EgoGun extends EgoWeapon {
 	protected void onShotHit(Hero hero, Char ch, boolean hit){
 	}
 
+	//the sound of a bullet hitting, same as a dart by default
+	protected void shotHitSound(float pitch){
+		Sample.INSTANCE.play(Assets.Sounds.HIT_ARROW, 1, pitch * 1.3f);
+	}
+
 	public int ammo(){
 		return ammo;
 	}
@@ -279,6 +284,11 @@ public abstract class EgoGun extends EgoWeapon {
 		public int proc(Char attacker, Char defender, int damage) {
 			damage = DamageType.apply(defender, gun.damageType, damage);
 			return super.proc(attacker, defender, damage);
+		}
+
+		@Override
+		public void hitSound(float pitch) {
+			gun.shotHitSound(pitch);
 		}
 	}
 }

@@ -35,8 +35,8 @@ public class Beak extends EgoGun {
 
 	{
 		image = ItemSpriteSheet.BEAK;
-		hitSound = Assets.Sounds.HIT_CRUSH;
-		hitSoundPitch = 1.2f;
+		hitSound = Assets.Sounds.HIT;
+		hitSoundPitch = 1f;
 
 		risk = RiskLevel.TETH;
 		damageType = DamageType.RED;

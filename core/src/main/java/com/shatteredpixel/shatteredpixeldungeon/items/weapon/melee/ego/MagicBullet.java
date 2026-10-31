@@ -57,8 +57,8 @@ public class MagicBullet extends EgoGun {
 
 	{
 		image = ItemSpriteSheet.MAGIC_BULLET;
-		hitSound = Assets.Sounds.HIT_CRUSH;
-		hitSoundPitch = 0.9f;
+		hitSound = Assets.Sounds.HIT;
+		hitSoundPitch = 1f;
 
 		risk = RiskLevel.WAW;
 		damageType = DamageType.BLACK;
@@ -115,6 +115,11 @@ public class MagicBullet extends EgoGun {
 		}
 
 		hero.spendAndNext(delay);
+	}
+
+	//the ray sound of the shot is all that is heard
+	@Override
+	protected void shotHitSound(float pitch) {
 	}
 
 	//pierces every character and door until it hits a wall or other obstacle

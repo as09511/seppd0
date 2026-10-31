@@ -40,8 +40,8 @@ public class SolemnLament extends EgoGun {
 
 	{
 		image = ItemSpriteSheet.SOLEMN_LAMENT;
-		hitSound = Assets.Sounds.HIT_CRUSH;
-		hitSoundPitch = 1.2f;
+		hitSound = Assets.Sounds.HIT;
+		hitSoundPitch = 1f;
 
 		risk = RiskLevel.HE;
 		damageType = DamageType.WHITE;
@@ -78,7 +78,7 @@ public class SolemnLament extends EgoGun {
 
 	@Override
 	protected int boltType() {
-		return MagicMissile.SHAMAN_PURPLE;
+		return MagicMissile.SHAMAN_WHITE_PURPLE;
 	}
 
 	//the bullet's normal hit is WHITE, then a separate BLACK hit is rolled with its own armor and multiplier

@@ -74,6 +74,7 @@ public class MagicMissile extends Emitter {
 	public static final int ELMO            = 15;
 	public static final int POISON          = 16;
 	public static final int LIGHT_MISSILE   = 17;
+	public static final int SHAMAN_WHITE_PURPLE = 18;
 
 	public static final int MAGIC_MISS_CONE = 100;
 	public static final int FROST_CONE      = 101;
@@ -195,6 +196,10 @@ public class MagicMissile extends Emitter {
 			case SHAMAN_ELMO:
 				size( 2 );
 				pour( ShamanParticle.ELMO, 0.01f );
+				break;
+			case SHAMAN_WHITE_PURPLE:
+				size( 2 );
+				pour( ShamanParticle.WHITE_PURPLE, 0.01f );
 				break;
 			case ELMO:
 				size( 5 );
@@ -479,7 +484,16 @@ public class MagicMissile extends Emitter {
 				return true;
 			}
 		};
-		
+
+		//starts white instead of brown
+		public static final Emitter.Factory WHITE_PURPLE = new Factory() {
+			@Override
+			public void emit( Emitter emitter, int index, float x, float y ) {
+				((ShamanParticle)emitter.recycle( ShamanParticle.class ))
+						.reset( x, y, ColorMath.random(0xFFFFFF, 0xC8C8D8), ColorMath.random(0xBB33FF, 0x5E1A80) );
+			}
+		};
+
 		int startColor;
 		int endColor;
 		
@@ -491,12 +505,16 @@ public class MagicMissile extends Emitter {
 		}
 		
 		public void reset( float x, float y, int endColor ){
+			reset( x, y, ColorMath.random(0x805500, 0x332500), endColor );
+		}
+
+		public void reset( float x, float y, int startColor, int endColor ){
 			super.reset( x, y );
-			
+
 			size( 1 );
-			
+
 			this.endColor = endColor;
-			startColor = ColorMath.random(0x805500, 0x332500);
+			this.startColor = startColor;
 			
 			speed.set( Random.Float( -10, +10 ), Random.Float( -10, +10 ) );
 		}

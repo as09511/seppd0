@@ -35,7 +35,7 @@ public class Laetitia extends EgoGun {
 
 	{
 		image = ItemSpriteSheet.LAETITIA;
-		hitSound = Assets.Sounds.HIT_CRUSH;
+		hitSound = Assets.Sounds.HIT;
 		hitSoundPitch = 1f;
 
 		risk = RiskLevel.HE;
