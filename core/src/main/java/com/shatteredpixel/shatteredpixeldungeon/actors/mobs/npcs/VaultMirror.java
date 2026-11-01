@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -158,6 +159,10 @@ public class VaultMirror extends NPC {
 										Dungeon.level.drop(reward, c.pos).sprite.drop();
 									}
 									Imp.Quest.mirrorUsed = true;
+									//Yesod's scarf comes with full info while in the vault
+									if (reward instanceof YesodScarf && InfoPower.get() != null){
+										InfoPower.get().fillForVault();
+									}
 									reward = null;
 								}
 							}

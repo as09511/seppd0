@@ -54,6 +54,8 @@ public class InfoPower extends Buff {
 	}
 
 	private int info = 0;
+	//info held before the vault mirror's scarf filled it up, given back when leaving the vault
+	private int vaultSavedInfo = -1;
 	//kinds of enemies already killed this run
 	private HashSet<String> slainTypes = new HashSet<>();
 
@@ -100,6 +102,23 @@ public class InfoPower extends Buff {
 		return true;
 	}
 
+	//the vault mirror's scarf comes with full info, but only inside the vault
+	public void fillForVault(){
+		if (vaultSavedInfo < 0) vaultSavedInfo = info;
+		info = max((Hero)target);
+		BuffIndicator.refreshHero();
+		Item.updateQuickslot();
+	}
+
+	public void restoreAfterVault(){
+		if (vaultSavedInfo >= 0){
+			info = vaultSavedInfo;
+			vaultSavedInfo = -1;
+			BuffIndicator.refreshHero();
+			Item.updateQuickslot();
+		}
+	}
+
 	public static void onItemIdentified(){
 		gain(IDENTIFY_INFO);
 	}
@@ -129,18 +148,21 @@ public class InfoPower extends Buff {
 
 	private static final String INFO = "info";
 	private static final String SLAIN = "slain_types";
+	private static final String VAULT_SAVED = "vault_saved_info";
 
 	@Override
 	public void storeInBundle(Bundle bundle) {
 		super.storeInBundle(bundle);
 		bundle.put(INFO, info);
 		bundle.put(SLAIN, slainTypes.toArray(new String[0]));
+		bundle.put(VAULT_SAVED, vaultSavedInfo);
 	}
 
 	@Override
 	public void restoreFromBundle(Bundle bundle) {
 		super.restoreFromBundle(bundle);
 		info = bundle.getInt(INFO);
+		vaultSavedInfo = bundle.contains(VAULT_SAVED) ? bundle.getInt(VAULT_SAVED) : -1;
 		slainTypes.clear();
 		if (bundle.contains(SLAIN)){
 			slainTypes.addAll(Arrays.asList(bundle.getStringArray(SLAIN)));

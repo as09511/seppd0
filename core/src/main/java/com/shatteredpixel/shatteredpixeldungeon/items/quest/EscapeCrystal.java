@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.quest;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -256,6 +257,11 @@ public class EscapeCrystal extends Item {
 
 	private void leaveVault( Item preserve, int score ){
 		Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
+
+		//the full info from the vault mirror's scarf stays in the vault
+		if (Dungeon.hero.buff(InfoPower.class) != null){
+			Dungeon.hero.buff(InfoPower.class).restoreAfterVault();
+		}
 
 		Dungeon.hero.live(); //clears all non-persist buffs, resets hunger/regen
 		Dungeon.hero.HP = Dungeon.hero.HT; //full heal
