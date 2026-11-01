@@ -2715,10 +2715,6 @@ public class Hero extends Char {
 							//Yesod gathers info from the secrets he finds by searching
 							if (oldValue == Terrain.SECRET_TRAP || oldValue == Terrain.SECRET_DOOR){
 								InfoPower.gain(oldValue == Terrain.SECRET_TRAP ? InfoPower.SECRET_TRAP_INFO : InfoPower.SECRET_DOOR_INFO);
-								if (hasTalent(Talent.SECURITY_PROCEDURE)){
-									//3/5 shielding
-									Buff.affect(this, Barrier.class).incShield(1 + 2*pointsInTalent(Talent.SECURITY_PROCEDURE));
-								}
 							}
 	
 							if (talisman != null){

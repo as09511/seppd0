@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -1109,6 +1110,11 @@ public abstract class Level implements Bundlable {
 	}
 
 	public void discover( int cell ) {
+		//security procedure: revealing a secret in any way gives 3/5 shielding, which doesn't stack
+		if ((Terrain.flags[map[cell]] & Terrain.SECRET) != 0 && Dungeon.hero != null && Dungeon.hero.isAlive()
+				&& Dungeon.hero.hasTalent(Talent.SECURITY_PROCEDURE)){
+			Buff.affect(Dungeon.hero, Barrier.class).setShield(1 + 2*Dungeon.hero.pointsInTalent(Talent.SECURITY_PROCEDURE));
+		}
 		set( cell, Terrain.discover( map[cell] ) );
 		Trap trap = traps.get( cell );
 		if (trap != null)

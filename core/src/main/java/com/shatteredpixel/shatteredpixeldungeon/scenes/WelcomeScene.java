@@ -81,7 +81,11 @@ public class WelcomeScene extends PixelScene {
 			return;
 		}
 
-		if (ShatteredPixelDungeon.versionCode == previousVersion && !SPDSettings.intro()) {
+		//no update notice: after the first launch, a new version just updates its data quietly
+		if (previousVersion != 0 && !SPDSettings.intro()) {
+			if (previousVersion != ShatteredPixelDungeon.versionCode){
+				updateVersion(previousVersion);
+			}
 			ShatteredPixelDungeon.switchNoFade(TitleScene.class);
 			return;
 		}
