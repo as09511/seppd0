@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AllyBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.DirectableAlly;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.LCorpEmployeeSprite;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
 
@@ -65,6 +66,13 @@ public class LCorpEmployee extends DirectableAlly {
 			sprite.idle();
 		}
 		return result;
+	}
+
+	//L Corp's employees and worker bees deal RED damage; notebook bonus damage stays untyped
+	@Override
+	public int attackProc( Char enemy, int damage ) {
+		damage = DamageType.apply(enemy, DamageType.RED, damage);
+		return super.attackProc(enemy, damage);
 	}
 
 	@Override

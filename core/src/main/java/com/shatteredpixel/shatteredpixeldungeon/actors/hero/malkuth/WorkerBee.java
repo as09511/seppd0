@@ -27,6 +27,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Bee;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.watabou.utils.Bundle;
 
 //an allied bee raised by the queen bee talent from an enemy that bled to death after a hornet dash
@@ -51,6 +53,13 @@ public class WorkerBee extends Bee {
 		Buff.affect(bee, Lifespan.class, LIFESPAN);
 		Dungeon.level.occupyCell(bee);
 		return bee;
+	}
+
+	//L Corp's employees and worker bees deal RED damage; notebook bonus damage stays untyped
+	@Override
+	public int attackProc( Char enemy, int damage ) {
+		damage = DamageType.apply(enemy, DamageType.RED, damage);
+		return super.attackProc(enemy, damage);
 	}
 
 	@Override

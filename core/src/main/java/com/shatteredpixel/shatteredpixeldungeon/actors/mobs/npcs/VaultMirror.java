@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MalkuthNotebook;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HolyTome;
@@ -94,6 +95,9 @@ public class VaultMirror extends NPC {
 					reward = new HolyTome().upgrade(8).identify(false);
 					((HolyTome) reward).directCharge(8);
 					break;
+				case MALKUTH:
+					reward = new MalkuthNotebook().identify(false);
+					break;
 			}
 		Random.popGenerator();
 	}
@@ -125,6 +129,9 @@ public class VaultMirror extends NPC {
 								break;
 							case CLERIC:
 								sceneText += Messages.get(VaultMirror.class, "scene_cleric");
+								break;
+							case MALKUTH:
+								sceneText += Messages.get(VaultMirror.class, "scene_malkuth");
 								break;
 						}
 						sceneText += "\n\n" + Messages.get(VaultMirror.class, "scene_final");
