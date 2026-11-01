@@ -235,7 +235,7 @@ public enum Talent {
 	//Regret T4
 	MIN_CORRECTION(148, 4), RIPPLE(149, 4), PURSUIT(145, 4),
 	//Solemn Lament T4
-	COFFIN(113, 4), DEAD_BUTTERFLY(114, 4), LIVING_BUTTERFLY(115, 4),
+	COFFIN(94, 4), DEAD_BUTTERFLY(95, 4), LIVING_BUTTERFLY(123, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
