@@ -146,6 +146,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfLivingEarth;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Kinetic;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Crossbow;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Flail;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
@@ -1627,6 +1628,14 @@ public class Hero extends Char {
 			if (enemy.isAlive() && buff(Smite.SmiteTracker.class) != null) {
 				enemy.damage(Smite.bonusDmg(this, enemy), Smite.INSTANCE);
 			}
+		}
+
+		//Malkuth's notebook stores bonus damage in the kinetic buff; weapons without
+		//the kinetic enchantment (which handles it itself) spend it on this hit
+		if (heroClass == HeroClass.MALKUTH && buff(Kinetic.ConservedDamage.class) != null
+				&& buff(Kinetic.KineticTracker.class) == null){
+			damage += buff(Kinetic.ConservedDamage.class).damageBonus();
+			buff(Kinetic.ConservedDamage.class).detach();
 		}
 		
 		switch (subClass) {

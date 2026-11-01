@@ -39,6 +39,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.malkuth.EmployeeCall
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.malkuth.LCorpEmployee;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Kinetic;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
@@ -58,6 +59,7 @@ public class MalkuthNotebook extends Item {
 	public static final float BLESS_DURATION = 15f;
 	public static final int BASE_CHARGES = 2;
 	public static final int RECHARGE_TURNS = 50;
+	public static final int NEXT_HIT_BONUS = 10;
 
 	private int charge = BASE_CHARGES;
 	private float partialCharge = 0;
@@ -148,6 +150,10 @@ public class MalkuthNotebook extends Item {
 		float haste = hasteDuration(hero);
 		float bless = blessDuration(hero);
 		empower(hero, haste, bless);
+
+		//the hero's next hit deals extra damage, stored in the kinetic enchantment's buff
+		Kinetic.ConservedDamage conserved = Buff.affect(hero, Kinetic.ConservedDamage.class);
+		conserved.setBonus(Math.max(conserved.damageBonus(), NEXT_HIT_BONUS));
 
 		//the control team's sephirah always shares the effect with her employee
 		EmployeeCall call = hero.buff(EmployeeCall.class);
