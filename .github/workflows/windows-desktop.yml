@@ -1,4 +1,4 @@
-name: Windows desktop build
+name: Windows debug build
 
 on:
   push:
@@ -18,13 +18,15 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      # builds a folder with an .exe and its own Java runtime, no Java install needed to play
-      - name: Build Windows app image
+      # builds a folder with an .exe and its own Java runtime, no Java install needed to play.
+      # This is the debug build for testing (version ends in -INDEV: tester hero, all heroes unlocked);
+      # release builds come from the Release workflow instead.
+      - name: Build Windows debug app image
         shell: bash
-        run: ./gradlew --no-daemon :desktop:jpackageImage
+        run: ./gradlew --no-daemon -Pindev :desktop:jpackageImage
 
       - uses: actions/upload-artifact@v4
         with:
-          name: sefirot-pixel-dungeon-windows
+          name: sefirot-pixel-dungeon-windows-debug
           path: desktop/build/jpackage/
           if-no-files-found: error

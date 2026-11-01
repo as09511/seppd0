@@ -40,7 +40,8 @@ tasks.register('release', Jar) {
         attributes 'Main-Class': appMainClass
         attributes 'Specification-Title': appName
         attributes 'Implementation-Title': appPackageName
-        attributes 'Specification-Version': appVersionName
+        //-Pindev marks the build as a debug build (tester hero, all heroes unlocked), used for testing builds
+        attributes 'Specification-Version': appVersionName + (project.hasProperty('indev') ? '-INDEV' : '')
         attributes 'Implementation-Version': appVersionCode
     }
 }
