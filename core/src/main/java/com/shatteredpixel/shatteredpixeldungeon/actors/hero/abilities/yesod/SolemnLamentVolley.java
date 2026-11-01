@@ -150,7 +150,7 @@ public class SolemnLamentVolley extends ArmorAbility {
 
 	@Override
 	public int icon() {
-		return HeroIcon.SPECTRAL_BLADES;
+		return HeroIcon.SOLEMN_LAMENT;
 	}
 
 	@Override

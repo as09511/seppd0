@@ -229,7 +229,7 @@ public enum Talent {
 	//Information Team Sephirah T3
 	YESOD_FARSIGHT(107, 3), INFO_SPREAD(151, 3), VIPER_YESOD(91, 3),
 	//Technological Sciences Floor Librarian T3
-	VIOLENCE(13, 3), COMMISSION(76, 3), BLACK_FLAME(15, 3),
+	VIOLENCE(13, 3), COMMISSION(93, 3), BLACK_FLAME(92, 3),
 	//Abnormality Response Manual T4
 	EXTENDED_MANUAL(151, 4), DAMAGE_RECORD(152, 4), COUNTER_GUIDELINE(153, 4),
 	//Regret T4
