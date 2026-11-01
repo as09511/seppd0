@@ -224,6 +224,12 @@ public enum Talent {
 	DAMAGE_NORMALIZATION(98), DOCUMENT_REVIEW(33), SECURITY_PROCEDURE(35), INFO_NETWORK(70),
 	//Yesod T2
 	RISK_REPORT(132), GO_VISUALIZATION(152), DATABASE(37), FIELD_SURVEILLANCE(103), EMERGENCY_RESPONSE(99),
+	//Yesod T3
+	SURVEILLANCE_CAMERA(39, 3), DOCUMENT_ORGANIZE(165, 3),
+	//Information Team Sephirah T3
+	YESOD_FARSIGHT(107, 3), INFO_SPREAD(151, 3), VIPER_YESOD(91, 3),
+	//Technological Sciences Floor Librarian T3
+	VIOLENCE(13, 3), COMMISSION(76, 3), BLACK_FLAME(15, 3),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -592,8 +598,13 @@ public enum Talent {
 			YesodScarf.openDocumentReview(hero);
 		}
 
-		if (talent == HEIGHTENED_SENSES || talent == FARSIGHT || talent == DIVINE_SENSE || talent == FIELD_SURVEILLANCE){
+		if (talent == HEIGHTENED_SENSES || talent == FARSIGHT || talent == DIVINE_SENSE || talent == FIELD_SURVEILLANCE || talent == YESOD_FARSIGHT){
 			Dungeon.observe();
+		}
+
+		if (talent == DOCUMENT_ORGANIZE){
+			BuffIndicator.refreshHero();
+			Item.updateQuickslot();
 		}
 
 		if (talent == TWIN_UPGRADES || talent == DESPERATE_POWER
@@ -1140,6 +1151,9 @@ public enum Talent {
 			case MALKUTH:
 				Collections.addAll(tierTalents, EFFICIENT_WORK, EXTRA_APPROVAL);
 				break;
+			case YESOD:
+				Collections.addAll(tierTalents, SURVEILLANCE_CAMERA, DOCUMENT_ORGANIZE);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1209,6 +1223,12 @@ public enum Talent {
 				break;
 			case HISTORY_LIBRARIAN:
 				Collections.addAll(tierTalents, MATCH_FLAME, SPORE, WORKER_BEE);
+				break;
+			case INFO_SEPHIRAH:
+				Collections.addAll(tierTalents, YESOD_FARSIGHT, INFO_SPREAD, VIPER_YESOD);
+				break;
+			case TECH_LIBRARIAN:
+				Collections.addAll(tierTalents, VIOLENCE, COMMISSION, BLACK_FLAME);
 				break;
 		}
 		for (Talent talent : tierTalents){

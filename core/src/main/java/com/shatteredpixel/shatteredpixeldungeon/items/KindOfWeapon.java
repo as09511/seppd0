@@ -249,6 +249,12 @@ abstract public class KindOfWeapon extends EquipableItem {
 			if (((Hero) owner).hasTalent(Talent.DAMAGE_NORMALIZATION)){
 				min = Math.min(max, min + ((Hero) owner).pointsInTalent(Talent.DAMAGE_NORMALIZATION));
 			}
+			//violence: minimum damage drops to 1, max damage gains 2/3/4x what was cut
+			if (((Hero) owner).hasTalent(Talent.VIOLENCE)){
+				int cut = Math.max(0, min - 1);
+				max += cut * (1 + ((Hero) owner).pointsInTalent(Talent.VIOLENCE));
+				min = Math.min(min, 1);
+			}
 			return Hero.heroDamageIntRange(min, max);
 		} else {
 			return Random.NormalIntRange(min(), max());

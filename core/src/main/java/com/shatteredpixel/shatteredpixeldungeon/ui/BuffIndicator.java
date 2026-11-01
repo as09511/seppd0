@@ -138,6 +138,7 @@ public class BuffIndicator extends Component {
 	public static final int THROWN_WEP  = 85;
 	public static final int INFO_POWER  = 86;
 	public static final int ANALYZED    = 87;
+	public static final int CHARGE      = 88;
 
 	public static final int SIZE_SMALL  = 7;
 	public static final int SIZE_LARGE  = 16;

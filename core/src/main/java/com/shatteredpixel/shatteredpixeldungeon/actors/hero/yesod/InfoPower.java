@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -65,7 +66,8 @@ public class InfoPower extends Buff {
 	}
 
 	public static int max( Hero hero ){
-		return BASE_MAX;
+		//document organization: +5/+10/+15
+		return BASE_MAX + 5*hero.pointsInTalent(Talent.DOCUMENT_ORGANIZE);
 	}
 
 	//the hero's info buff, or null if the hero isn't Yesod (or hasn't started collecting yet)

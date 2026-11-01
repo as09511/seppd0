@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.windows;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
+import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -157,6 +160,28 @@ public class WndTradeItem extends WndInfoItem {
 		add( btnBuy );
 
 		pos = btnBuy.bottom();
+
+		//info exchange: the Information Team Sephirah can pay with info, 75 gold per point
+		if (Dungeon.hero.subClass == HeroSubClass.INFO_SEPHIRAH){
+			final int infoPrice = (int)Math.ceil(price / (float)YesodScarf.INFO_EXCHANGE_GOLD);
+			RedButton btnInfo = new RedButton( Messages.get(YesodScarf.class, "buy_info", infoPrice) ) {
+				@Override
+				protected void onClick() {
+					hide();
+					InfoPower p = InfoPower.get();
+					if (p == null || !p.spend(infoPrice)) return;
+					Item bought = heap.pickUp();
+					if (bought != null && !bought.doPickUp( Dungeon.hero )) {
+						Dungeon.level.drop( bought, heap.pos ).sprite.drop();
+					}
+				}
+			};
+			btnInfo.setRect( 0, pos + GAP, width, BTN_HEIGHT );
+			btnInfo.icon(new ItemSprite(ItemSpriteSheet.YESOD_SCARF));
+			btnInfo.enable( InfoPower.current() >= infoPrice );
+			add( btnInfo );
+			pos = btnInfo.bottom();
+		}
 
 		final MasterThievesArmband.Thievery thievery = Dungeon.hero.buff(MasterThievesArmband.Thievery.class);
 		if (thievery != null && !thievery.isCursed() && thievery.chargesToUse(item) > 0) {

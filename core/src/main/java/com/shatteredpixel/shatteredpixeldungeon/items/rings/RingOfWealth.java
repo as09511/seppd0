@@ -207,7 +207,7 @@ public class RingOfWealth extends Ring {
 		}
 	}
 
-	private static Item genLowValueConsumable(){
+	public static Item genLowValueConsumable(){
 		switch (Random.Int(4)){
 			case 0: default:
 				Item i = new Gold().random();
@@ -221,7 +221,7 @@ public class RingOfWealth extends Ring {
 		}
 	}
 
-	private static Item genMidValueConsumable(){
+	public static Item genMidValueConsumable(){
 		switch (Random.Int(6)){
 			case 0: default:
 				Item i = genLowValueConsumable();
@@ -249,7 +249,7 @@ public class RingOfWealth extends Ring {
 		}
 	}
 
-	private static Item genHighValueConsumable(){
+	public static Item genHighValueConsumable(){
 		switch (Random.Int(4)){
 			case 0: default:
 				Item i = genMidValueConsumable();
@@ -267,7 +267,7 @@ public class RingOfWealth extends Ring {
 		}
 	}
 
-	private static Item genEquipmentDrop( int level ){
+	public static Item genEquipmentDrop( int level ){
 		Item result;
 		//each upgrade increases depth used for calculating drops by 1
 		int floorset = (Dungeon.depth + level)/5;

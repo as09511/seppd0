@@ -22,6 +22,15 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
+import java.util.Collections;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.SmokeScreen;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Charge;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -54,10 +63,17 @@ public class YesodScarf extends Item {
 	public static final String AC_DETECT  = "DETECT";
 	public static final String AC_PREDICT = "PREDICT";
 	public static final String AC_REVIEW  = "REVIEW";
+	public static final String AC_CENSOR  = "CENSOR";
+	public static final String AC_CHARGE  = "CHARGE";
 
 	public static final int ANALYZE_COST = 2;
 	public static final int DETECT_COST  = 4;
 	public static final int PREDICT_COST = 3;
+	public static final int CENSOR_COST  = 5;
+	//info exchange: gold value of one point of info in shops
+	public static final int INFO_EXCHANGE_GOLD = 75;
+
+	public static final float CENSOR_DURATION = 5f;
 
 	public static final int DETECT_RANGE = 8;
 
@@ -77,6 +93,8 @@ public class YesodScarf extends Item {
 			actions.add(AC_ANALYZE);
 			actions.add(AC_DETECT);
 			actions.add(AC_PREDICT);
+			if (hero.subClass == HeroSubClass.INFO_SEPHIRAH) actions.add(AC_CENSOR);
+			if (hero.subClass == HeroSubClass.TECH_LIBRARIAN) actions.add(AC_CHARGE);
 		}
 		if (reviewCharges(hero) > 0){
 			actions.add(AC_REVIEW);
@@ -91,6 +109,8 @@ public class YesodScarf extends Item {
 			case AC_DETECT:  return Messages.get(this, "ac_detect", DETECT_COST);
 			case AC_PREDICT: return Messages.get(this, "ac_predict", PREDICT_COST);
 			case AC_REVIEW:  return Messages.get(this, "ac_review", reviewCharges(hero));
+			case AC_CENSOR:  return Messages.get(this, "ac_censor", CENSOR_COST);
+			case AC_CHARGE:  return Messages.get(this, "ac_charge");
 		}
 		return super.actionName(action, hero);
 	}
@@ -138,7 +158,49 @@ public class YesodScarf extends Item {
 					hero.spendAndNext(1f);
 				}
 				break;
+			case AC_CENSOR:
+				if (canPay(CENSOR_COST)){
+					InfoPower.get().spend(CENSOR_COST);
+					censor(hero);
+					hero.spendAndNext(1f);
+				}
+				break;
+			case AC_CHARGE:
+				charge(hero);
+				break;
 		}
+	}
+
+	//Information Team Sephirah: 5 turns of invisibility and a 5x5 smoke screen
+	private static void censor( Hero hero ){
+		Buff.affect(hero, Invisibility.class, CENSOR_DURATION);
+		for (int dx = -2; dx <= 2; dx++){
+			for (int dy = -2; dy <= 2; dy++){
+				int cell = hero.pos + dx + dy*Dungeon.level.width();
+				if (cell >= 0 && cell < Dungeon.level.length() && !Dungeon.level.solid[cell]
+						&& Dungeon.level.distance(hero.pos, cell) <= 2){
+					GameScene.add(Blob.seed(cell, (int)CENSOR_DURATION, SmokeScreen.class));
+				}
+			}
+		}
+		CellEmitter.get(hero.pos).burst(Speck.factory(Speck.SMOKE), 10);
+		Sample.INSTANCE.play(Assets.Sounds.PUFF);
+		hero.sprite.operate(hero.pos);
+	}
+
+	//Technological Sciences Floor Librarian: all info becomes charge, takes no time
+	private static void charge( Hero hero ){
+		InfoPower p = InfoPower.get();
+		int amount = p == null ? 0 : p.info();
+		if (amount <= 0){
+			GLog.w(Messages.get(YesodScarf.class, "no_charge"));
+			return;
+		}
+		p.spend(amount);
+		Buff.affect(hero, Charge.class).add(amount);
+		hero.sprite.emitter().burst(Speck.factory(Speck.STAR), 8);
+		Sample.INSTANCE.play(Assets.Sounds.CHARGEUP);
+		GLog.p(Messages.get(YesodScarf.class, "charged", amount));
 	}
 
 	//reveals the map, traps and secrets within range. Secrets found this way give no info
@@ -180,6 +242,23 @@ public class YesodScarf extends Item {
 			InfoPower p = InfoPower.get();
 			if (p == null || !p.spend(ANALYZE_COST)) return;
 			Analyzed.apply(ch, Analyzed.DURATION);
+			//information spread: 1/2/3 more enemies close to the target are analyzed too
+			if (hero.hasTalent(Talent.INFO_SPREAD)){
+				ArrayList<Mob> others = new ArrayList<>();
+				for (Mob m : Dungeon.level.mobs){
+					if (m != ch && m.isAlive() && m.alignment == Char.Alignment.ENEMY && Dungeon.level.heroFOV[m.pos]){
+						others.add(m);
+					}
+				}
+				final int target = ch.pos;
+				Collections.sort(others, (a, b) -> Integer.compare(Dungeon.level.distance(target, a.pos), Dungeon.level.distance(target, b.pos)));
+				for (int i = 0; i < Math.min(others.size(), hero.pointsInTalent(Talent.INFO_SPREAD)); i++){
+					Analyzed.apply(others.get(i), Analyzed.DURATION);
+					if (others.get(i).sprite != null){
+						others.get(i).sprite.emitter().burst(Speck.factory(Speck.DISCOVER), 4);
+					}
+				}
+			}
 			if (ch.sprite != null){
 				ch.sprite.emitter().burst(Speck.factory(Speck.DISCOVER), 8);
 			}
@@ -260,6 +339,11 @@ public class YesodScarf extends Item {
 	public String desc() {
 		String desc = super.desc();
 		desc += "\n\n" + Messages.get(this, "effect", ANALYZE_COST, (int)Analyzed.DURATION, DETECT_COST, DETECT_RANGE, PREDICT_COST);
+		if (Dungeon.hero != null && Dungeon.hero.subClass == HeroSubClass.INFO_SEPHIRAH){
+			desc += "\n\n" + Messages.get(this, "effect_info", CENSOR_COST, (int)CENSOR_DURATION, INFO_EXCHANGE_GOLD);
+		} else if (Dungeon.hero != null && Dungeon.hero.subClass == HeroSubClass.TECH_LIBRARIAN){
+			desc += "\n\n" + Messages.get(this, "effect_tech", Math.round(100*Charge.DAMAGE_PER_POINT));
+		}
 		return desc;
 	}
 

@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
@@ -508,6 +509,9 @@ public class Dungeon {
 		
 		hero.curAction = hero.lastAction = null;
 
+		//Yesod's surveillance camera and commission talents
+		YesodTrackers.onLevelArrived( hero, level );
+
 		observe();
 		try {
 			saveAll();
@@ -897,7 +901,7 @@ public class Dungeon {
 	//default to recomputing based on max hero vision, in case vision just shrank/grew
 	public static void observe(){
 		int dist = Math.max(Dungeon.hero.viewDistance, 8);
-		dist *= 1f + 0.25f*Dungeon.hero.pointsInTalent(Talent.FARSIGHT);
+		dist *= 1f + 0.25f*(Dungeon.hero.pointsInTalent(Talent.FARSIGHT) + Dungeon.hero.pointsInTalent(Talent.YESOD_FARSIGHT));
 
 		if (Dungeon.hero.buff(MagicalSight.class) != null){
 			dist = Math.max( dist, MagicalSight.DISTANCE );

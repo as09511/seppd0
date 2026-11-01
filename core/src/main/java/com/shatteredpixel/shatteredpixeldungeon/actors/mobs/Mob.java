@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Commission;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
@@ -1034,6 +1035,11 @@ public abstract class Mob extends Char {
 		//lets E.G.O weapons react to kills made by the hero while they are equipped
 		if (cause == Dungeon.hero && Dungeon.hero.belongings.weapon() instanceof EgoWeapon){
 			((EgoWeapon) Dungeon.hero.belongings.weapon()).onKill(Dungeon.hero, this);
+		}
+
+		//commission talent target
+		if (buff(Commission.class) != null){
+			Commission.onTargetDied(this);
 		}
 
 		//Yesod learns from every new kind of enemy he kills

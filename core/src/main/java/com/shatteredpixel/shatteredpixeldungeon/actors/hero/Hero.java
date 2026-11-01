@@ -1736,6 +1736,11 @@ public class Hero extends Char {
 		//temporarily assign to a float to avoid rounding a bunch
 		float damage = dmg;
 
+		//black flame: 50% more damage taken
+		if (hasTalent(Talent.BLACK_FLAME)){
+			damage *= 1.5f;
+		}
+
 		Endure.EndureTracker endure = buff(Endure.EndureTracker.class);
 		if (!(src instanceof Char)){
 			//reduce damage here if it isn't coming from a character (if it is we already reduced it)

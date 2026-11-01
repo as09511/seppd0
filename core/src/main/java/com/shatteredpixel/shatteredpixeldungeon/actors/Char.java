@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Prediction;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Analyzed;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -470,6 +471,11 @@ public abstract class Char extends Actor {
 			if (Dungeon.hero != null && Dungeon.hero.hasTalent(Talent.GO_VISUALIZATION)){
 				if (buff(Analyzed.class) != null) dmg *= 0.8f;
 				if (enemy.buff(Analyzed.class) != null && Dungeon.hero.pointsInTalent(Talent.GO_VISUALIZATION) >= 2) dmg *= 1.2f;
+			}
+
+			//Yesod's subclass damage bonuses (viper Yesod, charge, black flame)
+			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.YESOD){
+				dmg *= YesodTrackers.attackMultiplier((Hero) this);
 			}
 
 			if (buff( PowerOfMany.PowerBuff.class) != null){
