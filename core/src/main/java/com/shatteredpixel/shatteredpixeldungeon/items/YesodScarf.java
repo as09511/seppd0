@@ -22,6 +22,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import java.util.Collections;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
@@ -59,6 +61,8 @@ import java.util.ArrayList;
 //Yesod's starting item: spends the information he gathers on his abilities
 public class YesodScarf extends Item {
 
+	//quickslot / default action: choose which ability to use
+	public static final String AC_USE     = "USE";
 	public static final String AC_ANALYZE = "ANALYZE";
 	public static final String AC_DETECT  = "DETECT";
 	public static final String AC_PREDICT = "PREDICT";
@@ -80,7 +84,7 @@ public class YesodScarf extends Item {
 	{
 		image = ItemSpriteSheet.YESOD_SCARF;
 
-		defaultAction = AC_ANALYZE;
+		defaultAction = AC_USE;
 
 		unique = true;
 		bones = false;
@@ -128,6 +132,11 @@ public class YesodScarf extends Item {
 
 		super.execute(hero, action);
 
+		if (action.equals(AC_USE)){
+			chooseAbility(hero);
+			return;
+		}
+
 		if (action.equals(AC_REVIEW)){
 			openDocumentReview(hero);
 			return;
@@ -169,6 +178,54 @@ public class YesodScarf extends Item {
 				charge(hero);
 				break;
 		}
+	}
+
+	//every ability the scarf can use right now, in the order of the item window
+	private ArrayList<String> abilities( Hero hero ){
+		ArrayList<String> list = new ArrayList<>();
+		for (String a : actions(hero)){
+			if (a.equals(AC_ANALYZE) || a.equals(AC_DETECT) || a.equals(AC_PREDICT)
+					|| a.equals(AC_CENSOR) || a.equals(AC_CHARGE) || a.equals(AC_REVIEW)){
+				list.add(a);
+			}
+		}
+		return list;
+	}
+
+	private static boolean affordable( String action ){
+		int info = InfoPower.current();
+		switch (action){
+			case AC_ANALYZE: return info >= ANALYZE_COST;
+			case AC_DETECT:  return info >= DETECT_COST;
+			case AC_PREDICT: return info >= PREDICT_COST;
+			case AC_CENSOR:  return info >= CENSOR_COST;
+			case AC_CHARGE:  return info > 0;
+			default:         return true;
+		}
+	}
+
+	//used from the quickslot: a window listing the abilities, unaffordable ones greyed out
+	private void chooseAbility( final Hero hero ){
+		final ArrayList<String> list = abilities(hero);
+		if (list.isEmpty()) return;
+		String[] names = new String[list.size()];
+		for (int i = 0; i < names.length; i++){
+			names[i] = actionName(list.get(i), hero);
+		}
+		GameScene.show(new WndOptions(new ItemSprite(this),
+				Messages.titleCase(name()),
+				Messages.get(YesodScarf.class, "choose_msg", InfoPower.current(), InfoPower.max(hero)),
+				names){
+			@Override
+			protected boolean enabled(int index) {
+				return affordable(list.get(index));
+			}
+
+			@Override
+			protected void onSelect(int index) {
+				execute(hero, list.get(index));
+			}
+		});
 	}
 
 	//Information Team Sephirah: 5 turns of invisibility and a 5x5 smoke screen
@@ -343,6 +400,12 @@ public class YesodScarf extends Item {
 			desc += "\n\n" + Messages.get(this, "effect_info", CENSOR_COST, (int)CENSOR_DURATION, INFO_EXCHANGE_GOLD);
 		} else if (Dungeon.hero != null && Dungeon.hero.subClass == HeroSubClass.TECH_LIBRARIAN){
 			desc += "\n\n" + Messages.get(this, "effect_tech", Math.round(100*Charge.DAMAGE_PER_POINT));
+		}
+		//the turn cost note always goes last, below any abilities from the subclass
+		if (Dungeon.hero != null && Dungeon.hero.subClass == HeroSubClass.TECH_LIBRARIAN){
+			desc += "\n\n" + Messages.get(this, "turn_note_tech");
+		} else {
+			desc += "\n\n" + Messages.get(this, "turn_note");
 		}
 		return desc;
 	}
