@@ -43,6 +43,8 @@ import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Callback;
 import com.watabou.utils.PathFinder;
 
+import java.util.ArrayList;
+
 //Yesod's second armor ability: a crushing blow with +50% max damage that paralyzes the target
 public class RegretStrike extends ArmorAbility {
 
@@ -129,28 +131,31 @@ public class RegretStrike extends ArmorAbility {
 		hero.sprite.attack(enemy.pos, new Callback() {
 			@Override
 			public void call() {
-				int before = enemy.HP + enemy.shielding();
+				//metallic ring (ripple talent): the enemies around the target are found before the blow lands
+				ArrayList<Char> around = new ArrayList<>();
+				if (hero.hasTalent(Talent.RIPPLE)){
+					for (int n : PathFinder.NEIGHBOURS8){
+						Char ch = Actor.findChar(enemy.pos + n);
+						if (ch != null && ch != hero && ch.alignment != hero.alignment){
+							around.add(ch);
+						}
+					}
+				}
 
 				Buff.affect(hero, RegretTracker.class);
 				hero.attack(enemy, 1f, 0, Char.INFINITE_ACCURACY);
+				//each surrounding enemy takes its own regret hit (own damage roll and armor) at 15/30/45/60% damage
+				for (Char ch : around){
+					if (ch.isAlive()){
+						hero.attack(ch, 0.15f * hero.pointsInTalent(Talent.RIPPLE), 0, Char.INFINITE_ACCURACY);
+					}
+				}
 				Buff.detach(hero, RegretTracker.class);
 
-				int dealt = Math.max(0, before - (enemy.isAlive() ? enemy.HP + enemy.shielding() : 0));
-
-				if (enemy.isAlive()){
-					boolean boss = Char.hasProp(enemy, Char.Property.BOSS) || Char.hasProp(enemy, Char.Property.MINIBOSS);
-					Buff.prolong(enemy, Paralysis.class, boss ? BOSS_PARALYSIS : PARALYSIS);
-				}
-
-				//ripple: 15/30/45/60% of the damage to enemies around the target
-				if (hero.hasTalent(Talent.RIPPLE) && dealt > 0){
-					int splash = Math.round(dealt * 0.15f * hero.pointsInTalent(Talent.RIPPLE));
-					for (int n : PathFinder.NEIGHBOURS8){
-						Char ch = Actor.findChar(enemy.pos + n);
-						if (ch != null && ch != hero && ch.alignment != hero.alignment && splash > 0){
-							ch.damage(splash, hero);
-						}
-					}
+				//the target and every surviving enemy hit by the ring are paralyzed
+				paralyze(enemy);
+				for (Char ch : around){
+					paralyze(ch);
 				}
 
 				Sample.INSTANCE.play(Assets.Sounds.HIT_CRUSH, 1f, 0.8f);
@@ -159,6 +164,13 @@ public class RegretStrike extends ArmorAbility {
 				hero.spendAndNext(hero.attackDelay());
 			}
 		});
+	}
+
+	private static void paralyze( Char ch ){
+		if (ch.isAlive()){
+			boolean boss = Char.hasProp(ch, Char.Property.BOSS) || Char.hasProp(ch, Char.Property.MINIBOSS);
+			Buff.prolong(ch, Paralysis.class, boss ? BOSS_PARALYSIS : PARALYSIS);
+		}
 	}
 
 	//while present, the hero's weapon hits with +50% max damage, and min correction raises the minimum
