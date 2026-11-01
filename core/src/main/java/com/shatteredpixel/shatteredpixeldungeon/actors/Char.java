@@ -746,6 +746,12 @@ public abstract class Char extends Actor {
 		for (ChampionEnemy buff : buffs(ChampionEnemy.class)){
 			buff.onAttackProc( enemy );
 		}
+		//allies empowered by Malkuth's notebook spend its stored bonus damage on their next hit
+		//(the hero handles this in Hero.attackProc, after any kinetic enchantment)
+		if (!(this instanceof Hero) && buff(Kinetic.ConservedDamage.class) != null){
+			damage += buff(Kinetic.ConservedDamage.class).damageBonus();
+			buff(Kinetic.ConservedDamage.class).detach();
+		}
 		return damage;
 	}
 	

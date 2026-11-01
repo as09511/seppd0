@@ -154,17 +154,14 @@ public class MalkuthNotebook extends Item {
 	public static void applyEffect(Hero hero){
 		float haste = hasteDuration(hero);
 		float bless = blessDuration(hero);
-		empower(hero, haste, bless);
-
-		//the hero's next hit deals extra damage, stored in the kinetic enchantment's buff
-		Kinetic.ConservedDamage conserved = Buff.affect(hero, Kinetic.ConservedDamage.class);
-		conserved.setBonus(Math.max(conserved.damageBonus(), nextHitBonus(hero)));
+		int bonus = nextHitBonus(hero);
+		empower(hero, haste, bless, bonus);
 
 		//the control team's sephirah always shares the effect with her employee
 		EmployeeCall call = hero.buff(EmployeeCall.class);
 		LCorpEmployee employee = call == null ? null : call.employee();
 		if (employee != null){
-			empower(employee, haste, bless);
+			empower(employee, haste, bless, bonus);
 		}
 
 		//joint command: allies within 2/3 tiles get the same effect
@@ -173,15 +170,18 @@ public class MalkuthNotebook extends Item {
 			for (Char ch : Actor.chars()){
 				if (ch != hero && ch != employee && ch.alignment == Char.Alignment.ALLY
 						&& Dungeon.level.distance(hero.pos, ch.pos) <= range){
-					empower(ch, haste, bless);
+					empower(ch, haste, bless, bonus);
 				}
 			}
 		}
 	}
 
-	private static void empower(Char ch, float haste, float bless){
+	private static void empower(Char ch, float haste, float bless, int bonus){
 		Buff.prolong(ch, Haste.class, haste);
 		Buff.prolong(ch, Bless.class, bless);
+		//the next hit deals extra damage, stored in the kinetic enchantment's buff
+		Kinetic.ConservedDamage conserved = Buff.affect(ch, Kinetic.ConservedDamage.class);
+		conserved.setBonus(Math.max(conserved.damageBonus(), bonus));
 		if (ch.sprite != null){
 			ch.sprite.emitter().burst(Speck.factory(Speck.LIGHT), 6);
 		}
