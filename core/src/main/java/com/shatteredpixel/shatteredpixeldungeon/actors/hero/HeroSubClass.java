@@ -56,7 +56,7 @@ public enum HeroSubClass {
 
 	//Yesod, icons are borrowed for now
 	INFO_SEPHIRAH(HeroIcon.SNIPER),
-	TECH_LIBRARIAN(HeroIcon.BERSERKER);
+	TECH_LIBRARIAN(HeroIcon.TECH_LIBRARIAN);
 
 	int icon;
 

@@ -73,6 +73,8 @@ public class HeroIcon extends Image {
 	public static final int RATMOGRIFY      = 34;
 	//Yesod
 	public static final int SOLEMN_LAMENT   = 35;
+	public static final int ANOMALY_MANUAL  = 36;
+	public static final int TECH_LIBRARIAN  = 37;
 
 	//cleric spells
 	public static final int GUIDING_LIGHT   = 40;

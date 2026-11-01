@@ -127,7 +127,7 @@ public class AnomalyManual extends ArmorAbility {
 
 	@Override
 	public int icon() {
-		return HeroIcon.ENDURE;
+		return HeroIcon.ANOMALY_MANUAL;
 	}
 
 	@Override
