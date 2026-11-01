@@ -136,6 +136,11 @@ public class MalkuthNotebook extends Item {
 		return RECHARGE_TURNS - (hero == null ? 0 : 5*hero.pointsInTalent(Talent.EFFICIENT_WORK));
 	}
 
+	//10, +5 per point in the vanguard command talent
+	public static int nextHitBonus(Hero hero){
+		return NEXT_HIT_BONUS + 5*hero.pointsInTalent(Talent.SPEARHEAD_CHARGE);
+	}
+
 	public static float blessDuration(Hero hero){
 		//+3/+5 turns from the overtime talent
 		float duration = BLESS_DURATION;
@@ -153,7 +158,7 @@ public class MalkuthNotebook extends Item {
 
 		//the hero's next hit deals extra damage, stored in the kinetic enchantment's buff
 		Kinetic.ConservedDamage conserved = Buff.affect(hero, Kinetic.ConservedDamage.class);
-		conserved.setBonus(Math.max(conserved.damageBonus(), NEXT_HIT_BONUS));
+		conserved.setBonus(Math.max(conserved.damageBonus(), nextHitBonus(hero)));
 
 		//the control team's sephirah always shares the effect with her employee
 		EmployeeCall call = hero.buff(EmployeeCall.class);

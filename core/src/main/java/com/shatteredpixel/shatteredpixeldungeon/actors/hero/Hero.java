@@ -724,11 +724,6 @@ public class Hero extends Char {
 			dmg += goldenRoad.damageBonus();
 		}
 
-		//spearhead charge: +20/40/60% melee damage after moving 3 or more tiles
-		if (hasTalent(Talent.SPEARHEAD_CHARGE) && tilesMovedSinceAttack >= 3 && !(wep instanceof MissileWeapon)){
-			dmg = Math.round(dmg * (1f + 0.2f*pointsInTalent(Talent.SPEARHEAD_CHARGE)));
-		}
-
 		//swift response: +1~2/+2~3 melee damage while blessed
 		if (hasTalent(Talent.SWIFT_RESPONSE) && buff(Bless.class) != null && !(wep instanceof MissileWeapon)){
 			int pts = pointsInTalent(Talent.SWIFT_RESPONSE);
@@ -2421,17 +2416,12 @@ public class Hero extends Char {
 		}
 	}
 
-	//tiles moved since the last melee attack, for the spearhead charge talent
-	public int tilesMovedSinceAttack = 0;
-
 	@Override
 	public void move(int step, boolean travelling) {
 		boolean wasHighGrass = Dungeon.level.map[step] == Terrain.HIGH_GRASS;
 
 		super.move( step, travelling);
 
-		if (travelling) tilesMovedSinceAttack++;
-		
 		if (!flying && travelling) {
 			if (Dungeon.level.water[pos]) {
 				Sample.INSTANCE.play( Assets.Sounds.WATER, 1, Random.Float( 0.8f, 1.25f ) );
@@ -2466,7 +2456,6 @@ public class Hero extends Char {
 
 		int targetPos = attackTarget.pos;
 		boolean hit = attack(attackTarget);
-		tilesMovedSinceAttack = 0;
 		
 		Invisibility.dispel();
 		spend( attackDelay() );

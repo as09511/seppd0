@@ -201,10 +201,10 @@ public class MagicBullet extends EgoGun {
 		}
 	}
 
-	//the quote always goes at the very bottom of the description
+	//the quote always goes at the very top of the description
 	@Override
 	public String info() {
-		return super.info() + "\n\n" + Messages.get(this, "quote");
+		return Messages.get(this, "quote") + "\n\n" + super.info();
 	}
 
 	//reveals the cells hit by the 7th bullet, see Level.updateFieldOfView and Dungeon.observe
