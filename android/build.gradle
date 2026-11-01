@@ -45,18 +45,20 @@ android {
             }
         }
         release {
+            //the mod's releases are signed with the same public debug key (the maintainer's choice),
+            // so they can be built by CI without any secrets
+            signingConfig signingConfigs.debug
 
-            //These lines enable R8, which is a code shrinker/optimizer/obfuscator.
-            //This makes release APKs smaller and more efficient, but also makes debugging trickier
-            //as the information produced in stack traces must be de-obfuscated.
-            //See here: https://developer.android.com/studio/build/shrink-code#decode-stack-trace
-            shrinkResources true
-            minifyEnabled true
+            //R8 shrinking is off: the release can't be run-tested before publishing, and
+            // shrinking risks stripping classes the mod only reaches by reflection
+            shrinkResources false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
+            //Shattered's update checker and news feed point at Shattered, the mod doesn't use them
             dependencies {
-                releaseImplementation project(':services:updates:githubUpdates')
-                releaseImplementation project(':services:news:shatteredNews')
+                releaseImplementation project(':services:updates:debugUpdates')
+                releaseImplementation project(':services:news:debugNews')
             }
         }
     }

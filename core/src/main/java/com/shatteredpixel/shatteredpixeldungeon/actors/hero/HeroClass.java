@@ -408,6 +408,9 @@ public enum HeroClass {
 				return Badges.isUnlocked(Badges.Badge.UNLOCK_DUELIST);
 			case CLERIC:
 				return Badges.isUnlocked(Badges.Badge.UNLOCK_CLERIC);
+			case TESTER:
+				//the tester is a debugging tool, only debug builds can use it
+				return false;
 		}
 	}
 	

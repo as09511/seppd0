@@ -195,6 +195,8 @@ public class HeroSelectScene extends PixelScene {
 		add(infoButton);
 
 		for (HeroClass cl : HeroClass.values()){
+			//the tester is a debugging tool, release builds don't show it
+			if (cl == HeroClass.TESTER && !DeviceCompat.isDebug()) continue;
 			HeroBtn button = new HeroBtn(cl);
 			add(button);
 			heroBtns.add(button);
@@ -398,6 +400,9 @@ public class HeroSelectScene extends PixelScene {
 		add(fadeResetter);
 		resetFade();
 
+		if (GamesInProgress.selectedClass == HeroClass.TESTER && !DeviceCompat.isDebug()){
+			GamesInProgress.selectedClass = null;
+		}
 		if (GamesInProgress.selectedClass != null){
 			setSelectedHero(GamesInProgress.selectedClass);
 		}
