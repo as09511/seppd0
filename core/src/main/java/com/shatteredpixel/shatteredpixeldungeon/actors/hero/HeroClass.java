@@ -188,7 +188,11 @@ public enum HeroClass {
 		notebook.identify().collect();
 		Buff.affect(hero, MalkuthNotebook.NotebookRecharge.class);
 
+		ThrowingStone stones = new ThrowingStone();
+		stones.identify().collect();
+
 		Dungeon.quickslot.setSlot(0, notebook);
+		Dungeon.quickslot.setSlot(1, stones);
 
 		new PotionOfHaste().identify();
 		new PotionOfLiquidFlame().identify();
