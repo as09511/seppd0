@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
+import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
@@ -106,6 +108,9 @@ public enum HeroClass {
 	//Malkuth, the Control Team's sephirah
 	MALKUTH( HeroSubClass.CONTROL_SEPHIRAH, HeroSubClass.HISTORY_LIBRARIAN ),
 
+	//Yesod, the Information Team's sephirah
+	YESOD( HeroSubClass.INFO_SEPHIRAH, HeroSubClass.TECH_LIBRARIAN ),
+
 	//testing class, uses the warrior's sprite, talents and subclasses
 	TESTER( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR );
 
@@ -167,6 +172,10 @@ public enum HeroClass {
 				initMalkuth( hero );
 				break;
 
+			case YESOD:
+				initYesod( hero );
+				break;
+
 			case TESTER:
 				initTester( hero );
 				break;
@@ -196,6 +205,23 @@ public enum HeroClass {
 
 		new PotionOfHaste().identify();
 		new PotionOfLiquidFlame().identify();
+	}
+
+	private static void initYesod( Hero hero ) {
+		YesodScarf scarf = new YesodScarf();
+		scarf.identify().collect();
+
+		ThrowingStone stones = new ThrowingStone();
+		stones.identify().collect();
+
+		Dungeon.quickslot.setSlot(0, scarf);
+		Dungeon.quickslot.setSlot(1, stones);
+
+		new ScrollOfMagicMapping().identify();
+		new PotionOfMindVision().identify();
+
+		//info starts being gathered only after the starting items are known
+		Buff.affect(hero, InfoPower.class);
 	}
 
 	private static void initTester( Hero hero ) {
@@ -373,6 +399,8 @@ public enum HeroClass {
 				return Assets.Sprites.CLERIC;
 			case MALKUTH:
 				return Assets.Sprites.MALKUTH;
+			case YESOD:
+				return Assets.Sprites.YESOD;
 		}
 	}
 
@@ -392,6 +420,8 @@ public enum HeroClass {
 				return Assets.Splashes.CLERIC;
 			case MALKUTH:
 				return Assets.Splashes.MALKUTH;
+			case YESOD:
+				return Assets.Splashes.YESOD;
 		}
 	}
 	

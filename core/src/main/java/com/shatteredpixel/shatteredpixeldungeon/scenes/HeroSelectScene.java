@@ -259,13 +259,15 @@ public class HeroSelectScene extends PixelScene {
 			title.setPos(insets.left + (leftArea - title.width())/2f, (h-uiHeight)/2f);
 			align(title);
 
-			int btnWidth = HeroBtn.MIN_WIDTH + 15;
+			int cols = (int)Math.ceil(heroBtns.size()/2f);
+			//narrower buttons when there are too many heroes to fit two rows in the left area
+			int btnWidth = (int)Math.max(HeroBtn.MIN_WIDTH,
+					Math.min(HeroBtn.MIN_WIDTH + 15, Math.floor((leftArea - 8 - (cols-1)) / cols)));
 			int btnHeight = HeroBtn.HEIGHT;
 			if (uiHeight >= 180){
 				btnHeight += 6;
 			}
 
-			int cols = (int)Math.ceil(heroBtns.size()/2f);
 			float curX = insets.left + (leftArea - btnWidth * cols + (cols-1))/2f;
 			float curY = title.bottom() + uiSpacing;
 

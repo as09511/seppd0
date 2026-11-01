@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Prediction;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Analyzed;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -464,6 +466,12 @@ public abstract class Char extends Actor {
 				dmg *= 1.5f;
 			}
 
+			//G.O visualization: analyzed enemies deal 20% less damage, and at +2 take 20% more
+			if (Dungeon.hero != null && Dungeon.hero.hasTalent(Talent.GO_VISUALIZATION)){
+				if (buff(Analyzed.class) != null) dmg *= 0.8f;
+				if (enemy.buff(Analyzed.class) != null && Dungeon.hero.pointsInTalent(Talent.GO_VISUALIZATION) >= 2) dmg *= 1.2f;
+			}
+
 			if (buff( PowerOfMany.PowerBuff.class) != null){
 				if (buff( BeamingRay.BeamingRayBoost.class) != null
 					&& buff( BeamingRay.BeamingRayBoost.class).object == enemy.id()){
@@ -662,6 +670,15 @@ public abstract class Char extends Actor {
 			defStat = INFINITE_EVASION;
 		}
 
+		//Yesod's prediction: the next attack against him misses, his next attack always hits
+		if (defender.buff(Prediction.Evade.class) != null){
+			defender.buff(Prediction.Evade.class).detach();
+			defStat = INFINITE_EVASION;
+		} else if (attacker.buff(Prediction.Strike.class) != null){
+			attacker.buff(Prediction.Strike.class).detach();
+			acuStat = INFINITE_ACCURACY;
+		}
+
 		//if accuracy or evasion are large enough, treat them as infinite.
 		//note that infinite evasion beats infinite accuracy
 		if (defStat >= INFINITE_EVASION){
@@ -675,6 +692,7 @@ public abstract class Char extends Actor {
 		float acuRoll = Random.Float( acuStat );
 		if (attacker.buff(Bless.class) != null) acuRoll *= 1.25f;
 		if (attacker.buff(  Hex.class) != null) acuRoll *= 0.8f;
+		if (attacker.buff(Analyzed.class) != null) acuRoll *= 0.8f;
 		if (attacker.buff( Daze.class) != null) acuRoll *= 0.5f;
 		for (ChampionEnemy buff : attacker.buffs(ChampionEnemy.class)){
 			acuRoll *= buff.evasionAndAccuracyFactor();
@@ -691,6 +709,7 @@ public abstract class Char extends Actor {
 		float defRoll = Random.Float( defStat );
 		if (defender.buff(Bless.class) != null) defRoll *= 1.25f;
 		if (defender.buff(  Hex.class) != null) defRoll *= 0.8f;
+		if (defender.buff(Analyzed.class) != null) defRoll *= 0.8f;
 		if (defender.buff( Daze.class) != null) defRoll *= 0.5f;
 		for (ChampionEnemy buff : defender.buffs(ChampionEnemy.class)){
 			defRoll *= buff.evasionAndAccuracyFactor();

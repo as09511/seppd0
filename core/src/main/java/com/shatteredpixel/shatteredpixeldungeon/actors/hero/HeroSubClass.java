@@ -52,7 +52,11 @@ public enum HeroSubClass {
 
 	//Malkuth, icons are borrowed for now
 	CONTROL_SEPHIRAH(HeroIcon.FREERUNNER),
-	HISTORY_LIBRARIAN(HeroIcon.BATTLEMAGE);
+	HISTORY_LIBRARIAN(HeroIcon.BATTLEMAGE),
+
+	//Yesod, icons are borrowed for now
+	INFO_SEPHIRAH(HeroIcon.SNIPER),
+	TECH_LIBRARIAN(HeroIcon.BERSERKER);
 
 	int icon;
 

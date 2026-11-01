@@ -463,6 +463,12 @@ public class ItemSpriteSheet {
 		assignItemRect(MALKUTH_NOTEBOOK,     16, 16);
 	}
 
+	//Yesod's scarf, in an unused corner of the trinket rows
+	public static final int YESOD_SCARF          = xy(16, 19);
+	static{
+		assignItemRect(YESOD_SCARF,          16, 16);
+	}
+
 	private static final int WANDS              =                           xy(1, 14);  //16 slots
 	public static final int WAND_MAGIC_MISSILE  = WANDS+0;
 	public static final int WAND_FIREBOLT       = WANDS+1;

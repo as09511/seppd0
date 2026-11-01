@@ -1439,6 +1439,10 @@ public abstract class Level implements Bundlable {
 				if (((Hero) c).hasTalent(Talent.HEIGHTENED_SENSES)) {
 					mindVisRange = 1 + ((Hero) c).pointsInTalent(Talent.HEIGHTENED_SENSES);
 				}
+				//field surveillance: 2/3 tiles
+				if (((Hero) c).hasTalent(Talent.FIELD_SURVEILLANCE)) {
+					mindVisRange = Math.max(mindVisRange, 1 + ((Hero) c).pointsInTalent(Talent.FIELD_SURVEILLANCE));
+				}
 				if (c.buff(DivineSense.DivineSenseTracker.class) != null) {
 					if (((Hero) c).heroClass == HeroClass.CLERIC) {
 						mindVisRange = 4 + 4 * ((Hero) c).pointsInTalent(Talent.DIVINE_SENSE);

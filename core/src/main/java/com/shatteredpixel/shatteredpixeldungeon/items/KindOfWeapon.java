@@ -244,7 +244,12 @@ abstract public class KindOfWeapon extends EquipableItem {
 
 	public int damageRoll( Char owner ) {
 		if (owner instanceof Hero){
-			return Hero.heroDamageIntRange(min(), max());
+			int min = min(), max = max();
+			//damage normalization: +1/+2 minimum damage
+			if (((Hero) owner).hasTalent(Talent.DAMAGE_NORMALIZATION)){
+				min = Math.min(max, min + ((Hero) owner).pointsInTalent(Talent.DAMAGE_NORMALIZATION));
+			}
+			return Hero.heroDamageIntRange(min, max);
 		} else {
 			return Random.NormalIntRange(min(), max());
 		}

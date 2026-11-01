@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Bones;
@@ -903,6 +905,11 @@ public class Hero extends Char {
 			Buff.affect(this, AbilityCrown.Charger.class);
 		}
 
+		//Yesod's information
+		if (heroClass == HeroClass.YESOD && buff(InfoPower.class) == null){
+			Buff.affect(this, InfoPower.class);
+		}
+
 		//Malkuth's subclass abilities
 		if (subClass == HeroSubClass.CONTROL_SEPHIRAH && buff(EmployeeCall.class) == null){
 			Buff.affect(this, EmployeeCall.class);
@@ -1777,6 +1784,20 @@ public class Hero extends Char {
 			Buff.affect(this, Talent.EmergencyManualCooldown.class, 200 - 50*pointsInTalent(Talent.EMERGENCY_MANUAL));
 		}
 
+		//emergency response: below 25% health, spend up to 5 info to heal 10/15% max HP each, once per floor
+		if (isAlive() && HP < HT*0.25f && hasTalent(Talent.EMERGENCY_RESPONSE)
+				&& !YesodTrackers.EmergencyResponseUsed.usedHere()){
+			InfoPower info = buff(InfoPower.class);
+			int spend = info == null ? 0 : Math.min(5, info.info());
+			if (spend > 0 && info.spend(spend)){
+				int heal = Math.round(HT * spend * (0.05f + 0.05f*pointsInTalent(Talent.EMERGENCY_RESPONSE)));
+				heal = Math.min(heal, HT - HP);
+				HP += heal;
+				sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(heal), FloatingText.HEALING);
+				YesodTrackers.EmergencyResponseUsed.markUsed();
+			}
+		}
+
 		if (buff(Challenge.DuelParticipant.class) != null){
 			buff(Challenge.DuelParticipant.class).addDamage(effectiveDamage);
 		}
@@ -2592,6 +2613,8 @@ public class Hero extends Char {
 		boolean circular = pointsInTalent(Talent.WIDE_SEARCH) == 1;
 		int distance = heroClass == HeroClass.ROGUE ? 2 : 1;
 		if (hasTalent(Talent.WIDE_SEARCH)) distance++;
+		//information network: 5x5 / 7x7
+		distance += pointsInTalent(Talent.INFO_NETWORK);
 		
 		boolean foresight = buff(Foresight.class) != null;
 		boolean foresightScan = foresight && !Dungeon.level.mapped[pos];
@@ -2688,6 +2711,15 @@ public class Hero extends Char {
 							ScrollOfMagicMapping.discover( curr );
 							
 							if (fieldOfView[curr]) smthFound = true;
+
+							//Yesod gathers info from the secrets he finds by searching
+							if (oldValue == Terrain.SECRET_TRAP || oldValue == Terrain.SECRET_DOOR){
+								InfoPower.gain(oldValue == Terrain.SECRET_TRAP ? InfoPower.SECRET_TRAP_INFO : InfoPower.SECRET_DOOR_INFO);
+								if (hasTalent(Talent.SECURITY_PROCEDURE)){
+									//3/5 shielding
+									Buff.affect(this, Barrier.class).incShield(1 + 2*pointsInTalent(Talent.SECURITY_PROCEDURE));
+								}
+							}
 	
 							if (talisman != null){
 								if (oldValue == Terrain.SECRET_TRAP){

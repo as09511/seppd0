@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -462,6 +463,13 @@ public class Item implements Bundlable {
 
 	public Item identify( boolean byHero ) {
 
+		//Yesod gathers info when one of his items becomes known
+		// (potions and scrolls count when their type becomes known instead, see setKnown)
+		if (byHero && !isIdentified() && Dungeon.hero != null && Dungeon.hero.isAlive()
+				&& Dungeon.hero.belongings.contains(this)){
+			yesodPendingInfo = true;
+		}
+
 		if (byHero && Dungeon.hero != null && Dungeon.hero.isAlive()){
 			Catalog.setSeen(getClass());
 			Statistics.itemTypesDiscovered.add(getClass());
@@ -470,9 +478,17 @@ public class Item implements Bundlable {
 		levelKnown = true;
 		cursedKnown = true;
 		Item.updateQuickslot();
+
+		if (yesodPendingInfo && isIdentified()){
+			InfoPower.onItemIdentified();
+		}
+		yesodPendingInfo = false;
 		
 		return this;
 	}
+
+	//set while identify() runs, so subclasses that become identified partway through still count once
+	private boolean yesodPendingInfo = false;
 	
 	public void onHeroGainExp( float levelPercent, Hero hero ){
 		//do nothing by default

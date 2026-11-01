@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
@@ -1033,6 +1034,11 @@ public abstract class Mob extends Char {
 		//lets E.G.O weapons react to kills made by the hero while they are equipped
 		if (cause == Dungeon.hero && Dungeon.hero.belongings.weapon() instanceof EgoWeapon){
 			((EgoWeapon) Dungeon.hero.belongings.weapon()).onKill(Dungeon.hero, this);
+		}
+
+		//Yesod learns from every new kind of enemy he kills
+		if (cause == Dungeon.hero && alignment == Alignment.ENEMY){
+			InfoPower.onEnemySlain(this);
 		}
 
 		//worker bee: killing a burning enemy gives the notebook 0.1/0.2/0.3 of a charge

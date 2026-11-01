@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.potions;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
@@ -355,6 +356,8 @@ public class Potion extends Item {
 			if (!isKnown()) {
 				handler.know(this);
 				updateQuickslot();
+				//Yesod gathers info whenever a new type becomes known
+				if (Dungeon.hero != null && Dungeon.hero.isAlive()) InfoPower.onItemIdentified();
 			}
 			
 			if (Dungeon.hero.isAlive()) {

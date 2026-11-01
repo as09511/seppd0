@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
+import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
@@ -216,6 +219,11 @@ public enum Talent {
 	VENOM_STING(120, 4), WINGBEAT(145, 4), QUEEN_BEE(89, 4),
 	//Fourth Match T4
 	SPREADING_FLAMES(49, 4), UNDYING_EMBERS(50, 4), FADING_FLAME(84, 4),
+
+	//Yesod T1, icons are borrowed from other classes for now
+	DAMAGE_NORMALIZATION(98), DOCUMENT_REVIEW(33), SECURITY_PROCEDURE(35), INFO_NETWORK(70),
+	//Yesod T2
+	RISK_REPORT(132), GO_VISUALIZATION(152), DATABASE(37), FIELD_SURVEILLANCE(103), EMERGENCY_RESPONSE(99),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -494,6 +502,7 @@ public enum Talent {
 				case CLERIC:
 					return 186;
 				case MALKUTH:
+				case YESOD:
 					return 154; //borrowed for now
 			}
 		} else {
@@ -577,7 +586,13 @@ public enum Talent {
 			}
 		}
 
-		if (talent == HEIGHTENED_SENSES || talent == FARSIGHT || talent == DIVINE_SENSE){
+		//document review: each point is one free identification, offered right away
+		if (talent == DOCUMENT_REVIEW){
+			Buff.count(hero, YesodTrackers.DocumentReviewCharges.class, 1);
+			YesodScarf.openDocumentReview(hero);
+		}
+
+		if (talent == HEIGHTENED_SENSES || talent == FARSIGHT || talent == DIVINE_SENSE || talent == FIELD_SURVEILLANCE){
 			Dungeon.observe();
 		}
 
@@ -625,6 +640,10 @@ public enum Talent {
 				hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(healing), FloatingText.HEALING);
 
 			}
+		}
+		if (hero.hasTalent(RISK_REPORT)){
+			//1/2 info
+			InfoPower.gain(hero.pointsInTalent(RISK_REPORT));
 		}
 		if (hero.hasTalent(WORK_SNACK)){
 			//5/8 turns of bless
@@ -800,6 +819,10 @@ public enum Talent {
 	}
 
 	public static void onScrollUsed( Hero hero, int pos, float factor, Class<?extends Item> cls ){
+		if (hero.hasTalent(DATABASE) && Scroll.class.isAssignableFrom(cls)){
+			//1/2 info for reading a scroll
+			InfoPower.gain(hero.pointsInTalent(DATABASE));
+		}
 		if (hero.hasTalent(SCROLL_FILING)){
 			// 5/8 turns of bless
 			Buff.prolong(hero, Bless.class, factor * (2 + 3*hero.pointsInTalent(SCROLL_FILING)));
@@ -1047,6 +1070,9 @@ public enum Talent {
 			case MALKUTH:
 				Collections.addAll(tierTalents, THOROUGH_RECORDS, SWIFT_RESPONSE, OVERTIME, SAFETY_PROTOCOL);
 				break;
+			case YESOD:
+				Collections.addAll(tierTalents, DAMAGE_NORMALIZATION, DOCUMENT_REVIEW, SECURITY_PROCEDURE, INFO_NETWORK);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1078,6 +1104,9 @@ public enum Talent {
 				break;
 			case MALKUTH:
 				Collections.addAll(tierTalents, WORK_SNACK, EMERGENCY_MANUAL, JOINT_COMMAND, SPEED_WAR, SCROLL_FILING);
+				break;
+			case YESOD:
+				Collections.addAll(tierTalents, RISK_REPORT, GO_VISUALIZATION, DATABASE, FIELD_SURVEILLANCE, EMERGENCY_RESPONSE);
 				break;
 		}
 		for (Talent talent : tierTalents){
