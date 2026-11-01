@@ -162,6 +162,7 @@ public class Badges {
 		RESEARCHER_3                ( 85, BadgeType.JOURNAL ),
 		GAMES_PLAYED_3              ( 86, BadgeType.GLOBAL ),
 		HIGH_SCORE_3                ( 87 ),
+		WILL_TO_STAND_TALL          ( 88 ), //victory as Malkuth
 
 		//platinum
 		MANY_BUFFS                  ( 96 ),
@@ -1026,6 +1027,13 @@ public class Badges {
 				&& Dungeon.hero.subClass != null
 				&& Dungeon.hero.armorAbility != null){
 			badge = Badge.VICTORY_RANDOM;
+			local.add( badge );
+			displayBadge( badge );
+		}
+
+		//the will to stand tall: obtain the seed of light as Malkuth
+		if (Dungeon.hero.heroClass == HeroClass.MALKUTH){
+			badge = Badge.WILL_TO_STAND_TALL;
 			local.add( badge );
 			displayBadge( badge );
 		}
