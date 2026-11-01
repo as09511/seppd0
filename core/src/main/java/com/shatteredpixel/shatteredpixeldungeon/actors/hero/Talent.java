@@ -230,6 +230,12 @@ public enum Talent {
 	YESOD_FARSIGHT(107, 3), INFO_SPREAD(151, 3), VIPER_YESOD(91, 3),
 	//Technological Sciences Floor Librarian T3
 	VIOLENCE(13, 3), COMMISSION(76, 3), BLACK_FLAME(15, 3),
+	//Abnormality Response Manual T4
+	EXTENDED_MANUAL(151, 4), DAMAGE_RECORD(152, 4), COUNTER_GUIDELINE(153, 4),
+	//Regret T4
+	MIN_CORRECTION(148, 4), RIPPLE(149, 4), PURSUIT(145, 4),
+	//Solemn Lament T4
+	COFFIN(113, 4), DEAD_BUTTERFLY(114, 4), LIVING_BUTTERFLY(115, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one

@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.AnomalyManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -1740,6 +1741,9 @@ public class Hero extends Char {
 		if (hasTalent(Talent.BLACK_FLAME)){
 			damage *= 1.5f;
 		}
+
+		//abnormality response manual: 50% less damage taken
+		damage = AnomalyManual.onDamage(this, damage, src);
 
 		Endure.EndureTracker endure = buff(Endure.EndureTracker.class);
 		if (!(src instanceof Char)){

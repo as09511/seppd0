@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.RegretStrike;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -255,6 +256,9 @@ abstract public class KindOfWeapon extends EquipableItem {
 				max += cut * (1 + ((Hero) owner).pointsInTalent(Talent.VIOLENCE));
 				min = Math.min(min, 1);
 			}
+			//regret armor ability: +50% max damage, min correction
+			int[] regret = RegretStrike.adjustRange((Hero) owner, min, max);
+			min = regret[0]; max = regret[1];
 			return Hero.heroDamageIntRange(min, max);
 		} else {
 			return Random.NormalIntRange(min(), max());

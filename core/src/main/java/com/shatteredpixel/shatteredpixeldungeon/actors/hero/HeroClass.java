@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.SolemnLamentVolley;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.RegretStrike;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.AnomalyManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -380,6 +383,8 @@ public enum HeroClass {
 				return new ArmorAbility[]{new AscendedForm(), new Trinity(), new PowerOfMany()};
 			case MALKUTH:
 				return new ArmorAbility[]{new MusterCall(), new Hornet(), new FourthMatch()};
+			case YESOD:
+				return new ArmorAbility[]{new AnomalyManual(), new RegretStrike(), new SolemnLamentVolley()};
 		}
 	}
 
