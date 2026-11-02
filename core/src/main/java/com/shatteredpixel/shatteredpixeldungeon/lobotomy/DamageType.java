@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 
+import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -69,7 +70,19 @@ public enum DamageType {
 	public static int apply(Char defender, DamageType type, int damage){
 		if (type == null) return damage;
 		defender.incomingDamageType = type;
-		return Math.max(0, Math.round(damage * defender.damageMultiplier(type)));
+		float multiplier = defender.damageMultiplier(type);
+		//a negative multiplier absorbs the damage, healing the defender instead
+		if (multiplier < 0){
+			int heal = Math.min(Math.round(damage * -multiplier), defender.HT - defender.HP);
+			if (heal > 0 && defender.isAlive()){
+				defender.HP += heal;
+				if (defender.sprite != null){
+					defender.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(heal), FloatingText.HEALING);
+				}
+			}
+			return 0;
+		}
+		return Math.max(0, Math.round(damage * multiplier));
 	}
 
 	public static boolean isNeutral(float[] multipliers){

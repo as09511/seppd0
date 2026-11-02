@@ -38,6 +38,9 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MagicBulletArmor
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.RedEyesArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LifeForADaredevilArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.BeakArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.DaCapoArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MimicryArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LaughterArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.HornetArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LampArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.SanguineDesireArmor;
@@ -512,9 +515,12 @@ public class Generator {
 					TearsArmor.class,
 					HornetArmor.class,
 					LampArmor.class,
-					JustitiaArmor.class
+					JustitiaArmor.class,
+					DaCapoArmor.class,
+					MimicryArmor.class,
+					LaughterArmor.class
 			};
-			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 			
 			//see Generator.randomMissile
 			MISSILE.classes = new Class<?>[]{};
@@ -819,7 +825,7 @@ public class Generator {
 			{RedEyesArmor.class, LifeForADaredevilArmor.class, BeakArmor.class},
 			{MagicBulletArmor.class, SanguineDesireArmor.class, SolemnLamentArmor.class},
 			{TearsArmor.class, HornetArmor.class, LampArmor.class},
-			{JustitiaArmor.class}
+			{JustitiaArmor.class, DaCapoArmor.class, MimicryArmor.class, LaughterArmor.class}
 	};
 
 	//a new, unidentified armor of the given tier (1-5), picked at random among that tier's armors

@@ -28,6 +28,9 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MagicBulletArmor
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.RedEyesArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LifeForADaredevilArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.BeakArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.DaCapoArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MimicryArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LaughterArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.HornetArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LampArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.SanguineDesireArmor;
@@ -98,8 +101,11 @@ public class EgoCatalog {
 			JustitiaArmor.class,
 			GoldRush.class,
 			Mimicry.class,
+			MimicryArmor.class,
 			DaCapo.class,
+			DaCapoArmor.class,
 			Laughter.class,
+			LaughterArmor.class,
 			SoundOfAStar.class
 	};
 
