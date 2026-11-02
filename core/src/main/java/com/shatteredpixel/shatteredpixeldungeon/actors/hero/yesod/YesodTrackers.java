@@ -81,6 +81,40 @@ public class YesodTrackers {
 		}
 	}
 
+	//shows the info gained by the surveillance camera once the level is on screen
+	public static class CameraReport extends Buff {
+
+		{
+			//acts before the hero, so the text appears as soon as the level is shown
+			actPriority = VFX_PRIO;
+		}
+
+		public int gained = 0;
+
+		@Override
+		public boolean act() {
+			if (gained > 0 && target.sprite != null){
+				target.sprite.showStatus(InfoPower.GAIN_COLOR, Messages.get(InfoPower.class, "gain", gained));
+			}
+			detach();
+			return true;
+		}
+
+		private static final String GAINED = "gained";
+
+		@Override
+		public void storeInBundle(Bundle bundle) {
+			super.storeInBundle(bundle);
+			bundle.put(GAINED, gained);
+		}
+
+		@Override
+		public void restoreFromBundle(Bundle bundle) {
+			super.restoreFromBundle(bundle);
+			gained = bundle.getInt(GAINED);
+		}
+	}
+
 	//floors Yesod has already arrived on, for the surveillance camera and commission talents
 	public static class VisitedFloors extends Buff {
 		{
@@ -132,7 +166,13 @@ public class YesodTrackers {
 					}
 				}
 			}
+			int before = InfoPower.current();
 			InfoPower.gain(info);
+			//the level is still loading, so the "+info" text is shown on the hero's first turn there
+			int gained = InfoPower.current() - before;
+			if (gained > 0){
+				Buff.affect(hero, CameraReport.class).gained = gained;
+			}
 		}
 
 		//commission: one random non-boss enemy on the floor becomes the target
