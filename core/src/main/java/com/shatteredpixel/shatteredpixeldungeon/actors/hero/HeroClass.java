@@ -100,6 +100,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingSt
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.darts.Dart;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DummySummoner;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.QliphothGate;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.EgoExtractor;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.watabou.utils.DeviceCompat;
@@ -270,6 +271,10 @@ public enum HeroClass {
 		DummySummoner summoner = new DummySummoner();
 		summoner.collect();
 		Dungeon.quickslot.setSlot(1, summoner);
+
+		QliphothGate gate = new QliphothGate();
+		gate.collect();
+		Dungeon.quickslot.setSlot(2, gate);
 	}
 
 	public Badges.Badge masteryBadge() {
