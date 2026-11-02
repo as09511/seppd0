@@ -36,6 +36,8 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.WarriorArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.JustitiaArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MagicBulletArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.RedEyesArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LifeForADaredevilArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.BeakArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.TearsArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit;
@@ -494,15 +496,17 @@ public class Generator {
 			WEP_T5.defaultProbs = new float[]{ 1, 1, 1, 1, 1, 1 };
 			WEP_T5.probs = WEP_T5.defaultProbs.clone();
 			
-			//one armor per tier, see Generator.randomArmor and Generator.armorOfTier
+			//every armor, see ARMOR_BY_TIER for how they drop
 			ARMOR.classes = new Class<?>[]{
 					Suit.class,
 					RedEyesArmor.class,
+					LifeForADaredevilArmor.class,
+					BeakArmor.class,
 					MagicBulletArmor.class,
 					TearsArmor.class,
 					JustitiaArmor.class
 			};
-			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1 };
+			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 1, 1 };
 			
 			//see Generator.randomMissile
 			MISSILE.classes = new Class<?>[]{};
@@ -796,15 +800,25 @@ public class Generator {
 
 		floorSet = (int)GameMath.gate(0, floorSet, floorSetTierProbs.length-1);
 		
-		Armor a = (Armor)Reflection.newInstance(Category.ARMOR.classes[Random.chances(floorSetTierProbs[floorSet])]);
+		Armor a = armorOfTier(Random.chances(floorSetTierProbs[floorSet]) + 1);
 		a.random();
 		return a;
 	}
 
-	//a new, unidentified armor of the given tier (1-5), used where the game used to create a specific armor
+	//E.G.O armor by tier, armors of the same tier have the same defense and differ in their resistances
+	private static final Class<?>[][] ARMOR_BY_TIER = new Class<?>[][]{
+			{Suit.class},
+			{RedEyesArmor.class, LifeForADaredevilArmor.class, BeakArmor.class},
+			{MagicBulletArmor.class},
+			{TearsArmor.class},
+			{JustitiaArmor.class}
+	};
+
+	//a new, unidentified armor of the given tier (1-5), picked at random among that tier's armors
+	//used where the game used to create a specific armor
 	public static Armor armorOfTier(int tier){
-		tier = (int)GameMath.gate(1, tier, Category.ARMOR.classes.length);
-		return (Armor)Reflection.newInstance(Category.ARMOR.classes[tier-1]);
+		tier = (int)GameMath.gate(1, tier, ARMOR_BY_TIER.length);
+		return (Armor)Reflection.newInstance(Random.element(ARMOR_BY_TIER[tier-1]));
 	}
 
 	//the original Shattered Pixel Dungeon weapons and armor, no longer dropped or listed in the catalog

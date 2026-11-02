@@ -475,6 +475,14 @@ public class ItemSpriteSheet {
 		assignItemRect(LONELINESS,           16, 16);
 	}
 
+	//more E.G.O armor, left of Sound of a Star
+	public static final int LIFE_FOR_A_DAREDEVIL_ARMOR = xy(11, 19);
+	public static final int BEAK_ARMOR           = xy(12, 19);
+	static{
+		assignItemRect(LIFE_FOR_A_DAREDEVIL_ARMOR, 16, 15);
+		assignItemRect(BEAK_ARMOR,           16, 15);
+	}
+
 	//Sound of a Star, left of Hod's manual
 	public static final int SOUND_OF_A_STAR      = xy(13, 19);
 	static{

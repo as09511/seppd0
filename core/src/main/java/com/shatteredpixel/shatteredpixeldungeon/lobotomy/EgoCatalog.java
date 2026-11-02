@@ -26,6 +26,8 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.JustitiaArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MagicBulletArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.RedEyesArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LifeForADaredevilArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.BeakArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.TearsArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Baton;
@@ -63,11 +65,13 @@ public class EgoCatalog {
 			Suit.class,
 			Penitence.class,
 			LifeForADaredevil.class,
+			LifeForADaredevilArmor.class,
 			MagicBullet.class,
 			MagicBulletArmor.class,
 			RedEyes.class,
 			RedEyesArmor.class,
 			Beak.class,
+			BeakArmor.class,
 			Loneliness.class,
 			FragmentsFromSomewhere.class,
 			Regret.class,
