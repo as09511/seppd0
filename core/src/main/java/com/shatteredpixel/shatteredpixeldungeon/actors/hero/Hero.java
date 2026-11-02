@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.Anom
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Bones;
@@ -682,11 +683,14 @@ public class Hero extends Char {
 		int dr = super.drRoll();
 
 		if (belongings.armor() != null) {
-			int armDr = Random.NormalIntRange( belongings.armor().DRMin(), belongings.armor().DRMax());
+			int armDr = Random.NormalIntRange( belongings.armor().DRMin(), belongings.armor().DRMax() + HodTrackers.armorBonus(this));
 			if (STR() < belongings.armor().STRReq()){
 				armDr -= 2*(belongings.armor().STRReq() - STR());
 			}
 			if (armDr > 0) dr += armDr;
+		} else if (HodTrackers.armorBonus(this) > 0){
+			//Hod's clumsy goodwill also works without armor
+			dr += Random.NormalIntRange( 0, HodTrackers.armorBonus(this) );
 		}
 		if (belongings.weapon() != null && !RingOfForce.fightingUnarmed(this))  {
 			int wepDr = Random.NormalIntRange( 0 , belongings.weapon().defenseFactor( this ) );
@@ -1684,6 +1688,11 @@ public class Hero extends Char {
 	
 	@Override
 	public int defenseProc( Char enemy, int damage ) {
+
+		//Hod's old umbrella: the whole hit is reflected back and not taken
+		if (HodTrackers.reflects(this, enemy, damage)){
+			return 0;
+		}
 		
 		if (damage > 0 && subClass == HeroSubClass.BERSERKER){
 			Berserk berserk = Buff.affect(this, Berserk.class);
@@ -2195,7 +2204,7 @@ public class Hero extends Char {
 				buff(Talent.WandPreservationCounter.class).detach();
 			}
 
-			if (lvl < MAX_LEVEL) {
+			if (lvl < HodTrackers.maxLevel(this)) {
 				lvl++;
 				levelUp = true;
 				
@@ -2207,8 +2216,9 @@ public class Hero extends Char {
 				attackSkill++;
 				defenseSkill++;
 
-				//Hod's rest time
+				//Hod's rest time and hope it helps
 				HodManual.onLevelUp( this );
+				HodTrackers.onLevelUpOrExperience( this );
 
 			} else {
 				Buff.prolong(this, Bless.class, Bless.DURATION);

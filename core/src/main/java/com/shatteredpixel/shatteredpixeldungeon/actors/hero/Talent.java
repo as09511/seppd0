@@ -243,6 +243,12 @@ public enum Talent {
 	REST_TIME(0), WORK_FAMILIARITY(1), PRACTICAL_EVAL(66), SAFETY_TRAINING(3),
 	//Hod T2
 	LUNCH_SEMINAR(100), JOB_TRAINING(33), BASIC_FITNESS(99), DEMO_TRAINING(137), FIELD_ADAPTATION(102),
+	//Hod T3
+	POTENTIAL_DEV(10, 3), TRAINING_RESULT(11, 3),
+	//Training Team Sephirah T3
+	CLUMSY_GOODWILL(14, 3), HOPE_IT_HELPS(15, 3), CERTIFICATE(76, 3),
+	//Literature Floor Librarian T3
+	OBSESSION(77, 3), COCOON(78, 3), OLD_UMBRELLA(79, 3),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -1188,6 +1194,9 @@ public enum Talent {
 			case YESOD:
 				Collections.addAll(tierTalents, SURVEILLANCE_CAMERA, DOCUMENT_ORGANIZE);
 				break;
+			case HOD:
+				Collections.addAll(tierTalents, POTENTIAL_DEV, TRAINING_RESULT);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1263,6 +1272,12 @@ public enum Talent {
 				break;
 			case TECH_LIBRARIAN:
 				Collections.addAll(tierTalents, VIOLENCE, COMMISSION, BLACK_FLAME);
+				break;
+			case TRAINING_SEPHIRAH:
+				Collections.addAll(tierTalents, CLUMSY_GOODWILL, HOPE_IT_HELPS, CERTIFICATE);
+				break;
+			case LITERATURE_LIBRARIAN:
+				Collections.addAll(tierTalents, OBSESSION, COCOON, OLD_UMBRELLA);
 				break;
 		}
 		for (Talent talent : tierTalents){

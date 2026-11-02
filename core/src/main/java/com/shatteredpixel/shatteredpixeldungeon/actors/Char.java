@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Analyzed;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Electricity;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.StormCloud;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.ToxicGas;
@@ -478,6 +479,11 @@ public abstract class Char extends Actor {
 				dmg *= YesodTrackers.attackMultiplier((Hero) this);
 			}
 
+			//Hod's training results and the literature floor librarian's bonus on rooted enemies
+			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.HOD){
+				dmg *= HodTrackers.attackMultiplier((Hero) this, enemy);
+			}
+
 			if (buff( PowerOfMany.PowerBuff.class) != null){
 				if (buff( BeamingRay.BeamingRayBoost.class) != null
 					&& buff( BeamingRay.BeamingRayBoost.class).object == enemy.id()){
@@ -553,6 +559,11 @@ public abstract class Char extends Actor {
 
 			enemy.damage( effectiveDamage, this );
 			enemy.incomingDamageType = null;
+
+			//literature floor librarian's bleeding and cocoon
+			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.HOD){
+				HodTrackers.afterHit((Hero) this, enemy);
+			}
 
 			if (buff(FireImbue.class) != null)  buff(FireImbue.class).proc(enemy);
 			if (buff(FrostImbue.class) != null) buff(FrostImbue.class).proc(enemy);

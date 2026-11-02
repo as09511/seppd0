@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -387,9 +388,10 @@ public class Item implements Bundlable {
 		//only the hero can be affected by Degradation
 		if (Dungeon.hero != null && Dungeon.hero.buff( Degrade.class ) != null
 			&& (isEquipped( Dungeon.hero ) || Dungeon.hero.belongings.contains( this ))) {
-			return Degrade.reduceLevel(level());
+			return Degrade.reduceLevel(level()) + HodTrackers.potentialBonus(this);
 		} else {
-			return level();
+			//Hod's potential development
+			return level() + HodTrackers.potentialBonus(this);
 		}
 	}
 

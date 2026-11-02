@@ -76,6 +76,9 @@ public class ChaliceOfBlood extends Artifact {
 
 		if (action.equals(AC_PRICK)){
 
+			//can't be fed while invulnerable (e.g. Hod's hope it helps)
+			if (hero.isInvulnerable(getClass())) return;
+
 			int minDmg = minPrickDmg();
 			int maxDmg = maxPrickDmg();
 

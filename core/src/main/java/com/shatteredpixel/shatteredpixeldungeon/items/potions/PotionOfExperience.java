@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.potions;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Flare;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
@@ -42,6 +43,8 @@ public class PotionOfExperience extends Potion {
 		identify();
 		hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(hero.maxExp()), FloatingText.EXPERIENCE);
 		hero.earnExp( hero.maxExp(), getClass() );
+		//Hod's hope it helps
+		HodTrackers.onLevelUpOrExperience( hero );
 		new Flare( 6, 32 ).color(0xFFFF00, true).show( curUser.sprite, 2f );
 	}
 	
