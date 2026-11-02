@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
+import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.utils.Bundle;
@@ -116,14 +117,22 @@ public class YesodTrackers {
 		if (visited.floors.contains(key)) return;
 		visited.floors.add(key);
 
-		//surveillance camera: maps the area around the stairs he arrived by, 8/12/16 tiles
+		//surveillance camera: like magic mapping around the stairs he arrived by, 8/10/12 tiles.
+		//hidden traps and secret doors are found too, giving info and triggering security procedure
 		if (hero.hasTalent(Talent.SURVEILLANCE_CAMERA)){
-			int range = 4 + 4*hero.pointsInTalent(Talent.SURVEILLANCE_CAMERA);
+			int range = 6 + 2*hero.pointsInTalent(Talent.SURVEILLANCE_CAMERA);
+			int info = 0;
 			for (int i = 0; i < level.length(); i++){
 				if (level.discoverable[i] && level.distance(hero.pos, i) <= range){
 					level.mapped[i] = true;
+					int terr = level.map[i];
+					if ((Terrain.flags[terr] & Terrain.SECRET) != 0){
+						level.discover(i);
+						info += terr == Terrain.SECRET_TRAP ? InfoPower.SECRET_TRAP_INFO : InfoPower.SECRET_DOOR_INFO;
+					}
 				}
 			}
+			InfoPower.gain(info);
 		}
 
 		//commission: one random non-boss enemy on the floor becomes the target
