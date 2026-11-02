@@ -82,6 +82,9 @@ public class WndHeroInfo extends WndTabbed {
 			case YESOD:
 				tabIcon = new ItemSprite(ItemSpriteSheet.YESOD_SCARF, null);
 				break;
+			case HOD:
+				tabIcon = new ItemSprite(ItemSpriteSheet.HOD_MANUAL, null);
+				break;
 		}
 
 		int finalHeight = MIN_HEIGHT;
@@ -220,6 +223,11 @@ public class WndHeroInfo extends WndTabbed {
 					break;
 				case YESOD:
 					icons = new Image[]{ new ItemSprite(ItemSpriteSheet.YESOD_SCARF),
+							new ItemSprite(ItemSpriteSheet.BATON),
+							new ItemSprite(ItemSpriteSheet.SCROLL_ISAZ)};
+					break;
+				case HOD:
+					icons = new Image[]{ new ItemSprite(ItemSpriteSheet.HOD_MANUAL),
 							new ItemSprite(ItemSpriteSheet.BATON),
 							new ItemSprite(ItemSpriteSheet.SCROLL_ISAZ)};
 					break;

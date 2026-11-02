@@ -125,8 +125,19 @@ public class Hunger extends Buff implements Hero.Doom {
 		return true;
 	}
 
+	//hunger actually removed by the last satisfy, read once by Hod's lunch seminar
+	private float lastRestored = 0;
+
 	public void satisfy( float energy ) {
+		float before = level;
 		affectHunger( energy, false );
+		lastRestored = Math.max(0, before - level);
+	}
+
+	public float lastRestored(){
+		float restored = lastRestored;
+		lastRestored = 0;
+		return restored;
 	}
 
 	public void affectHunger(float energy ){

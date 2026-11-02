@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -33,6 +34,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Hunger;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
@@ -236,6 +238,11 @@ public enum Talent {
 	MIN_CORRECTION(188, 4), RIPPLE(189, 4), PURSUIT(190, 4),
 	//Solemn Lament T4
 	COFFIN(94, 4), DEAD_BUTTERFLY(95, 4), LIVING_BUTTERFLY(123, 4),
+
+	//Hod T1, icons are borrowed from other classes for now
+	REST_TIME(0), WORK_FAMILIARITY(1), PRACTICAL_EVAL(66), SAFETY_TRAINING(3),
+	//Hod T2
+	LUNCH_SEMINAR(100), JOB_TRAINING(33), BASIC_FITNESS(99), DEMO_TRAINING(137), FIELD_ADAPTATION(102),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -515,6 +522,7 @@ public enum Talent {
 					return 186;
 				case MALKUTH:
 				case YESOD:
+				case HOD:
 					return 154; //borrowed for now
 			}
 		} else {
@@ -548,6 +556,11 @@ public enum Talent {
 	}
 
 	public static void onTalentUpgraded( Hero hero, Talent talent ){
+		//Hod's basic fitness raises max HP right away
+		if (talent == BASIC_FITNESS){
+			hero.updateHT(false);
+		}
+
 		//for metamorphosis
 		if (talent == IRON_WILL && hero.heroClass != HeroClass.WARRIOR){
 			Buff.affect(hero, BrokenSeal.WarriorShield.class);
@@ -658,6 +671,8 @@ public enum Talent {
 
 			}
 		}
+		//Hod's lunch seminar: exp from the hunger actually restored
+		HodManual.onFoodEaten(hero, Buff.affect(hero, Hunger.class).lastRestored());
 		if (hero.hasTalent(RISK_REPORT)){
 			//1/2 info
 			InfoPower.gain(hero.pointsInTalent(RISK_REPORT));
@@ -759,6 +774,10 @@ public enum Talent {
 		// Malkuth: 1.75x/2.5x for weapons and armor
 		if (item instanceof MeleeWeapon || item instanceof Armor){
 			factor *= 1f + 0.75f*hero.pointsInTalent(THOROUGH_RECORDS);
+		}
+		// Hod: 1.5x/2x for weapons, armor and rings
+		if (item instanceof MeleeWeapon || item instanceof Armor || item instanceof Ring){
+			factor *= 1f + 0.5f*hero.pointsInTalent(WORK_FAMILIARITY);
 		}
 		if (item instanceof MeleeWeapon){
 			factor *= 1f + 1.5f*hero.pointsInTalent(ADVENTURERS_INTUITION); //instant at +2 (see onItemEquipped)
@@ -951,6 +970,9 @@ public enum Talent {
 
 	public static int onAttackProc( Hero hero, Char enemy, int dmg ){
 
+		//Hod's practical evaluation
+		dmg = HodManual.onAttackProc(hero, enemy, dmg);
+
 		//spore: 10/20/30% of the damage as bleeding on burning enemies
 		if (hero.hasTalent(SPORE) && enemy.buff(Burning.class) != null && dmg > 0){
 			int bleed = Math.round(dmg * 0.1f * hero.pointsInTalent(SPORE));
@@ -1090,6 +1112,9 @@ public enum Talent {
 			case YESOD:
 				Collections.addAll(tierTalents, DAMAGE_NORMALIZATION, DOCUMENT_REVIEW, SECURITY_PROCEDURE, INFO_NETWORK);
 				break;
+			case HOD:
+				Collections.addAll(tierTalents, REST_TIME, WORK_FAMILIARITY, PRACTICAL_EVAL, SAFETY_TRAINING);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1124,6 +1149,9 @@ public enum Talent {
 				break;
 			case YESOD:
 				Collections.addAll(tierTalents, RISK_REPORT, GO_VISUALIZATION, DATABASE, FIELD_SURVEILLANCE, EMERGENCY_RESPONSE);
+				break;
+			case HOD:
+				Collections.addAll(tierTalents, LUNCH_SEMINAR, JOB_TRAINING, BASIC_FITNESS, DEMO_TRAINING, FIELD_ADAPTATION);
 				break;
 		}
 		for (Talent talent : tierTalents){

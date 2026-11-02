@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
@@ -511,6 +512,11 @@ public class Dungeon {
 
 		//Yesod's surveillance camera and commission talents
 		YesodTrackers.onLevelArrived( hero, level );
+
+		//Hod's vault training only lasts inside the vault
+		if (!(level instanceof VaultLevel) && hero.buff(HodManual.VaultTraining.class) != null){
+			hero.buff(HodManual.VaultTraining.class).detach();
+		}
 
 		observe();
 		try {

@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.AnomalyManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Bones;
@@ -275,7 +276,7 @@ public class Hero extends Char {
 	public void updateHT( boolean boostHP ){
 		int curHT = HT;
 		
-		HT = 20 + 5*(lvl-1) + HTBoost;
+		HT = 20 + 5*(lvl-1) + HTBoost + HodManual.bonusHT(this);
 		float multiplier = RingOfMight.HTMultiplier(this);
 		HT = Math.round(multiplier * HT);
 		
@@ -535,6 +536,7 @@ public class Hero extends Char {
 		
 		float accuracy = 1;
 		accuracy *= RingOfAccuracy.accuracyMultiplier( this );
+		accuracy *= HodManual.accuracyMultiplier( this );
 		
 		//precise assault and liquid agility
 		if (!(wep instanceof MissileWeapon)) {
@@ -603,6 +605,7 @@ public class Hero extends Char {
 		float evasion = defenseSkill;
 		
 		evasion *= RingOfEvasion.evasionMultiplier( this );
+		evasion *= HodManual.evasionMultiplier( this );
 
 		//mobile command: +10/20/30% evasion while hasted
 		if (hasTalent(Talent.MOBILE_COMMAND) && buff(Haste.class) != null){
@@ -909,6 +912,11 @@ public class Hero extends Char {
 		//Yesod's information
 		if (heroClass == HeroClass.YESOD && buff(InfoPower.class) == null){
 			Buff.affect(this, InfoPower.class);
+		}
+
+		//Hod's training manual
+		if (heroClass == HeroClass.HOD && buff(HodManual.class) == null){
+			Buff.affect(this, HodManual.class);
 		}
 
 		//Malkuth's subclass abilities
@@ -1807,6 +1815,9 @@ public class Hero extends Char {
 			}
 		}
 
+		//Hod's safety training
+		HodManual.onDamaged(this);
+
 		if (buff(Challenge.DuelParticipant.class) != null){
 			buff(Challenge.DuelParticipant.class).addDamage(effectiveDamage);
 		}
@@ -2195,6 +2206,9 @@ public class Hero extends Char {
 				updateHT( true );
 				attackSkill++;
 				defenseSkill++;
+
+				//Hod's rest time
+				HodManual.onLevelUp( this );
 
 			} else {
 				Buff.prolong(this, Bless.class, Bless.DURATION);

@@ -106,7 +106,8 @@ public class Food extends Item {
 			|| Dungeon.hero.hasTalent(Talent.FOCUSED_MEAL)
 			|| Dungeon.hero.hasTalent(Talent.ENLIGHTENING_MEAL)
 			|| Dungeon.hero.hasTalent(Talent.WORK_SNACK)
-			|| Dungeon.hero.hasTalent(Talent.RISK_REPORT)){
+			|| Dungeon.hero.hasTalent(Talent.RISK_REPORT)
+			|| Dungeon.hero.hasTalent(Talent.LUNCH_SEMINAR)){
 			return TIME_TO_EAT - 2;
 		} else {
 			return TIME_TO_EAT;

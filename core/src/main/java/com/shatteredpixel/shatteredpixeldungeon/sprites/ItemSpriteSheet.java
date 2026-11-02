@@ -475,6 +475,12 @@ public class ItemSpriteSheet {
 		assignItemRect(LONELINESS,           16, 16);
 	}
 
+	//Hod's training manual, only used as her icon
+	public static final int HOD_MANUAL           = xy(14, 19);
+	static{
+		assignItemRect(HOD_MANUAL,           16, 16);
+	}
+
 	private static final int WANDS              =                           xy(1, 14);  //16 slots
 	public static final int WAND_MAGIC_MISSILE  = WANDS+0;
 	public static final int WAND_FIREBOLT       = WANDS+1;

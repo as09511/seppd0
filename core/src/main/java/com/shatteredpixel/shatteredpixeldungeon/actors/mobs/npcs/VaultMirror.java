@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -68,6 +69,8 @@ public class VaultMirror extends NPC {
 	}
 
 	public Item reward = null;
+	//Hod gets no item from the mirror, but training that lasts while she stays in the vault
+	public boolean hodTraining = false;
 
 	public void createReward(HeroClass cls){
 		//we create a new generator here as some heroes call RNG here and some don't
@@ -103,6 +106,9 @@ public class VaultMirror extends NPC {
 				case YESOD:
 					reward = new YesodScarf().identify(false);
 					break;
+				case HOD:
+					hodTraining = true;
+					break;
 			}
 		Random.popGenerator();
 	}
@@ -113,7 +119,7 @@ public class VaultMirror extends NPC {
 			ShatteredPixelDungeon.runOnRenderThread(new Callback() {
 				@Override
 				public void call() {
-					if (reward != null) {
+					if (reward != null || hodTraining) {
 
 						String sceneText = Messages.get(VaultMirror.class, "approach") + "\n\n";
 						switch (((Hero) c).heroClass){
@@ -141,17 +147,25 @@ public class VaultMirror extends NPC {
 							case YESOD:
 								sceneText += Messages.get(VaultMirror.class, "scene_yesod");
 								break;
+							case HOD:
+								sceneText += Messages.get(VaultMirror.class, "scene_hod");
+								break;
 						}
 						sceneText += "\n\n" + Messages.get(VaultMirror.class, "scene_final");
 
 						GameScene.show(new WndOptions(sprite(),
 								Messages.titleCase(name()),
 								sceneText,
-								Messages.get(VaultMirror.class, "take")) {
+								Messages.get(VaultMirror.class, hodTraining ? "take_hod" : "take")) {
 							@Override
 							protected void onSelect(int index) {
 								super.onSelect(index);
-								if (index == 0) {
+								if (index == 0 && hodTraining) {
+									GameScene.show(new WndTitledMessage(sprite(), Messages.titleCase(name()), Messages.get(VaultMirror.class, "scene_take_hod", HodManual.VAULT_BONUS)));
+									Buff.affect(c, HodManual.VaultTraining.class);
+									Imp.Quest.mirrorUsed = true;
+									hodTraining = false;
+								} else if (index == 0) {
 									GameScene.show(new WndTitledMessage(sprite(), Messages.titleCase(name()), Messages.get(VaultMirror.class, "scene_take")));
 									if (reward.doPickUp((Hero) c)) {
 										GLog.i( Messages.capitalize(Messages.get(Dungeon.hero, "you_now_have", reward.name())) );
@@ -197,6 +211,7 @@ public class VaultMirror extends NPC {
 	}
 
 	private static final String REWARD = "reward";
+	private static final String HOD_TRAINING = "hod_training";
 
 	@Override
 	public void storeInBundle(Bundle bundle) {
@@ -204,6 +219,7 @@ public class VaultMirror extends NPC {
 		if (reward != null) {
 			bundle.put(REWARD, reward);
 		}
+		bundle.put(HOD_TRAINING, hodTraining);
 	}
 
 	@Override
@@ -212,6 +228,7 @@ public class VaultMirror extends NPC {
 		if (bundle.contains(REWARD)){
 			reward = (Item) bundle.get(REWARD);
 		}
+		hodTraining = bundle.getBoolean(HOD_TRAINING);
 	}
 
 	public static class MirrorSword extends Greatsword {

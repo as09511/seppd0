@@ -483,6 +483,8 @@ public enum Icons {
 				return new ItemSprite(ItemSpriteSheet.MALKUTH_NOTEBOOK);
 			case YESOD:
 				return new ItemSprite(ItemSpriteSheet.YESOD_SCARF);
+			case HOD:
+				return new ItemSprite(ItemSpriteSheet.HOD_MANUAL);
 			case TESTER:
 				return new ItemSprite(ItemSpriteSheet.CRYSTAL_CHEST);
 			default:

@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.Sole
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.RegretStrike;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.AnomalyManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
@@ -81,6 +82,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImag
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRage;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRemoveCurse;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfUpgrade;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfExperience;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfMagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Cudgel;
@@ -113,6 +115,9 @@ public enum HeroClass {
 
 	//Yesod, the Information Team's sephirah
 	YESOD( HeroSubClass.INFO_SEPHIRAH, HeroSubClass.TECH_LIBRARIAN ),
+
+	//Hod, the Training Team's sephirah
+	HOD( HeroSubClass.TRAINING_SEPHIRAH, HeroSubClass.LITERATURE_LIBRARIAN ),
 
 	//testing class, uses the warrior's sprite, talents and subclasses
 	TESTER( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR );
@@ -179,6 +184,10 @@ public enum HeroClass {
 				initYesod( hero );
 				break;
 
+			case HOD:
+				initHod( hero );
+				break;
+
 			case TESTER:
 				initTester( hero );
 				break;
@@ -225,6 +234,18 @@ public enum HeroClass {
 
 		//info starts being gathered only after the starting items are known
 		Buff.affect(hero, InfoPower.class);
+	}
+
+	private static void initHod( Hero hero ) {
+		ThrowingStone stones = new ThrowingStone();
+		stones.identify().collect();
+
+		Dungeon.quickslot.setSlot(0, stones);
+
+		new ScrollOfUpgrade().identify();
+		new PotionOfExperience().identify();
+
+		Buff.affect(hero, HodManual.class);
 	}
 
 	private static void initTester( Hero hero ) {
@@ -406,6 +427,8 @@ public enum HeroClass {
 				return Assets.Sprites.MALKUTH;
 			case YESOD:
 				return Assets.Sprites.YESOD;
+			case HOD:
+				return Assets.Sprites.HOD;
 		}
 	}
 
@@ -427,6 +450,8 @@ public enum HeroClass {
 				return Assets.Splashes.MALKUTH;
 			case YESOD:
 				return Assets.Splashes.YESOD;
+			case HOD:
+				return Assets.Splashes.HOD;
 		}
 	}
 	
