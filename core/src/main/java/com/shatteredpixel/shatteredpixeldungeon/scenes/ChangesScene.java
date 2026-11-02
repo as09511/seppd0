@@ -65,6 +65,8 @@ public class ChangesScene extends PixelScene {
 	
 	public static int changesSelected = 0;
 
+	public static final String RELEASES_URL = "https://github.com/as09511/seppd0/releases";
+
 	private NinePatch rightPanel;
 	private ScrollPane rightScroll;
 	private IconTitle changeTitle;
@@ -103,166 +105,26 @@ public class ChangesScene extends PixelScene {
 		btnExit.setPos( insets.left + w - btnExit.width(), insets.top );
 		add( btnExit );
 
-		NinePatch panel = Chrome.get(Chrome.Type.TOAST);
+		//Sefirot: the patch notes live on the GitHub releases page instead of the original changelog
+		RenderedTextBlock notice = PixelScene.renderTextBlock(Messages.get(this, "github_notice"), 9);
+		notice.maxWidth(Math.min(200, (int)w - 20));
+		notice.align(RenderedTextBlock.CENTER_ALIGN);
+		notice.setPos(insets.left + (w - notice.width()) / 2f, insets.top + h / 2f - notice.height() - 12);
+		align(notice);
+		add(notice);
 
-		int pw = 135 + panel.marginLeft() + panel.marginRight() - 2;
-		int ph = h - 36;
-
-		if (h >= PixelScene.MIN_HEIGHT_FULL && w >= 300) {
-			panel.size( pw, ph );
-			panel.x = insets.left + (w - pw) / 2f - pw/2 - 1;
-			panel.y = insets.top + 20;
-
-			rightPanel = Chrome.get(Chrome.Type.TOAST);
-			rightPanel.size( pw, ph );
-			rightPanel.x = (w - pw) / 2f + pw/2 + 1;
-			rightPanel.y = 20;
-			add(rightPanel);
-
-			rightScroll = new ScrollPane(new Component());
-			add(rightScroll);
-			rightScroll.setRect(
-					rightPanel.x + rightPanel.marginLeft(),
-					rightPanel.y + rightPanel.marginTop()-1,
-					rightPanel.innerWidth() + 2,
-					rightPanel.innerHeight() + 2);
-			rightScroll.scrollTo(0, 0);
-
-			changeTitle = new IconTitle(Icons.get(Icons.CHANGES), Messages.get(this, "right_title"));
-			changeTitle.setPos(0, 1);
-			changeTitle.setSize(pw, 20);
-			rightScroll.content().add(changeTitle);
-
-			String body = Messages.get(this, "right_body");
-
-			changeBody = PixelScene.renderTextBlock(body, 6);
-			changeBody.maxWidth(pw - panel.marginHor());
-			changeBody.setPos(0, changeTitle.bottom()+2);
-			rightScroll.content().add(changeBody);
-
-		} else {
-			panel.size( pw, ph );
-			panel.x = insets.left + (w - pw) / 2f;
-			panel.y = insets.top + 20;
-		}
-		align( panel );
-		add( panel );
-		
-		final ArrayList<ChangeInfo> changeInfos = new ArrayList<>();
-
-		if (Messages.lang() != Languages.ENGLISH){
-			ChangeInfo langWarn = new ChangeInfo("", true, Messages.get(this, "lang_warn"));
-			langWarn.hardlight(CharSprite.WARNING);
-			changeInfos.add(langWarn);
-		}
-		
-		switch (changesSelected){
-			case 0: default:
-				v4_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 1:
-				v3_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 2:
-				v2_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 3:
-				v1_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 4:
-				v0_9_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 5:
-				v0_8_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 6:
-				v0_7_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 7:
-				v0_6_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 8:
-				v0_5_X_Changes.addAllChanges(changeInfos);
-				v0_4_X_Changes.addAllChanges(changeInfos);
-				v0_3_X_Changes.addAllChanges(changeInfos);
-				v0_2_X_Changes.addAllChanges(changeInfos);
-				v0_1_X_Changes.addAllChanges(changeInfos);
-				Pixel_Dungeon_Changes.addAllChanges(changeInfos);
-				break;
-		}
-
-		ScrollPane list = new ScrollPane( new Component() ){
-
+		StyledButton btnGithub = new StyledButton(Chrome.Type.GREY_BUTTON_TR, Messages.get(this, "github_button")){
 			@Override
-			public void onClick(float x, float y) {
-				for (ChangeInfo info : changeInfos){
-					if (info.onClick( x, y )){
-						return;
-					}
-				}
+			protected void onClick() {
+				super.onClick();
+				ShatteredPixelDungeon.platform.openURI(RELEASES_URL);
 			}
-
 		};
-		add( list );
-
-		Component content = list.content();
-		content.clear();
-
-		float posY = 0;
-		float nextPosY = 0;
-		boolean second = false;
-		for (ChangeInfo info : changeInfos){
-			if (info.major) {
-				posY = nextPosY;
-				second = false;
-				info.setRect(0, posY, panel.innerWidth(), 0);
-				content.add(info);
-				posY = nextPosY = info.bottom();
-			} else {
-				if (!second){
-					second = true;
-					info.setRect(0, posY, panel.innerWidth()/2f, 0);
-					content.add(info);
-					nextPosY = info.bottom();
-				} else {
-					second = false;
-					info.setRect(panel.innerWidth()/2f, posY, panel.innerWidth()/2f, 0);
-					content.add(info);
-					nextPosY = Math.max(info.bottom(), nextPosY);
-					posY = nextPosY;
-				}
-			}
-		}
-
-		content.setSize( panel.innerWidth(), (int)Math.ceil(posY) );
-
-		list.setRect(
-				panel.x + panel.marginLeft(),
-				panel.y + panel.marginTop() - 1,
-				panel.innerWidth() + 2,
-				panel.innerHeight() + 2);
-		list.scrollTo(0, 0);
-
-		float left = list.left()-4f;
-
-		if (changesSelected <= 3){
-
-			left = setupChangesSelectionButton(0, "v4.X", left, list.bottom(), 24);
-			left = setupChangesSelectionButton(1, "v3.X", left, list.bottom(), 24);
-			left = setupChangesSelectionButton(2, "v2.X", left, list.bottom(), 24);
-			left = setupChangesSelectionButton(3, "v1.X", left, list.bottom(), 24);
-			left = setupChangesSelectionButton(4, "PreRelease->", left, list.bottom(), 53);
-
-		} else {
-
-			left = setupChangesSelectionButton(3, "<-Release", left, list.bottom(), 40);
-			left = setupChangesSelectionButton(4, "v0.9", left, list.bottom(), 22);
-			left = setupChangesSelectionButton(5, "v0.8", left, list.bottom(), 22);
-			left = setupChangesSelectionButton(6, "v0.7", left, list.bottom(), 22);
-			left = setupChangesSelectionButton(7, "v0.6", left, list.bottom(), 22);
-			left = setupChangesSelectionButton(8, "v0.5-", left, list.bottom(), 23);
-
-		}
+		btnGithub.icon(Icons.get(Icons.CHANGES));
+		float bw = Math.min(160, w - 20);
+		btnGithub.setRect(insets.left + (w - bw) / 2f, notice.bottom() + 10, bw, 22);
+		align(btnGithub);
+		add(btnGithub);
 
 		addToBack( BG );
 
