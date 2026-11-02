@@ -164,6 +164,7 @@ public class Badges {
 		HIGH_SCORE_3                ( 87 ),
 		WILL_TO_STAND_TALL          ( 88 ), //victory as Malkuth
 		REASON_TO_DISCERN           ( 89 ), //victory as Yesod
+		HOPE_TO_BE_BETTER           ( 90 ), //victory as Hod
 
 		//platinum
 		MANY_BUFFS                  ( 96 ),
@@ -1042,6 +1043,13 @@ public class Badges {
 		//the reason to discern: obtain the seed of light as Yesod
 		if (Dungeon.hero.heroClass == HeroClass.YESOD){
 			badge = Badge.REASON_TO_DISCERN;
+			local.add( badge );
+			displayBadge( badge );
+		}
+
+		//the hope to become a better being: obtain the seed of light as Hod
+		if (Dungeon.hero.heroClass == HeroClass.HOD){
+			badge = Badge.HOPE_TO_BE_BETTER;
 			local.add( badge );
 			displayBadge( badge );
 		}
