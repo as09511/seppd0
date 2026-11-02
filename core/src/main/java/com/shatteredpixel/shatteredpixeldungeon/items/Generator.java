@@ -38,6 +38,8 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MagicBulletArmor
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.RedEyesArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LifeForADaredevilArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.BeakArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.HornetArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LampArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.SanguineDesireArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.SolemnLamentArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.TearsArmor;
@@ -508,9 +510,11 @@ public class Generator {
 					SanguineDesireArmor.class,
 					SolemnLamentArmor.class,
 					TearsArmor.class,
+					HornetArmor.class,
+					LampArmor.class,
 					JustitiaArmor.class
 			};
-			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 			
 			//see Generator.randomMissile
 			MISSILE.classes = new Class<?>[]{};
@@ -814,7 +818,7 @@ public class Generator {
 			{Suit.class},
 			{RedEyesArmor.class, LifeForADaredevilArmor.class, BeakArmor.class},
 			{MagicBulletArmor.class, SanguineDesireArmor.class, SolemnLamentArmor.class},
-			{TearsArmor.class},
+			{TearsArmor.class, HornetArmor.class, LampArmor.class},
 			{JustitiaArmor.class}
 	};
 

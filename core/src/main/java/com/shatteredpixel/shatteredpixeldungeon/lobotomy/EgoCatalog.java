@@ -28,6 +28,8 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.MagicBulletArmor
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.RedEyesArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LifeForADaredevilArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.BeakArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.HornetArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LampArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.SanguineDesireArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.SolemnLamentArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.TearsArmor;
@@ -84,12 +86,14 @@ public class EgoCatalog {
 			SolemnLamentArmor.class,
 			SanguineDesireArmor.class,
 			Hornet.class,
+			HornetArmor.class,
 			Echo.class,
 			SwordSharpenedWithTears.class,
 			TearsArmor.class,
 			InTheNameOfLoveAndHate.class,
 			Diffraction.class,
 			Lamp.class,
+			LampArmor.class,
 			Justitia.class,
 			JustitiaArmor.class,
 			GoldRush.class,
