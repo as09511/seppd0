@@ -246,9 +246,9 @@ public enum Talent {
 	//Hod T3
 	POTENTIAL_DEV(10, 3), TRAINING_RESULT(11, 3),
 	//Training Team Sephirah T3
-	CLUMSY_GOODWILL(14, 3), HOPE_IT_HELPS(15, 3), CERTIFICATE(76, 3),
+	CLUMSY_GOODWILL(191, 3), HOPE_IT_HELPS(192, 3), CERTIFICATE(193, 3),
 	//Literature Floor Librarian T3
-	OBSESSION(77, 3), COCOON(78, 3), OLD_UMBRELLA(79, 3),
+	OBSESSION(194, 3), COCOON(195, 3), OLD_UMBRELLA(196, 3),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
