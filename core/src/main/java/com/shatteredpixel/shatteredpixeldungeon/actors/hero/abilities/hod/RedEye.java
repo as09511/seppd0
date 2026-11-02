@@ -198,7 +198,7 @@ public class RedEye extends ArmorAbility {
 
 	@Override
 	public int icon() {
-		return HeroIcon.SPIRIT_HAWK;
+		return HeroIcon.DEATH_MARK;
 	}
 
 	@Override

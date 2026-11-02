@@ -155,7 +155,7 @@ public class BloodyDesire extends ArmorAbility {
 
 	@Override
 	public int icon() {
-		return HeroIcon.DEATH_MARK;
+		return HeroIcon.BLOODY_DESIRE;
 	}
 
 	@Override

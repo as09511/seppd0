@@ -77,9 +77,10 @@ public class ManagerCall extends ArmorAbility {
 		return 1f - 0.05f*hero.pointsInTalent(Talent.FIELD_GUIDANCE);
 	}
 
-	//emergency relocation: 20/15/10/5 charge
+	//emergency relocation: 20/17/14/10 charge
+	private static final int[] RELOCATE_COST = {20, 20, 17, 14, 10};
 	public static float relocateCost( Hero hero ){
-		return 25 - 5*hero.pointsInTalent(Talent.EMERGENCY_RELOCATION);
+		return RELOCATE_COST[Math.min(4, hero.pointsInTalent(Talent.EMERGENCY_RELOCATION))];
 	}
 
 	public static boolean canRelocate( Hero hero ){

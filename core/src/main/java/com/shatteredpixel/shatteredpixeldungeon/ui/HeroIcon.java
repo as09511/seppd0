@@ -77,6 +77,7 @@ public class HeroIcon extends Image {
 	public static final int TECH_LIBRARIAN  = 37;
 	public static final int TRAINING_SEPHIRAH    = 12;
 	public static final int LITERATURE_LIBRARIAN = 13;
+	public static final int BLOODY_DESIRE   = 38;
 
 	//cleric spells
 	public static final int GUIDING_LIGHT   = 40;
