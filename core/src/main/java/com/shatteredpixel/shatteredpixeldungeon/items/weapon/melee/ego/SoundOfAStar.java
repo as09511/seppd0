@@ -59,7 +59,7 @@ public class SoundOfAStar extends EgoGun {
 	@Override
 	public int max(int lvl) {
 		return  20 +            //20 base, down from 30
-				4*lvl;          //+4 per level, down from +6
+				6*lvl;          //+6 per level
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class SoundOfAStar extends EgoGun {
 	@Override
 	public int shotMax(int lvl) {
 		return  24 +            //24 base
-				5*lvl;          //+5 per level
+				6*lvl;          //+6 per level
 	}
 
 	@Override
