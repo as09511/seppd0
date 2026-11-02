@@ -116,9 +116,9 @@ public class YesodTrackers {
 		if (visited.floors.contains(key)) return;
 		visited.floors.add(key);
 
-		//surveillance camera: maps the area around the stairs he arrived by, 4/6/8 tiles
+		//surveillance camera: maps the area around the stairs he arrived by, 8/12/16 tiles
 		if (hero.hasTalent(Talent.SURVEILLANCE_CAMERA)){
-			int range = 2 + 2*hero.pointsInTalent(Talent.SURVEILLANCE_CAMERA);
+			int range = 4 + 4*hero.pointsInTalent(Talent.SURVEILLANCE_CAMERA);
 			for (int i = 0; i < level.length(); i++){
 				if (level.discoverable[i] && level.distance(hero.pos, i) <= range){
 					level.mapped[i] = true;
