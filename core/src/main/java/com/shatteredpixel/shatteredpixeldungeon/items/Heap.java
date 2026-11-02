@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LaughterArmor;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -89,6 +90,8 @@ public class Heap implements Bundlable {
 		case REMAINS:
 		case SKELETON:
 			CellEmitter.center( pos ).start(Speck.factory(Speck.RATTLE), 0.1f, 3);
+			//Laughter's armor eats the bones while they are searched
+			LaughterArmor.onBonesSearched(hero);
 			break;
 		default:
 		}

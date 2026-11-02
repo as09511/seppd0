@@ -21,7 +21,6 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LaughterArmor;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
@@ -1755,9 +1754,6 @@ public class GameScene extends PixelScene {
 				|| (!Dungeon.level.visited[cell] && !Dungeon.level.mapped[cell])) {
 			return;
 		}
-
-		//Laughter's armor eats a pile of bones next to the hero instead of examining it
-		if (LaughterArmor.tryEat(Dungeon.hero, cell)) return;
 
 		ArrayList<Object> objects = getObjectsAtCell(cell);
 
