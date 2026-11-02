@@ -475,11 +475,6 @@ public abstract class Char extends Actor {
 				if (enemy.buff(Analyzed.class) != null && Dungeon.hero.pointsInTalent(Talent.GO_VISUALIZATION) >= 2) dmg *= 1.2f;
 			}
 
-			//Yesod's subclass damage bonuses (viper Yesod, charge, black flame)
-			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.YESOD){
-				dmg *= YesodTrackers.attackMultiplier((Hero) this);
-			}
-
 			//Hod's training results and the literature floor librarian's bonus on rooted enemies
 			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.HOD){
 				dmg *= HodTrackers.attackMultiplier((Hero) this, enemy);
@@ -532,6 +527,11 @@ public abstract class Char extends Actor {
 			//do not trigger on-hit logic if defenseProc returned a negative value
 			if (effectiveDamage >= 0) {
 				effectiveDamage = Math.max(effectiveDamage - dr, 0);
+
+				//Yesod's subclass damage bonuses (viper Yesod, charge, black flame) apply after armor, added together
+				if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.YESOD){
+					effectiveDamage = Math.round(effectiveDamage * YesodTrackers.attackMultiplier((Hero) this));
+				}
 
 				if (enemy.buff(Viscosity.ViscosityTracker.class) != null) {
 					effectiveDamage = enemy.buff(Viscosity.ViscosityTracker.class).deferDamage(effectiveDamage);

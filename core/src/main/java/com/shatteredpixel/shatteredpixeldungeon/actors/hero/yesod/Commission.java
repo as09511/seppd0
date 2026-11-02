@@ -23,6 +23,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.effects.CommissionTint;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -70,6 +71,20 @@ public class Commission extends Buff {
 	public void restoreFromBundle(com.watabou.utils.Bundle bundle) {
 		super.restoreFromBundle(bundle);
 		announcedTarget = bundle.getBoolean(ANNOUNCED);
+	}
+
+	//the target is tinted purple so it stands out, like corrupted enemies are darkened
+	private transient CommissionTint tint;
+
+	@Override
+	public void fx(boolean on) {
+		if (on) {
+			if (tint != null) tint.remove();
+			tint = CommissionTint.apply(target.sprite);
+		} else if (tint != null) {
+			tint.remove();
+			tint = null;
+		}
 	}
 
 	@Override

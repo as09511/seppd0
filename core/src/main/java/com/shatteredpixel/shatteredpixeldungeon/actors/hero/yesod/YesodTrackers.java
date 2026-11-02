@@ -192,21 +192,22 @@ public class YesodTrackers {
 		}
 	}
 
-	//damage bonuses on the hero's attacks from the Yesod subclass talents and charge
+	//damage bonuses on the hero's attacks from the Yesod subclass talents and charge,
+	// added together and applied to the damage left after the enemy's armor
 	public static float attackMultiplier( Hero hero ){
-		float mult = 1f;
+		float bonus = 0f;
 		if (hero.hasTalent(Talent.VIPER_YESOD)){
 			//+1/1.5/2% per info held
-			mult *= 1f + 0.005f*(1 + hero.pointsInTalent(Talent.VIPER_YESOD)) * InfoPower.current();
+			bonus += 0.005f*(1 + hero.pointsInTalent(Talent.VIPER_YESOD)) * InfoPower.current();
 		}
 		Charge charge = hero.buff(Charge.class);
 		if (charge != null){
-			mult *= charge.damageMultiplier();
+			bonus += charge.damageMultiplier() - 1f;
 		}
 		if (hero.hasTalent(Talent.BLACK_FLAME)){
 			//+50/75/100%
-			mult *= 1.25f + 0.25f*hero.pointsInTalent(Talent.BLACK_FLAME);
+			bonus += 0.25f + 0.25f*hero.pointsInTalent(Talent.BLACK_FLAME);
 		}
-		return mult;
+		return 1f + bonus;
 	}
 }
