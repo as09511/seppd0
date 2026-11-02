@@ -35,14 +35,14 @@ import com.watabou.noosa.audio.Music;
 
 import java.util.Arrays;
 
-//Boss arena modelled on the qliphoth tree: a 3x3 grid of 6x6 rooms joined by 2 wide, 8 long corridors,
+//L Corp headquarters (L사 본사), a boss arena modelled on the qliphoth tree: a 3x3 grid of 6x6 rooms joined by 2 wide, 8 long corridors,
 //plus Malkuth's room above the top middle one, where the hero arrives.
 //Each room's floor has its sephira's colour, laid out like the tree turned upside down:
 //           Malkuth
 //   Netzach  Yesod     Hod
 //   Chesed  Tiphereth  Gebura
 //   Hokma    Keter     Binah
-public class QliphothBossLevel extends Level {
+public class LCorpHQLevel extends Level {
 
 	public static final int ROOM = 6;
 	public static final int CORRIDOR = 8;
@@ -194,7 +194,7 @@ public class QliphothBossLevel extends Level {
 		@Override
 		public Tilemap create() {
 			Tilemap v = super.create();
-			QliphothBossLevel level = (QliphothBossLevel) Dungeon.level;
+			LCorpHQLevel level = (LCorpHQLevel) Dungeon.level;
 			int[] data = new int[tileW*tileH];
 			for (int i = 0; i < data.length; i++){
 				int cell = (tileX + i % tileW) + (tileY + i / tileW) * level.width();
@@ -206,8 +206,8 @@ public class QliphothBossLevel extends Level {
 
 		@Override
 		public String name(int tileX, int tileY) {
-			int room = ((QliphothBossLevel) Dungeon.level).roomAt(tileX + this.tileX + (tileY + this.tileY) * Dungeon.level.width());
-			return room == -1 ? null : Messages.get(QliphothBossLevel.class, "room_" + room);
+			int room = ((LCorpHQLevel) Dungeon.level).roomAt(tileX + this.tileX + (tileY + this.tileY) * Dungeon.level.width());
+			return room == -1 ? null : Messages.get(LCorpHQLevel.class, "room_" + room);
 		}
 	}
 }

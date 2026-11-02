@@ -35,9 +35,9 @@ import com.watabou.noosa.Game;
 
 import java.util.ArrayList;
 
-//testing tool, takes the hero to the qliphoth boss arena (branch 2 of the current depth)
+//testing tool, takes the hero to L Corp headquarters (branch 2 of the current depth)
 //the stairs in Malkuth's room lead back to the entrance of the floor the hero came from
-public class QliphothGate extends Item {
+public class LCorpHQGate extends Item {
 
 	public static final String AC_ENTER = "ENTER";
 
