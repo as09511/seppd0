@@ -113,6 +113,11 @@ public abstract class EgoGun extends EgoWeapon {
 		return true;
 	}
 
+	//guns that refill themselves cannot be reloaded by hand
+	protected boolean canReload(){
+		return true;
+	}
+
 	//firearms and bows sound different, everything added so far is a firearm
 	protected boolean isBow(){
 		return false;
@@ -143,7 +148,7 @@ public abstract class EgoGun extends EgoWeapon {
 		ArrayList<String> actions = super.actions(hero);
 		if (isEquipped(hero)){
 			actions.add(AC_SHOOT);
-			if (usesAmmo()) actions.add(AC_RELOAD);
+			if (usesAmmo() && canReload()) actions.add(AC_RELOAD);
 		}
 		return actions;
 	}
@@ -162,12 +167,13 @@ public abstract class EgoGun extends EgoWeapon {
 				GLog.w(Messages.get(this, "need_equip"));
 			} else if (usesAmmo() && ammo <= 0){
 				//trying to fire an empty gun reloads it instead
-				reload(hero);
+				if (canReload()) reload(hero);
+				else GLog.w(Messages.get(this, "no_ammo"));
 			} else {
 				usesTargeting = true;
 				GameScene.selectCell(shooter);
 			}
-		} else if (action.equals(AC_RELOAD) && usesAmmo()){
+		} else if (action.equals(AC_RELOAD) && usesAmmo() && canReload()){
 			if (!isEquipped(hero)){
 				GLog.w(Messages.get(this, "need_equip"));
 			} else if (ammo >= maxAmmo()){

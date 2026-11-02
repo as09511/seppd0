@@ -475,6 +475,12 @@ public class ItemSpriteSheet {
 		assignItemRect(LONELINESS,           16, 16);
 	}
 
+	//Sound of a Star, left of Hod's manual
+	public static final int SOUND_OF_A_STAR      = xy(13, 19);
+	static{
+		assignItemRect(SOUND_OF_A_STAR,      16, 16);
+	}
+
 	//Hod's training manual, only used as her icon
 	public static final int HOD_MANUAL           = xy(14, 19);
 	static{

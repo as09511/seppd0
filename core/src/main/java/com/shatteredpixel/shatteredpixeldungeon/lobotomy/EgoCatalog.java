@@ -52,6 +52,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.GoldRush;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Mimicry;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.DaCapo;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Laughter;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SoundOfAStar;
 
 //every E.G.O equipment in the mod, add new E.G.O here
 public class EgoCatalog {
@@ -86,7 +87,8 @@ public class EgoCatalog {
 			GoldRush.class,
 			Mimicry.class,
 			DaCapo.class,
-			Laughter.class
+			Laughter.class,
+			SoundOfAStar.class
 	};
 
 }
