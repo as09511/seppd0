@@ -22,14 +22,23 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.armor.ego;
 
-import com.shatteredpixel.shatteredpixeldungeon.lobotomy.Corpses;
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
+import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.audio.Sample;
 
 //ALEPH, same defense as the tier 5 armor
-//its wearer can eat the bodies enemies leave behind to heal, see Corpses
+//its wearer can eat the piles of bones found in the dungeon to heal, by examining one next to them
 public class LaughterArmor extends EgoArmor {
+
+	public static final int HEAL = 10;
 
 	{
 		image = ItemSpriteSheet.LAUGHTER_ARMOR;
@@ -42,9 +51,33 @@ public class LaughterArmor extends EgoArmor {
 		super( 5 );
 	}
 
+	//called when the hero examines a cell, returns true if she ate the bones there
+	//the pile is opened as if searched, so whatever was in it stays behind
+	public static boolean tryEat( Hero hero, int cell ){
+		if (hero == null || !(hero.belongings.armor() instanceof LaughterArmor)) return false;
+		Heap heap = Dungeon.level.heaps.get(cell);
+		if (heap == null || !heap.seen || (heap.type != Heap.Type.SKELETON && heap.type != Heap.Type.REMAINS)) return false;
+		if (cell != hero.pos && !Dungeon.level.adjacent(cell, hero.pos)){
+			GLog.w(Messages.get(LaughterArmor.class, "too_far"));
+			return false;
+		}
+
+		hero.sprite.operate(cell);
+		heap.open(hero);
+		Sample.INSTANCE.play(Assets.Sounds.EAT);
+		GLog.i(Messages.get(LaughterArmor.class, "eat"));
+		int heal = Math.min(HEAL, hero.HT - hero.HP);
+		if (heal > 0 && hero.isAlive()){
+			hero.HP += heal;
+			hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(heal), FloatingText.HEALING);
+		}
+		hero.spendAndNext(1f);
+		return true;
+	}
+
 	@Override
 	protected String statsInfo() {
-		return super.statsInfo() + "\n\n" + Messages.get(this, "stats_desc", Corpses.HEAL);
+		return super.statsInfo() + "\n\n" + Messages.get(this, "stats_desc", HEAL);
 	}
 
 }

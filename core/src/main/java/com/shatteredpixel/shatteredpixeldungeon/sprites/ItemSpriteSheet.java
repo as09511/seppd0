@@ -479,8 +479,6 @@ public class ItemSpriteSheet {
 	public static final int DA_CAPO_ARMOR        = xy(3, 19);
 	public static final int MIMICRY_ARMOR        = xy(4, 19);
 	public static final int LAUGHTER_ARMOR       = xy(5, 19);
-	//a body on the floor, see Corpses
-	public static final int CORPSE               = xy(6, 19);
 	public static final int HORNET_ARMOR         = xy(7, 19);
 	public static final int LAMP_ARMOR           = xy(8, 19);
 	public static final int SANGUINE_DESIRE_ARMOR = xy(9, 19);
@@ -491,7 +489,6 @@ public class ItemSpriteSheet {
 		assignItemRect(DA_CAPO_ARMOR,        16, 15);
 		assignItemRect(MIMICRY_ARMOR,        16, 15);
 		assignItemRect(LAUGHTER_ARMOR,       16, 15);
-		assignItemRect(CORPSE,               16, 16);
 		assignItemRect(HORNET_ARMOR,         16, 15);
 		assignItemRect(LAMP_ARMOR,           16, 15);
 		assignItemRect(SANGUINE_DESIRE_ARMOR, 16, 15);

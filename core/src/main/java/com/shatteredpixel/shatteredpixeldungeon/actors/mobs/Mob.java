@@ -21,7 +21,6 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 
-import com.shatteredpixel.shatteredpixeldungeon.lobotomy.Corpses;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Commission;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -1077,9 +1076,6 @@ public abstract class Mob extends Char {
 			}
 
 			rollToDropLoot();
-
-			//enemies leave their bodies behind, which Laughter's armor can eat
-			Corpses.leaveCorpse(this);
 
 			if (cause == Dungeon.hero || cause instanceof Weapon || cause instanceof Weapon.Enchantment){
 				if (Dungeon.hero.hasTalent(Talent.LETHAL_MOMENTUM)

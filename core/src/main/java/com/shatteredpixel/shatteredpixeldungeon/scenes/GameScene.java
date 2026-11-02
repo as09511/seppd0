@@ -21,7 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
-import com.shatteredpixel.shatteredpixeldungeon.lobotomy.Corpses;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.LaughterArmor;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
@@ -1089,8 +1089,7 @@ public class GameScene extends PixelScene {
 	
 	private void addBlobSprite( final Blob gas ) {
 		if (gas.emitter == null) {
-			//bodies lie on the floor, under items and characters
-			(gas instanceof Corpses ? floorEmitters : gases).add( new BlobEmitter( gas ) );
+			gases.add( new BlobEmitter( gas ) );
 		}
 	}
 	
@@ -1757,8 +1756,8 @@ public class GameScene extends PixelScene {
 			return;
 		}
 
-		//Laughter's armor eats a body next to the hero instead of examining it
-		if (Corpses.tryEat(Dungeon.hero, cell)) return;
+		//Laughter's armor eats a pile of bones next to the hero instead of examining it
+		if (LaughterArmor.tryEat(Dungeon.hero, cell)) return;
 
 		ArrayList<Object> objects = getObjectsAtCell(cell);
 
