@@ -249,6 +249,12 @@ public enum Talent {
 	CLUMSY_GOODWILL(191, 3), HOPE_IT_HELPS(192, 3), CERTIFICATE(193, 3),
 	//Literature Floor Librarian T3
 	OBSESSION(194, 3), COCOON(195, 3), OLD_UMBRELLA(196, 3),
+	//Manager Call T4, icons are borrowed for now
+	HIRING_PROCEDURE(121, 4), FIELD_GUIDANCE(146, 4), EMERGENCY_RELOCATION(57, 4),
+	//Bloody Desire T4
+	SLASH(120, 4), AXE(145, 4), SPARKLE(89, 4),
+	//Red Eye T4
+	LONG_GAZE(151, 4), VIGILANCE(152, 4), FEAST(153, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one

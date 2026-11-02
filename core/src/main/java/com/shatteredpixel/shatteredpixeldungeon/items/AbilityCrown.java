@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod.ManagerCall;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -40,6 +41,8 @@ import java.util.ArrayList;
 public class AbilityCrown extends Item {
 
 	private static final String AC_ABILITY = "ABILITY";
+	//Hod's emergency relocation: swap places with the manager
+	private static final String AC_RELOCATE = "RELOCATE";
 
 	{
 		image = ItemSpriteSheet.CROWN;
@@ -56,6 +59,9 @@ public class AbilityCrown extends Item {
 	public ArrayList<String> actions( Hero hero ) {
 		ArrayList<String> actions = super.actions( hero );
 		actions.add( AC_ABILITY );
+		if (ManagerCall.canRelocate(hero)){
+			actions.add( AC_RELOCATE );
+		}
 		return actions;
 	}
 
@@ -63,6 +69,8 @@ public class AbilityCrown extends Item {
 	public String actionName(String action, Hero hero) {
 		if (hero.armorAbility != null && action.equals(AC_ABILITY)){
 			return Messages.upperCase(hero.armorAbility.name());
+		} else if (action.equals(AC_RELOCATE)){
+			return Messages.get(this, "ac_relocate", Math.round(ManagerCall.relocateCost(hero)));
 		} else {
 			return super.actionName(action, hero);
 		}
@@ -83,6 +91,11 @@ public class AbilityCrown extends Item {
 			} else {
 				usesTargeting = hero.armorAbility.useTargeting();
 				hero.armorAbility.use(this, hero);
+			}
+		} else if (action.equals(AC_RELOCATE)){
+			usesTargeting = false;
+			if (ManagerCall.canRelocate(hero)){
+				ManagerCall.relocate(this, hero);
 			}
 		}
 	}

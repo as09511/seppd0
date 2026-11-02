@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod.ManagerCall;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Bones;
@@ -1761,6 +1762,9 @@ public class Hero extends Char {
 
 		//abnormality response manual: 50% less damage taken
 		damage = AnomalyManual.onDamage(this, damage, src);
+
+		//Hod's field guidance: less damage taken next to her manager
+		damage *= ManagerCall.guidanceFactor(this, this);
 
 		Endure.EndureTracker endure = buff(Endure.EndureTracker.class);
 		if (!(src instanceof Char)){

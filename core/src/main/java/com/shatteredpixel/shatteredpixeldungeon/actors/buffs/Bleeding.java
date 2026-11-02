@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod.BloodyDesire;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Splash;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.curses.Sacrificial;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
@@ -129,7 +130,10 @@ public class Bleeding extends Buff implements Buff.DOTbuff {
 				spend( TICK );
 			}
 
-			level = Random.NormalFloat(level / 2f, level);
+			//Hod's bloody desire: bleeding doesn't go down while a deep wound is open
+			if (target.buff(BloodyDesire.DeepWound.class) == null) {
+				level = Random.NormalFloat(level / 2f, level);
+			}
 			if (Math.round(level) <= 0){
 				detach();
 			}
