@@ -99,8 +99,6 @@ jobs:
               cat "repo/release-notes/${TAG}.md"
               echo
             fi
-            echo '**안드로이드**: `SefirotPixelDungeon-*.apk`를 받아 설치합니다. 테스트용(debug) 앱과는 별개의 앱으로 설치되고 세이브도 따로입니다.'
-            echo '**Windows**: `SefirotPixelDungeon-*-windows.zip`을 풀고 `Sefirot Pixel Dungeon.exe`를 실행합니다. Java를 따로 설치할 필요는 없습니다.'
           } > body.md
           cat body.md
 
