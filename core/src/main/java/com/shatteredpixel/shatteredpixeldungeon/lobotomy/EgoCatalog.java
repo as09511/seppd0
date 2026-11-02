@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.TearsArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Baton;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Beak;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Loneliness;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.FragmentsFromSomewhere;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.FrostSplinter;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Laetitia;
@@ -66,6 +67,7 @@ public class EgoCatalog {
 			RedEyes.class,
 			RedEyesArmor.class,
 			Beak.class,
+			Loneliness.class,
 			FragmentsFromSomewhere.class,
 			Regret.class,
 			FrostSplinter.class,

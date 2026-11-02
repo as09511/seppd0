@@ -469,6 +469,12 @@ public class ItemSpriteSheet {
 		assignItemRect(YESOD_SCARF,          16, 16);
 	}
 
+	//more E.G.O weapons, next to Yesod's scarf
+	public static final int LONELINESS           = xy(15, 19);
+	static{
+		assignItemRect(LONELINESS,           16, 16);
+	}
+
 	private static final int WANDS              =                           xy(1, 14);  //16 slots
 	public static final int WAND_MAGIC_MISSILE  = WANDS+0;
 	public static final int WAND_FIREBOLT       = WANDS+1;

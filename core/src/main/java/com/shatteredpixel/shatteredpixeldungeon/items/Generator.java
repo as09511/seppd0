@@ -181,6 +181,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WarScythe;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Whip;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Baton;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Beak;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Loneliness;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.FragmentsFromSomewhere;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.FrostSplinter;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Laetitia;
@@ -453,9 +454,10 @@ public class Generator {
 					RedEyes.class,
 					Beak.class,
 					FragmentsFromSomewhere.class,
-					Regret.class
+					Regret.class,
+					Loneliness.class
 			};
-			WEP_T2.defaultProbs = new float[]{ 1, 1, 1, 1, 1 };
+			WEP_T2.defaultProbs = new float[]{ 1, 1, 1, 1, 1, 1 };
 			WEP_T2.probs = WEP_T2.defaultProbs.clone();
 			
 			WEP_T3.classes = new Class<?>[]{
