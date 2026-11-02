@@ -70,8 +70,8 @@ public class YesodScarf extends Item {
 	public static final String AC_CENSOR  = "CENSOR";
 	public static final String AC_CHARGE  = "CHARGE";
 
-	public static final int ANALYZE_COST = 2;
-	public static final int DETECT_COST  = 1;
+	public static final int ANALYZE_COST = 1;
+	public static final int DETECT_COST  = 2;
 	public static final int PREDICT_COST = 3;
 	public static final int CENSOR_COST  = 5;
 	//info exchange: gold value of one point of info in shops
@@ -94,8 +94,8 @@ public class YesodScarf extends Item {
 	public ArrayList<String> actions( Hero hero ) {
 		ArrayList<String> actions = super.actions( hero );
 		if (hero.buff(MagicImmune.class) == null) {
-			actions.add(AC_DETECT);
 			actions.add(AC_ANALYZE);
+			actions.add(AC_DETECT);
 			actions.add(AC_PREDICT);
 			if (hero.subClass == HeroSubClass.INFO_SEPHIRAH) actions.add(AC_CENSOR);
 			if (hero.subClass == HeroSubClass.TECH_LIBRARIAN) actions.add(AC_CHARGE);
@@ -395,7 +395,7 @@ public class YesodScarf extends Item {
 	@Override
 	public String desc() {
 		String desc = super.desc();
-		desc += "\n\n" + Messages.get(this, "effect", DETECT_COST, DETECT_RANGE, ANALYZE_COST, (int)Analyzed.DURATION, PREDICT_COST);
+		desc += "\n\n" + Messages.get(this, "effect", ANALYZE_COST, (int)Analyzed.DURATION, DETECT_COST, DETECT_RANGE, PREDICT_COST);
 		if (Dungeon.hero != null && Dungeon.hero.subClass == HeroSubClass.INFO_SEPHIRAH){
 			desc += "\n\n" + Messages.get(this, "effect_info", CENSOR_COST, (int)CENSOR_DURATION, INFO_EXCHANGE_GOLD);
 		} else if (Dungeon.hero != null && Dungeon.hero.subClass == HeroSubClass.TECH_LIBRARIAN){
