@@ -30,8 +30,8 @@ import com.watabou.noosa.Image;
 import com.watabou.utils.PointF;
 import com.watabou.utils.Random;
 
-//da capo's score: one ring of staff and notes per movement around Netzach (5x5, 7x7, 9x9),
-//alternating white and violet and turning in opposite directions. In the last movement the score shakes.
+//da capo's score: one ring of staff and notes per movement around Netzach (5x5, 7x7, 9x9, 11x11),
+//alternating white and violet and turning in opposite directions. In the finale the score shakes.
 public class DaCapoScore extends Group {
 
 	private static final float LIFE  = 1.6f;
@@ -40,7 +40,7 @@ public class DaCapoScore extends Group {
 	//outer radius of the staff in the texture, in pixels
 	private static final float TEX_RADIUS = 76f;
 
-	private static final int[] COLORS = {0xFFFFFF, 0xB070E0, 0xFFFFFF};
+	private static final int[] COLORS = {0xFFFFFF, 0xB070E0, 0xFFFFFF, 0xB070E0};
 
 	private final CharSprite target;
 	private final boolean finale;
@@ -53,7 +53,7 @@ public class DaCapoScore extends Group {
 		this.target = target;
 		this.finale = movement >= 4;
 
-		int count = Math.min(3, movement);
+		int count = Math.min(4, movement);
 		rings = new Image[count];
 		spin = new float[count];
 		for (int i = 0; i < count; i++){

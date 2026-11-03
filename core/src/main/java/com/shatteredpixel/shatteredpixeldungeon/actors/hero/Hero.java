@@ -102,6 +102,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap.Type;
 import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach.DaCapoMovement;
 import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.KindOfWeapon;
@@ -1779,6 +1780,8 @@ public class Hero extends Char {
 		}
 		//Netzach's safety secured: less damage taken while paying back deferred damage
 		damage *= NetzachTrackers.damageTakenFactor(this, src);
+		//Netzach's trance: less damage taken while performing da capo
+		damage *= DaCapoMovement.damageTakenFactor(this);
 
 		//abnormality response manual: 50% less damage taken
 		damage = AnomalyManual.onDamage(this, damage, src);

@@ -53,9 +53,9 @@ import com.watabou.utils.Random;
 import java.util.ArrayList;
 
 //Netzach's third armor ability: da capo, a performance in four movements.
-//Each use damages and debuffs every visible enemy around him; used again soon after, the next movement plays,
-//wider and stronger, with another score ring around him:
-// 1st 5x5 12-24 weakness, 2nd 7x7 cripple, 3rd 9x9 vulnerable, 4th 9x9 paralysis (2 turns on bosses), 5 turns each
+//Each use damages and debuffs every enemy around him, walls and doors don't stop the music. Used again on the very next
+//turn the next movement plays, wider and stronger, with another score ring around him; any other action ends it:
+// 1st 5x5 12-24 weakness, 2nd 7x7 cripple, 3rd 9x9 vulnerable, finale 11x11 paralysis (2 turns on bosses), 5 turns each
 public class DaCapoMovement extends ArmorAbility {
 
 	{
@@ -64,13 +64,19 @@ public class DaCapoMovement extends ArmorAbility {
 
 	public static final int MOVEMENTS = 4;
 
-	//the next movement has to be played within 10 turns, encore: 15/20/25
-	public static float window( Hero hero ){
-		return 10f + 5f*hero.pointsInTalent(Talent.ENCORE);
+	//the next movement has to be played on the very next turn: the tracker outlives the 1 turn the ability takes
+	// by half a turn, so any other action lets it run out
+	private static final float WINDOW = 1.5f;
+
+	//5x5, 7x7, 9x9, then 11x11 for the finale
+	public static int radius( int movement ){
+		return movement + 1;
 	}
 
-	public static int radius( int movement ){
-		return Math.min(4, movement + 1);
+	//trance: 10/20/30/40% less damage taken while the performance goes on
+	public static float damageTakenFactor( Hero hero ){
+		if (hero.buff(Movement.class) == null || !hero.hasTalent(Talent.TRANCE)) return 1f;
+		return 1f - 0.1f*hero.pointsInTalent(Talent.TRANCE);
 	}
 
 	//12-24, +4-8 per movement. fortissimo: +10/20/30%
@@ -99,7 +105,7 @@ public class DaCapoMovement extends ArmorAbility {
 		float duration = debuffDuration(hero);
 		ArrayList<Char> targets = new ArrayList<>();
 		for (Mob m : Dungeon.level.mobs.toArray(new Mob[0])){
-			if (m.alignment == Char.Alignment.ENEMY && m.isAlive() && Dungeon.level.heroFOV[m.pos]
+			if (m.alignment == Char.Alignment.ENEMY && m.isAlive()
 					&& Dungeon.level.distance(hero.pos, m.pos) <= r){
 				targets.add(m);
 			}
@@ -128,7 +134,7 @@ public class DaCapoMovement extends ArmorAbility {
 		if (movement >= MOVEMENTS){
 			Buff.detach(hero, Movement.class);
 		} else {
-			Buff.affect(hero, Movement.class, window(hero)).next = movement + 1;
+			Buff.affect(hero, Movement.class, WINDOW).next = movement + 1;
 		}
 
 		hero.sprite.operate(hero.pos);
@@ -143,7 +149,7 @@ public class DaCapoMovement extends ArmorAbility {
 
 	@Override
 	public Talent[] talents() {
-		return new Talent[]{Talent.ENCORE, Talent.FORTISSIMO, Talent.FERMATA, Talent.HEROIC_ENERGY};
+		return new Talent[]{Talent.TRANCE, Talent.FORTISSIMO, Talent.FERMATA, Talent.HEROIC_ENERGY};
 	}
 
 	//which movement plays next, for as long as the performance can still go on
@@ -172,7 +178,7 @@ public class DaCapoMovement extends ArmorAbility {
 
 		@Override
 		public String desc() {
-			return Messages.get(this, "desc", next, dispTurns());
+			return Messages.get(this, "desc", next);
 		}
 
 		private static final String NEXT = "next";

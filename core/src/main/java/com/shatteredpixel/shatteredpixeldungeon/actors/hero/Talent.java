@@ -272,7 +272,7 @@ public enum Talent {
 	//Our Galaxy T4
 	STARLIGHT(209, 4), STARFALL(210, 4), GALAXY_EMBRACE(211, 4),
 	//Da Capo T4
-	ENCORE(212, 4), FORTISSIMO(213, 4), FERMATA(214, 4),
+	TRANCE(212, 4), FORTISSIMO(213, 4), FERMATA(214, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one

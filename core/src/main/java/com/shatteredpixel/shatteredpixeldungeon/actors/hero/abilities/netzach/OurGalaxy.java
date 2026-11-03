@@ -32,8 +32,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.effects.FallingStar;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
-import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -44,8 +44,8 @@ import com.watabou.utils.Random;
 
 import java.util.ArrayList;
 
-//Netzach's second armor ability: our galaxy. Every visible enemy nearby takes 3-6 damage that ignores armor,
-//and Netzach heals for all the damage dealt.
+//Netzach's second armor ability: our galaxy. Blue starlight falls on every visible enemy nearby for 3-6 damage
+//that ignores armor, and Netzach heals for all the damage dealt.
 public class OurGalaxy extends ArmorAbility {
 
 	{
@@ -80,18 +80,36 @@ public class OurGalaxy extends ArmorAbility {
 			}
 		}
 
-		int dealt = 0;
-		for (Char ch : targets){
-			int before = ch.HP + ch.shielding();
-			ch.damage(Random.NormalIntRange(minDamage(hero), maxDamage(hero)), hero);
-			dealt += Math.max(0, before - (ch.HP + ch.shielding()));
-			if (ch.sprite != null){
-				ch.sprite.emitter().burst(Speck.factory(Speck.STAR), 6);
-				MagicMissile.boltFromChar(hero.sprite.parent, MagicMissile.BEACON, ch.sprite, hero.pos, () -> {});
-			}
+		hero.busy();
+		hero.sprite.operate(hero.pos);
+		Sample.INSTANCE.play(Assets.Sounds.CHARMS);
+		Invisibility.dispel();
+
+		if (targets.isEmpty()){
+			finish(hero, 0);
+			return;
 		}
 
-		//the stolen starlight heals Netzach, galaxy embrace turns 33/66/100% of the excess into a shield
+		//blue starlight falls from the sky onto each enemy, the damage lands with it
+		final int[] remaining = {targets.size()};
+		final int[] dealt = {0};
+		for (Char ch : targets){
+			hero.sprite.parent.add(new FallingStar(ch.sprite.center(), () -> {
+				if (ch.isAlive()){
+					int before = ch.HP + ch.shielding();
+					ch.damage(Random.NormalIntRange(minDamage(hero), maxDamage(hero)), hero);
+					dealt[0] += Math.max(0, before - (ch.HP + ch.shielding()));
+					if (ch.sprite != null) ch.sprite.emitter().burst(Speck.factory(Speck.STAR), 6);
+				}
+				if (--remaining[0] == 0){
+					finish(hero, dealt[0]);
+				}
+			}));
+		}
+	}
+
+	//the stolen starlight heals Netzach, galaxy embrace turns 33/66/100/133% of the excess into a shield
+	private void finish( Hero hero, int dealt ){
 		if (dealt > 0){
 			int heal = Math.min(dealt, hero.HT - hero.HP);
 			if (heal > 0){
@@ -107,11 +125,6 @@ public class OurGalaxy extends ArmorAbility {
 				}
 			}
 		}
-
-		hero.sprite.emitter().burst(Speck.factory(Speck.STAR), 10);
-		Sample.INSTANCE.play(Assets.Sounds.CHARMS);
-		hero.sprite.operate(hero.pos);
-		Invisibility.dispel();
 		hero.spendAndNext(1f);
 	}
 
