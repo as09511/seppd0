@@ -31,8 +31,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Weakness;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
-import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.CombinedEgo;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.CombinedEgoRecipe;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
@@ -43,7 +43,6 @@ import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
 
-import java.util.ArrayList;
 
 //combined E.G.O (WAW, balanced as tier 5): the Echo crossbow and the Loneliness revolver, used in turns.
 //Echo: 1 arrow that pierces every enemy in its path and paralyses each one it hits for 1 turn.
@@ -250,7 +249,7 @@ public class EchoLoneliness extends EgoGun implements CombinedEgo {
 		}
 	}
 
-	public static class Recipe extends com.shatteredpixel.shatteredpixeldungeon.items.Recipe.SimpleRecipe {
+	public static class Recipe extends CombinedEgoRecipe {
 
 		{
 			inputs =  new Class[]{Echo.class, Loneliness.class};
@@ -262,20 +261,5 @@ public class EchoLoneliness extends EgoGun implements CombinedEgo {
 			outQuantity = 1;
 		}
 
-		@Override
-		public Item brew( ArrayList<Item> ingredients ) {
-			int level = 0;
-			for (Item i : ingredients){
-				if (i instanceof Echo || i instanceof Loneliness){
-					level = Math.max(level, i.level());
-				}
-			}
-			Item result = super.brew(ingredients);
-			if (result != null){
-				if (level > 0) result.upgrade(level);
-				result.identify();
-			}
-			return result;
-		}
 	}
 }

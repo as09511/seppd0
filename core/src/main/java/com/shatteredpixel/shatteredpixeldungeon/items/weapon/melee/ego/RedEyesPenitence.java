@@ -31,10 +31,10 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bleeding;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.Recipe;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Mace;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.CombinedEgo;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.CombinedEgoRecipe;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -253,7 +253,7 @@ public class RedEyesPenitence extends EgoWeapon implements CombinedEgo {
 	}
 
 	//Red Eyes (the weapon) + Penitence + 10 energy. The result keeps the higher upgrade level of the two.
-	public static class Recipe extends com.shatteredpixel.shatteredpixeldungeon.items.Recipe.SimpleRecipe {
+	public static class Recipe extends CombinedEgoRecipe {
 
 		{
 			inputs =  new Class[]{RedEyes.class, Penitence.class};
@@ -265,20 +265,5 @@ public class RedEyesPenitence extends EgoWeapon implements CombinedEgo {
 			outQuantity = 1;
 		}
 
-		@Override
-		public Item brew( ArrayList<Item> ingredients ) {
-			int level = 0;
-			for (Item i : ingredients){
-				if (i instanceof RedEyes || i instanceof Penitence){
-					level = Math.max(level, i.level());
-				}
-			}
-			Item result = super.brew(ingredients);
-			if (result != null){
-				if (level > 0) result.upgrade(level);
-				result.identify();
-			}
-			return result;
-		}
 	}
 }
