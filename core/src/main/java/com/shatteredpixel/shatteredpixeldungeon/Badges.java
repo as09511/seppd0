@@ -1388,7 +1388,7 @@ public class Badges {
 
 		if (badge == Badge.BOSS_SLAIN_1_ALL_CLASSES){
 			for (HeroClass cls : HeroClass.values()){
-				if (cls == HeroClass.TESTER) continue;
+				if (cls.isDebugOnly()) continue;
 				result += "\n";
 				if (isUnlocked(firstBossClassBadges.get(cls)))  result += "_" + Messages.titleCase(cls.title()) + "_";
 				else                                            result += Messages.titleCase(cls.title());
@@ -1399,7 +1399,7 @@ public class Badges {
 		} else if (badge == Badge.VICTORY_ALL_CLASSES) {
 
 			for (HeroClass cls : HeroClass.values()){
-				if (cls == HeroClass.TESTER) continue;
+				if (cls.isDebugOnly()) continue;
 				result += "\n";
 				if (isUnlocked(victoryClassBadges.get(cls)))    result += "_" + Messages.titleCase(cls.title()) + "_";
 				else                                            result += Messages.titleCase(cls.title());

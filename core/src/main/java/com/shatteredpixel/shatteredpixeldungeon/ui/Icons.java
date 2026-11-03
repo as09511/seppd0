@@ -486,6 +486,7 @@ public enum Icons {
 			case HOD:
 				return new ItemSprite(ItemSpriteSheet.HOD_MANUAL);
 			case NETZACH:
+			case TEST_NETZACH:
 				return new ItemSprite(ItemSpriteSheet.CONCENTRATED_ENKEPHALIN);
 			case TESTER:
 				return new ItemSprite(ItemSpriteSheet.CRYSTAL_CHEST);

@@ -1132,6 +1132,8 @@ public enum Talent {
 	}
 
 	public static void initClassTalents( HeroClass cls, ArrayList<LinkedHashMap<Talent, Integer>> talents, LinkedHashMap<Talent, Talent> replacements ){
+		//testing classes use the talents of the class they play as
+		cls = cls.playedClass();
 		while (talents.size() < MAX_TALENT_TIERS){
 			talents.add(new LinkedHashMap<>());
 		}

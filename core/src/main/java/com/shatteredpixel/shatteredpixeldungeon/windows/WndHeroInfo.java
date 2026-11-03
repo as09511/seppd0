@@ -86,6 +86,7 @@ public class WndHeroInfo extends WndTabbed {
 				tabIcon = new ItemSprite(ItemSpriteSheet.HOD_MANUAL, null);
 				break;
 			case NETZACH:
+			case TEST_NETZACH:
 				tabIcon = new ItemSprite(ItemSpriteSheet.CONCENTRATED_ENKEPHALIN, null);
 				break;
 		}
@@ -235,6 +236,7 @@ public class WndHeroInfo extends WndTabbed {
 							new ItemSprite(ItemSpriteSheet.SCROLL_ISAZ)};
 					break;
 				case NETZACH:
+				case TEST_NETZACH:
 					icons = new Image[]{ new ItemSprite(ItemSpriteSheet.CONCENTRATED_ENKEPHALIN),
 							new ItemSprite(ItemSpriteSheet.BATON),
 							new ItemSprite(ItemSpriteSheet.SCROLL_ISAZ)};

@@ -64,6 +64,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.He
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Shockwave;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
+import com.shatteredpixel.shatteredpixeldungeon.items.TengusMask;
+import com.shatteredpixel.shatteredpixeldungeon.items.KingsCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.Waterskin;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit;
@@ -132,7 +134,20 @@ public enum HeroClass {
 	NETZACH( HeroSubClass.SAFETY_SEPHIRAH, HeroSubClass.ART_LIBRARIAN ),
 
 	//testing class, uses the warrior's sprite, talents and subclasses
-	TESTER( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR );
+	TESTER( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
+
+	//testing class: starts the run as a level 30 Netzach with Tengu's mask and the dwarf king's crown
+	TEST_NETZACH( HeroSubClass.SAFETY_SEPHIRAH, HeroSubClass.ART_LIBRARIAN );
+
+	//debugging tools: only debug builds can show or start them
+	public boolean isDebugOnly(){
+		return this == TESTER || this == TEST_NETZACH;
+	}
+
+	//the class the hero actually plays as
+	public HeroClass playedClass(){
+		return this == TEST_NETZACH ? NETZACH : this;
+	}
 
 	private HeroSubClass[] subClasses;
 
@@ -142,7 +157,7 @@ public enum HeroClass {
 
 	public void initHero( Hero hero ) {
 
-		hero.heroClass = this;
+		hero.heroClass = playedClass();
 		Talent.initClassTalents(hero);
 
 		Item i = new Suit().identify();
@@ -202,6 +217,11 @@ public enum HeroClass {
 
 			case NETZACH:
 				initNetzach( hero );
+				break;
+
+			case TEST_NETZACH:
+				initNetzach( hero );
+				initTestNetzach( hero );
 				break;
 
 			case TESTER:
@@ -276,6 +296,16 @@ public enum HeroClass {
 
 		new ScrollOfLullaby().identify();
 		new PotionOfHealing().identify();
+	}
+
+	//level 30 right away, with both the subclass and the armor ability items ready to use
+	private static void initTestNetzach( Hero hero ) {
+		hero.lvl = 30;
+		hero.exp = 0;
+		hero.updateHT(true);
+		hero.HP = hero.HT;
+		new TengusMask().collect();
+		new KingsCrown().collect();
 	}
 
 	private static void initTester( Hero hero ) {
@@ -431,7 +461,7 @@ public enum HeroClass {
 	}
 
 	public ArmorAbility[] armorAbilities(){
-		switch (this) {
+		switch (playedClass()) {
 			case WARRIOR: default:
 				return new ArmorAbility[]{new HeroicLeap(), new Shockwave(), new Endure()};
 			case MAGE:
@@ -476,6 +506,7 @@ public enum HeroClass {
 			case HOD:
 				return Assets.Sprites.HOD;
 			case NETZACH:
+			case TEST_NETZACH:
 				return Assets.Sprites.NETZACH;
 		}
 	}
@@ -501,6 +532,7 @@ public enum HeroClass {
 			case HOD:
 				return Assets.Splashes.HOD;
 			case NETZACH:
+			case TEST_NETZACH:
 				return Assets.Splashes.NETZACH;
 		}
 	}
@@ -523,7 +555,8 @@ public enum HeroClass {
 			case CLERIC:
 				return Badges.isUnlocked(Badges.Badge.UNLOCK_CLERIC);
 			case TESTER:
-				//the tester is a debugging tool, only debug builds can use it
+			case TEST_NETZACH:
+				//testing classes are debugging tools, only debug builds can use them
 				return false;
 		}
 	}
