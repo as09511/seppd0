@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AscensionChallenge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LostInventory;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Imp;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ElmoParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
@@ -191,6 +192,13 @@ public class CityLevel extends RegularLevel {
 	@Override
 	protected ArrayList<Room> initRooms() {
 		return Imp.Quest.spawn(super.initRooms());
+	}
+
+	//Angela waits by the stairs of floor 16 to trade E.G.O for enkephalin
+	@Override
+	protected void createMobs() {
+		if (Dungeon.depth == 16) Angela.Quest.spawnTrader(this, roomEntrance);
+		super.createMobs();
 	}
 	
 	@Override

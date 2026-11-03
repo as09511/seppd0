@@ -64,8 +64,8 @@ import com.watabou.utils.Random;
 
 import java.util.ArrayList;
 
-//Angela, the AI secretary of L Corp. She waits by the stairs of floor 6, can't be harmed,
-//and offers the hero one of three Dawn ordeals, chosen at random when she appears.
+//Angela, the AI secretary of L Corp. She waits by the stairs of floors 6, 11 and 16, can't be harmed,
+//and on floor 6 offers the hero one of three Dawn ordeals, chosen at random when she appears.
 //In exchange for enkephalin boxes from the warehouse she also extracts or refines E.G.O, once each per game.
 public class Angela extends NPC {
 
@@ -74,6 +74,10 @@ public class Angela extends NPC {
 
 		properties.add(Property.IMMOVABLE);
 	}
+
+	//only the Angela of floor 6 (or one summoned by the Tester) offers the Dawn ordeal,
+	//the ones on floors 11 and 16 only trade E.G.O for enkephalin
+	private boolean offersOrdeal = true;
 
 	@Override
 	public int defenseSkill( Char enemy ) {
@@ -109,7 +113,7 @@ public class Angela extends NPC {
 		}
 
 		//an Angela summoned by the Tester picks her ordeal on the spot
-		if (Quest.type == 0){
+		if (offersOrdeal && Quest.type == 0){
 			Quest.spawned = true;
 			Quest.type = Random.Int(3) + 1;
 		}
@@ -150,35 +154,64 @@ public class Angela extends NPC {
 		});
 	}
 
-	//Angela's services: the ordeal, E.G.O extraction and E.G.O refining, each paid for with enkephalin boxes
+	private static final int MENU_ORDEAL  = 0;
+	private static final int MENU_EXTRACT = 1;
+	private static final int MENU_REFINE  = 2;
+	private static final int MENU_LEAVE   = 3;
+
+	//Angela's services: the ordeal (floor 6 only), E.G.O extraction and E.G.O refining, paid for with enkephalin boxes
 	private void showMenu(){
+		ArrayList<Integer> entries = new ArrayList<>();
+		ArrayList<String> labels = new ArrayList<>();
+		if (offersOrdeal){
+			entries.add(MENU_ORDEAL);
+			labels.add(Messages.get(Angela.class, "menu_ordeal", Quest.ordealName()));
+		}
+		entries.add(MENU_EXTRACT);
+		labels.add(Messages.get(Angela.class, Quest.extracted ? "menu_extract_used" : "menu_extract"));
+		entries.add(MENU_REFINE);
+		labels.add(Messages.get(Angela.class, Quest.refined ? "menu_refine_used" : "menu_refine"));
+		entries.add(MENU_LEAVE);
+		labels.add(Messages.get(Angela.class, "menu_leave"));
+
 		GameScene.show(new WndOptions(
 				sprite(),
 				Messages.titleCase(name()),
 				Messages.get(Angela.class, "menu", Warehouse.enkephalin()),
-				Messages.get(Angela.class, "menu_ordeal", Quest.ordealName()),
-				Messages.get(Angela.class, Quest.extracted ? "menu_extract_used" : "menu_extract"),
-				Messages.get(Angela.class, Quest.refined ? "menu_refine_used" : "menu_refine"),
-				Messages.get(Angela.class, "menu_leave")){
+				labels.toArray(new String[0])){
 			@Override
 			protected boolean enabled( int index ) {
-				switch (index){
-					case 0: return !Quest.completed;
-					case 1: return !Quest.extracted;
-					case 2: return !Quest.refined;
+				switch (entries.get(index)){
+					case MENU_ORDEAL:  return !Quest.completed;
+					case MENU_EXTRACT: return !Quest.extracted;
+					case MENU_REFINE:  return !Quest.refined;
 					default: return true;
 				}
 			}
 
 			@Override
 			protected void onSelect( int index ) {
-				switch (index){
-					case 0: ordeal(); break;
-					case 1: GameScene.show(new WndEgoExtract(Angela.this)); break;
-					case 2: refine(); break;
+				switch (entries.get(index)){
+					case MENU_ORDEAL:  ordeal(); break;
+					case MENU_EXTRACT: GameScene.show(new WndEgoExtract(Angela.this)); break;
+					case MENU_REFINE:  refine(); break;
 				}
 			}
 		});
+	}
+
+	private static final String OFFERS_ORDEAL = "offers_ordeal";
+
+	@Override
+	public void storeInBundle( Bundle bundle ) {
+		super.storeInBundle(bundle);
+		bundle.put(OFFERS_ORDEAL, offersOrdeal);
+	}
+
+	@Override
+	public void restoreFromBundle( Bundle bundle ) {
+		super.restoreFromBundle(bundle);
+		offersOrdeal = !bundle.contains(OFFERS_ORDEAL) || bundle.getBoolean(OFFERS_ORDEAL);
 	}
 
 	private void ordeal(){
@@ -351,19 +384,33 @@ public class Angela extends NPC {
 			return Messages.get(Angela.class, "ordeal_" + type);
 		}
 
-		//places Angela near the entrance stairs of floor 6 while it is being built
+		//places Angela near the entrance stairs of floor 6 while it is being built, with her ordeal
 		public static void spawn( Level level, Room entranceRoom ){
-			if (spawned || entranceRoom == null) return;
+			if (spawned) return;
+			if (placeNearEntrance(level, entranceRoom, true) == null) return;
 
-			Angela angela = new Angela();
+			spawned = true;
+			type = Random.Int(3) + 1;
+			given = false;
+			completed = false;
+		}
+
+		//places an Angela without an ordeal near the entrance stairs of floors 11 and 16
+		public static void spawnTrader( Level level, Room entranceRoom ){
+			placeNearEntrance(level, entranceRoom, false);
+		}
+
+		private static Angela placeNearEntrance( Level level, Room entranceRoom, boolean offersOrdeal ){
+			if (entranceRoom == null) return null;
+
 			int entrance = level.entrance();
-
 			ArrayList<Integer> near = new ArrayList<>();
 			ArrayList<Integer> inRoom = new ArrayList<>();
 			for (Point p : entranceRoom.getPoints()){
 				int cell = level.pointToCell(p);
 				if (!entranceRoom.inside(p) || cell == entrance || !level.passable[cell] || level.solid[cell]
-						|| level.traps.get(cell) != null || level.map[cell] == Terrain.EMPTY_SP){
+						|| level.traps.get(cell) != null || level.map[cell] == Terrain.EMPTY_SP
+						|| level.findMob(cell) != null){
 					continue;
 				}
 				boolean byDoor = false;
@@ -374,15 +421,13 @@ public class Angela extends NPC {
 				inRoom.add(cell);
 				if (level.distance(cell, entrance) <= 2) near.add(cell);
 			}
-			if (near.isEmpty() && inRoom.isEmpty()) return;
+			if (near.isEmpty() && inRoom.isEmpty()) return null;
 
+			Angela angela = new Angela();
+			angela.offersOrdeal = offersOrdeal;
 			angela.pos = Random.element(near.isEmpty() ? inRoom : near);
 			level.mobs.add(angela);
-
-			spawned = true;
-			type = Random.Int(3) + 1;
-			given = false;
-			completed = false;
+			return angela;
 		}
 
 		public static void start(){

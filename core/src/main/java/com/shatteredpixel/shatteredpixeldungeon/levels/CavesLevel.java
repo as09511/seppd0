@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Blacksmith;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.Pickaxe;
 import com.shatteredpixel.shatteredpixeldungeon.levels.features.LevelTransition;
@@ -89,6 +90,13 @@ public class CavesLevel extends RegularLevel {
 	@Override
 	protected ArrayList<Room> initRooms() {
 		return Blacksmith.Quest.spawn(super.initRooms());
+	}
+
+	//Angela waits by the stairs of floor 11 to trade E.G.O for enkephalin
+	@Override
+	protected void createMobs() {
+		if (Dungeon.depth == 11) Angela.Quest.spawnTrader(this, roomEntrance);
+		super.createMobs();
 	}
 	
 	@Override
