@@ -40,12 +40,14 @@ import com.watabou.utils.Random;
 import java.util.ArrayList;
 
 //Dawn of Violet: a slow fruit with a weak touch that, every so often, charges up for 2 turns like Goo
-//and then strikes everything within 2 tiles (5x5) with 4x damage and 2x accuracy
+//and then strikes everything within 2 tiles (5x5) with 6x damage and 2x accuracy
 public class FruitOfUnderstanding extends OrdealMob {
 
 	public static final int BLAST_RANGE     = 2;
 	public static final int CHARGE_TURNS    = 2;
 	public static final float BLAST_COOLDOWN = 7f;
+	public static final float BLAST_DAMAGE   = 6f;
+	public static final float BLAST_ACCURACY = 2f;
 
 	{
 		spriteClass = FruitOfUnderstandingSprite.class;
@@ -155,7 +157,7 @@ public class FruitOfUnderstanding extends OrdealMob {
 		}
 
 		for (Char ch : targets){
-			attack(ch, 4f, 0f, 2f);
+			attack(ch, BLAST_DAMAGE, 0f, BLAST_ACCURACY);
 		}
 
 		spend( attackDelay() );

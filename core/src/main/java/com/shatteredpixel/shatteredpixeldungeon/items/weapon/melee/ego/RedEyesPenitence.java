@@ -50,8 +50,9 @@ import com.watabou.utils.Bundle;
 import java.util.ArrayList;
 
 //combined E.G.O (TETH, balanced as tier 4): Red Eyes and Penitence swung together.
-//Each hit deals its damage as both RED and WHITE, bleeds for 10% of the RED part and shields for 10% of the WHITE part.
-//Hitting a bleeding enemy or being hit while shielded charges it; at 20 charge it can smash a head for real.
+//Each hit deals RED, plus a separately rolled WHITE hit; it bleeds for 10% of the RED and shields for 10% of the WHITE.
+//Every hit charges it (twice against a bleeding enemy), and so does being hit while shielded;
+//at 20 it can smash a head for real, also from the quickslot.
 public class RedEyesPenitence extends EgoWeapon implements CombinedEgo {
 
 	public static final String AC_SMASH = "SMASH";
@@ -123,8 +124,10 @@ public class RedEyesPenitence extends EgoWeapon implements CombinedEgo {
 		boolean wasBleeding = defender.buff(Bleeding.class) != null;
 		float ratio = smashing ? SMASH_RATIO : RATIO;
 
-		//the Penitence half: the same damage dealt again as WHITE, part of it kept as a shield
-		int white = DamageType.apply(defender, DamageType.WHITE, damage);
+		//the Penitence half: a separate WHITE hit, rolled with its own damage, armor and multiplier like Solemn Lament
+		int white = Math.round(damageRoll(attacker) * (smashing ? SMASH_DAMAGE : 1f));
+		white = Math.max(0, white - defender.drRoll());
+		white = DamageType.apply(defender, DamageType.WHITE, white);
 		if (white > 0 && defender.isAlive()){
 			defender.damage(white, attacker);
 			if (attacker instanceof Hero && attacker.isAlive()){
@@ -138,10 +141,19 @@ public class RedEyesPenitence extends EgoWeapon implements CombinedEgo {
 			Buff.affect(defender, Bleeding.class).set((float)Math.ceil(red * ratio));
 		}
 
-		if (wasBleeding && attacker instanceof Hero){
+		//every hit gives one, and one more against a bleeding enemy
+		if (attacker instanceof Hero){
 			gainCharge((Hero) attacker);
+			if (wasBleeding) gainCharge((Hero) attacker);
 		}
 		return red;
+	}
+
+	//from the quickslot it smashes once equipped
+	@Override
+	public String defaultAction() {
+		if (Dungeon.hero != null && isEquipped(Dungeon.hero)) return AC_SMASH;
+		return super.defaultAction();
 	}
 
 	@Override
