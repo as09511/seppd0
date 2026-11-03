@@ -21,7 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.CombinedEgo;
 import com.shatteredpixel.shatteredpixeldungeon.items.bombs.Bomb;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.Blandfruit;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.MeatPie;
@@ -257,6 +259,12 @@ public abstract class Recipe {
 	}
 	
 	public static boolean usableInRecipe(Item item){
+		//E.G.O weapons that a combined E.G.O is made from: identified, uncursed, and not worn,
+		// as the alchemy pot only takes items out of the backpack
+		if (isCombinedEgoIngredient(item)){
+			return item.isIdentified() && !item.cursed
+					&& !(Dungeon.hero != null && ((EquipableItem) item).isEquipped(Dungeon.hero));
+		}
 		//only upgradeable thrown weapons and wands allowed among equipment items
 		if (item instanceof EquipableItem){
 			return item.cursedKnown && !item.cursed &&
@@ -268,6 +276,20 @@ public abstract class Recipe {
 			return !item.cursed;
 		}
 	}
+
+	//an input of any recipe that makes a combined E.G.O, see CombinedEgo
+	public static boolean isCombinedEgoIngredient(Item item){
+		if (!(item instanceof EquipableItem)) return false;
+		for (Recipe[] recipes : new Recipe[][]{oneIngredientRecipes, twoIngredientRecipes, threeIngredientRecipes}){
+			for (Recipe recipe : recipes){
+				if (recipe instanceof SimpleRecipe
+						&& CombinedEgo.class.isAssignableFrom(((SimpleRecipe) recipe).output)){
+					for (Class<? extends Item> input : ((SimpleRecipe) recipe).inputs){
+						if (input == item.getClass()) return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 }
-
-

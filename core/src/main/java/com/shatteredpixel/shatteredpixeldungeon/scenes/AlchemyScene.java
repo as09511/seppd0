@@ -799,6 +799,8 @@ public class AlchemyScene extends PixelScene {
 		for (Item finding : toFind){
 			int needed = finding.quantity();
 			ArrayList<Item> found = inventory.getAllSimilar(finding);
+			//skip what can't go in the pot, such as a worn or cursed E.G.O weapon
+			found.removeIf(i -> !Recipe.usableInRecipe(i));
 			while (!found.isEmpty() && needed > 0){
 				Item detached;
 				if (finding instanceof LiquidMetal || finding instanceof MissileWeapon) {

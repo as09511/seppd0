@@ -122,6 +122,7 @@ public class QuickRecipe extends Component {
 				ArrayList<Item> similar = Dungeon.hero.belongings.getAllSimilar(in);
 				for (Item sim : similar) {
 					//if we are looking for a specific item, it must be IDed
+					if (!Recipe.usableInRecipe(sim)) continue;
 					if (sim.getClass() != in.getClass() || sim.isIdentified())
 						quantity += sim.quantity();
 				}
