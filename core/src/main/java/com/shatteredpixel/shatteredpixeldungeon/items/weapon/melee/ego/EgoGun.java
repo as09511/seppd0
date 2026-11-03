@@ -321,6 +321,12 @@ public abstract class EgoGun extends EgoWeapon {
 			return gun.STRReq(lvl);
 		}
 
+		//the bullet itself is always +0, so it takes the gun's own requirement, upgrades and mastery included
+		@Override
+		public int STRReq() {
+			return gun.STRReq();
+		}
+
 		@Override
 		public int damageRoll(Char owner) {
 			return super.damageRoll(owner) + RingOfSharpshooting.levelDamageBonus(owner);
