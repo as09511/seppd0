@@ -74,11 +74,11 @@ public class Badges {
 		FOUND_RATMOGRIFY,
 
 		//bronze
-		UNLOCK_MAGE                 ( 1 ),
-		UNLOCK_ROGUE                ( 2 ),
-		UNLOCK_HUNTRESS             ( 3 ),
-		UNLOCK_DUELIST              ( 4 ),
-		UNLOCK_CLERIC               ( 5 ),
+		UNLOCK_MAGE, //retired with its hero, kept hidden for old profiles
+		UNLOCK_ROGUE, //retired with its hero, kept hidden for old profiles
+		UNLOCK_HUNTRESS, //retired with its hero, kept hidden for old profiles
+		UNLOCK_DUELIST, //retired with its hero, kept hidden for old profiles
+		UNLOCK_CLERIC, //retired with its hero, kept hidden for old profiles
 		MONSTERS_SLAIN_1            ( 6 ),
 		MONSTERS_SLAIN_2            ( 7 ),
 		GOLD_COLLECTED_1            ( 8 ),
@@ -129,6 +129,10 @@ public class Badges {
 		BOSS_SLAIN_1_HUNTRESS,
 		BOSS_SLAIN_1_DUELIST,
 		BOSS_SLAIN_1_CLERIC,
+		BOSS_SLAIN_1_MALKUTH,
+		BOSS_SLAIN_1_YESOD,
+		BOSS_SLAIN_1_HOD,
+		BOSS_SLAIN_1_NETZACH,
 		BOSS_SLAIN_1_ALL_CLASSES    ( 54, BadgeType.GLOBAL ),
 		RESEARCHER_2                ( 55, BadgeType.JOURNAL ),
 		GAMES_PLAYED_2              ( 56, BadgeType.GLOBAL ),
@@ -196,6 +200,14 @@ public class Badges {
 		BOSS_SLAIN_3_MONK,
 		BOSS_SLAIN_3_PRIEST,
 		BOSS_SLAIN_3_PALADIN,
+		BOSS_SLAIN_3_CONTROL_SEPHIRAH,
+		BOSS_SLAIN_3_HISTORY_LIBRARIAN,
+		BOSS_SLAIN_3_INFO_SEPHIRAH,
+		BOSS_SLAIN_3_TECH_LIBRARIAN,
+		BOSS_SLAIN_3_TRAINING_SEPHIRAH,
+		BOSS_SLAIN_3_LITERATURE_LIBRARIAN,
+		BOSS_SLAIN_3_SAFETY_SEPHIRAH,
+		BOSS_SLAIN_3_ART_LIBRARIAN,
 		BOSS_SLAIN_3_ALL_SUBCLASSES ( 105, BadgeType.GLOBAL ),
 		BOSS_CHALLENGE_3            ( 106 ),
 		BOSS_CHALLENGE_4            ( 107 ),
@@ -804,40 +816,35 @@ public class Badges {
 		}
 	}
 
+	//the "every hero" badges count the sephirot only, Shattered's original heroes are retired.
+	//Their own per-hero badges stay in the enum so old profiles keep them
 	private static LinkedHashMap<HeroClass, Badge> firstBossClassBadges = new LinkedHashMap<>();
 	static {
-		firstBossClassBadges.put(HeroClass.WARRIOR, Badge.BOSS_SLAIN_1_WARRIOR);
-		firstBossClassBadges.put(HeroClass.MAGE, Badge.BOSS_SLAIN_1_MAGE);
-		firstBossClassBadges.put(HeroClass.ROGUE, Badge.BOSS_SLAIN_1_ROGUE);
-		firstBossClassBadges.put(HeroClass.HUNTRESS, Badge.BOSS_SLAIN_1_HUNTRESS);
-		firstBossClassBadges.put(HeroClass.DUELIST, Badge.BOSS_SLAIN_1_DUELIST);
-		firstBossClassBadges.put(HeroClass.CLERIC, Badge.BOSS_SLAIN_1_CLERIC);
+		firstBossClassBadges.put(HeroClass.MALKUTH, Badge.BOSS_SLAIN_1_MALKUTH);
+		firstBossClassBadges.put(HeroClass.YESOD, Badge.BOSS_SLAIN_1_YESOD);
+		firstBossClassBadges.put(HeroClass.HOD, Badge.BOSS_SLAIN_1_HOD);
+		firstBossClassBadges.put(HeroClass.NETZACH, Badge.BOSS_SLAIN_1_NETZACH);
 	}
 
+	//the seed of light badge of each sephirah
 	private static LinkedHashMap<HeroClass, Badge> victoryClassBadges = new LinkedHashMap<>();
 	static {
-		victoryClassBadges.put(HeroClass.WARRIOR, Badge.VICTORY_WARRIOR);
-		victoryClassBadges.put(HeroClass.MAGE, Badge.VICTORY_MAGE);
-		victoryClassBadges.put(HeroClass.ROGUE, Badge.VICTORY_ROGUE);
-		victoryClassBadges.put(HeroClass.HUNTRESS, Badge.VICTORY_HUNTRESS);
-		victoryClassBadges.put(HeroClass.DUELIST, Badge.VICTORY_DUELIST);
-		victoryClassBadges.put(HeroClass.CLERIC, Badge.VICTORY_CLERIC);
+		victoryClassBadges.put(HeroClass.MALKUTH, Badge.WILL_TO_STAND_TALL);
+		victoryClassBadges.put(HeroClass.YESOD, Badge.REASON_TO_DISCERN);
+		victoryClassBadges.put(HeroClass.HOD, Badge.HOPE_TO_BE_BETTER);
+		victoryClassBadges.put(HeroClass.NETZACH, Badge.COURAGE_TO_LIVE_ON);
 	}
 
 	private static LinkedHashMap<HeroSubClass, Badge> thirdBossSubclassBadges = new LinkedHashMap<>();
 	static {
-		thirdBossSubclassBadges.put(HeroSubClass.BERSERKER, Badge.BOSS_SLAIN_3_BERSERKER);
-		thirdBossSubclassBadges.put(HeroSubClass.GLADIATOR, Badge.BOSS_SLAIN_3_GLADIATOR);
-		thirdBossSubclassBadges.put(HeroSubClass.BATTLEMAGE, Badge.BOSS_SLAIN_3_BATTLEMAGE);
-		thirdBossSubclassBadges.put(HeroSubClass.WARLOCK, Badge.BOSS_SLAIN_3_WARLOCK);
-		thirdBossSubclassBadges.put(HeroSubClass.ASSASSIN, Badge.BOSS_SLAIN_3_ASSASSIN);
-		thirdBossSubclassBadges.put(HeroSubClass.FREERUNNER, Badge.BOSS_SLAIN_3_FREERUNNER);
-		thirdBossSubclassBadges.put(HeroSubClass.SNIPER, Badge.BOSS_SLAIN_3_SNIPER);
-		thirdBossSubclassBadges.put(HeroSubClass.WARDEN, Badge.BOSS_SLAIN_3_WARDEN);
-		thirdBossSubclassBadges.put(HeroSubClass.CHAMPION, Badge.BOSS_SLAIN_3_CHAMPION);
-		thirdBossSubclassBadges.put(HeroSubClass.MONK, Badge.BOSS_SLAIN_3_MONK);
-		thirdBossSubclassBadges.put(HeroSubClass.PRIEST, Badge.BOSS_SLAIN_3_PRIEST);
-		thirdBossSubclassBadges.put(HeroSubClass.PALADIN, Badge.BOSS_SLAIN_3_PALADIN);
+		thirdBossSubclassBadges.put(HeroSubClass.CONTROL_SEPHIRAH, Badge.BOSS_SLAIN_3_CONTROL_SEPHIRAH);
+		thirdBossSubclassBadges.put(HeroSubClass.HISTORY_LIBRARIAN, Badge.BOSS_SLAIN_3_HISTORY_LIBRARIAN);
+		thirdBossSubclassBadges.put(HeroSubClass.INFO_SEPHIRAH, Badge.BOSS_SLAIN_3_INFO_SEPHIRAH);
+		thirdBossSubclassBadges.put(HeroSubClass.TECH_LIBRARIAN, Badge.BOSS_SLAIN_3_TECH_LIBRARIAN);
+		thirdBossSubclassBadges.put(HeroSubClass.TRAINING_SEPHIRAH, Badge.BOSS_SLAIN_3_TRAINING_SEPHIRAH);
+		thirdBossSubclassBadges.put(HeroSubClass.LITERATURE_LIBRARIAN, Badge.BOSS_SLAIN_3_LITERATURE_LIBRARIAN);
+		thirdBossSubclassBadges.put(HeroSubClass.SAFETY_SEPHIRAH, Badge.BOSS_SLAIN_3_SAFETY_SEPHIRAH);
+		thirdBossSubclassBadges.put(HeroSubClass.ART_LIBRARIAN, Badge.BOSS_SLAIN_3_ART_LIBRARIAN);
 	}
 	
 	public static void validateBossSlain() {
@@ -972,44 +979,23 @@ public class Badges {
 	}
 	
 	public static void validateMageUnlock(){
-		if (Statistics.upgradesUsed >= 1 && !isUnlocked(Badge.UNLOCK_MAGE)){
-			displayBadge( Badge.UNLOCK_MAGE );
-		}
+		//retired with its hero, its unlock badge can no longer be earned
 	}
 	
 	public static void validateRogueUnlock(){
-		if (Statistics.sneakAttacks >= 10 && !isUnlocked(Badge.UNLOCK_ROGUE)){
-			displayBadge( Badge.UNLOCK_ROGUE );
-		}
+		//retired with its hero, its unlock badge can no longer be earned
 	}
 	
 	public static void validateHuntressUnlock(){
-		if (Statistics.thrownAttacks >= 10 && !isUnlocked(Badge.UNLOCK_HUNTRESS)){
-			displayBadge( Badge.UNLOCK_HUNTRESS );
-		}
+		//retired with its hero, its unlock badge can no longer be earned
 	}
 
 	public static void validateDuelistUnlock(){
-		if (!isUnlocked(Badge.UNLOCK_DUELIST) && Dungeon.hero != null
-				&& Dungeon.hero.belongings.weapon instanceof MeleeWeapon
-				&& ((MeleeWeapon) Dungeon.hero.belongings.weapon).tier >= 2
-				&& ((MeleeWeapon) Dungeon.hero.belongings.weapon).STRReq() <= Dungeon.hero.STR()){
-
-			if (Dungeon.hero.belongings.weapon.isIdentified() &&
-					((MeleeWeapon) Dungeon.hero.belongings.weapon).STRReq() <= Dungeon.hero.STR()) {
-				displayBadge(Badge.UNLOCK_DUELIST);
-
-			} else if (!Dungeon.hero.belongings.weapon.isIdentified() &&
-					((MeleeWeapon) Dungeon.hero.belongings.weapon).STRReq(0) <= Dungeon.hero.STR()){
-				displayBadge(Badge.UNLOCK_DUELIST);
-			}
-		}
+		//retired with its hero, its unlock badge can no longer be earned
 	}
 
 	public static void validateClericUnlock(){
-		if (!isUnlocked(Badge.UNLOCK_CLERIC)){
-			displayBadge( Badge.UNLOCK_CLERIC );
-		}
+		//retired with its hero, its unlock badge can no longer be earned
 	}
 	
 	public static void validateMasteryCombo( int n ) {
@@ -1035,38 +1021,12 @@ public class Badges {
 			displayBadge( badge );
 		}
 
-		//the will to stand tall: obtain the seed of light as Malkuth
-		if (Dungeon.hero.heroClass == HeroClass.MALKUTH){
-			badge = Badge.WILL_TO_STAND_TALL;
-			local.add( badge );
-			displayBadge( badge );
-		}
-
-		//the reason to discern: obtain the seed of light as Yesod
-		if (Dungeon.hero.heroClass == HeroClass.YESOD){
-			badge = Badge.REASON_TO_DISCERN;
-			local.add( badge );
-			displayBadge( badge );
-		}
-
-		//the hope to become a better being: obtain the seed of light as Hod
-		if (Dungeon.hero.heroClass == HeroClass.HOD){
-			badge = Badge.HOPE_TO_BE_BETTER;
-			local.add( badge );
-			displayBadge( badge );
-		}
-
-		//the courage to go on living: obtain the seed of light as Netzach
-		if (Dungeon.hero.heroClass == HeroClass.NETZACH){
-			badge = Badge.COURAGE_TO_LIVE_ON;
-			local.add( badge );
-			displayBadge( badge );
-		}
-
+		//the seed of light badge of the sephirah: 똑바로 설 수 있는 의지, 분별할 수 있는 이성,
+		// 더 나은 존재가 될 수 있다는 희망, 삶을 이어나갈 것이라는 용기
 		badge = victoryClassBadges.get(Dungeon.hero.heroClass);
 		if (badge == null) return;
 		local.add( badge );
-		unlock(badge);
+		displayBadge( badge );
 
 		boolean allUnlocked = true;
 		for (Badge b : victoryClassBadges.values()){
@@ -1418,7 +1378,7 @@ public class Badges {
 		} else if (badge == Badge.BOSS_SLAIN_3_ALL_SUBCLASSES){
 
 			for (HeroSubClass cls : HeroSubClass.values()){
-				if (cls == HeroSubClass.NONE) continue;
+				if (cls == HeroSubClass.NONE || !thirdBossSubclassBadges.containsKey(cls)) continue;
 				result += "\n";
 				if (isUnlocked(thirdBossSubclassBadges.get(cls)))   result += "_" + Messages.titleCase(cls.title()) + "_";
 				else                                                result += Messages.titleCase(cls.title()) ;
