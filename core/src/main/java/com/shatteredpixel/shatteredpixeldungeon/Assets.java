@@ -289,6 +289,9 @@ public class Assets {
 		public static final String HOD      = "sprites/hod.png";
 		public static final String LCORP_EMPLOYEE = "sprites/lcorp_employee.png";
 		public static final String ANGELA   = "sprites/angela.png";
+		public static final String DOUBT    = "sprites/doubt.png";
+		public static final String FRUIT_OF_UNDERSTANDING = "sprites/fruit_of_understanding.png";
+		public static final String PERFECT_FOOD = "sprites/perfect_food.png";
 		public static final String AVATARS  = "sprites/avatars.png";
 		public static final String PET      = "sprites/pet.png";
 		public static final String AMULET   = "sprites/amulet.png";

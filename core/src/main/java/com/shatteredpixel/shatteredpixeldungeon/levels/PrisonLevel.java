@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Wandmaker;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.FlameParticle;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.WindParticle;
@@ -88,6 +89,7 @@ public class PrisonLevel extends RegularLevel {
 	@Override
 	protected void createMobs() {
 		Wandmaker.Quest.spawnWandmaker(this, roomEntrance);
+		if (Dungeon.depth == 6) Angela.Quest.spawn(this, roomEntrance);
 		super.createMobs();
 	}
 
