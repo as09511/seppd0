@@ -110,6 +110,12 @@ public class Warehouse {
 		return null;
 	}
 
+	//the risk level an item is priced at, which can differ from its own (combined E.G.O)
+	public static RiskLevel costRisk( Item item ){
+		if (item instanceof EgoWeapon) return ((EgoWeapon) item).costRisk();
+		return risk(item);
+	}
+
 	//enkephalin boxes Angela asks to extract an E.G.O of this risk level
 	public static int extractCost( RiskLevel risk ){
 		switch (risk){

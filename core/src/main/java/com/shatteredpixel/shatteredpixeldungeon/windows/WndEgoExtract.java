@@ -25,6 +25,7 @@ package com.shatteredpixel.shatteredpixeldungeon.windows;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.CombinedEgo;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.EgoCatalog;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.Warehouse;
@@ -53,7 +54,8 @@ public class WndEgoExtract extends Window {
 			boolean titled = false;
 			for (Class<? extends Item> cls : EgoCatalog.ALL){
 				Item item = Reflection.newInstance(cls);
-				if (item == null || Warehouse.risk(item) != risk) continue;
+				//combined E.G.O can only be made at an alchemy pot
+				if (item == null || item instanceof CombinedEgo || Warehouse.risk(item) != risk) continue;
 				if (!titled){
 					list.addTitle(Messages.get(this, "risk", risk.title(), Warehouse.extractCost(risk)));
 					titled = true;

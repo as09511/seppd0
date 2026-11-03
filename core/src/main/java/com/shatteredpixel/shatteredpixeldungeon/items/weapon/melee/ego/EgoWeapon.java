@@ -43,6 +43,11 @@ public abstract class EgoWeapon extends MeleeWeapon {
 		return risk;
 	}
 
+	//the risk level Angela charges for when refining this E.G.O
+	public RiskLevel costRisk(){
+		return risk;
+	}
+
 	public DamageType damageType(){
 		return damageType;
 	}

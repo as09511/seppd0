@@ -276,7 +276,7 @@ public class Angela extends NPC {
 			@Override
 			public void onSelect( Item item ) {
 				if (item == null || !refinable(item)) return;
-				int cost = Warehouse.refineCost(Warehouse.risk(item));
+				int cost = Warehouse.refineCost(Warehouse.costRisk(item));
 				boolean enough = Warehouse.enkephalin() >= cost;
 				String text = Messages.get(Angela.class, "refine_confirm", item.name(), cost, Warehouse.enkephalin());
 				if (!enough) text += "\n\n" + Messages.get(Angela.class, "not_enough");

@@ -62,6 +62,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Sh
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.Waterskin;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HolyTome;
@@ -263,6 +264,12 @@ public enum HeroClass {
 		new PotionOfStrength().quantity(10).identify().collect();
 		new PotionOfExperience().quantity(30).identify().collect();
 		new PotionOfHealing().quantity(10).identify().collect();
+
+		//alchemy anywhere, for combined E.G.O
+		AlchemistsToolkit toolkit = new AlchemistsToolkit();
+		toolkit.upgrade(10);
+		toolkit.identify().collect();
+		Dungeon.energy += 100;
 		new ScrollOfUpgrade().quantity(10).identify().collect();
 		new Dart().quantity(1).identify().collect();
 

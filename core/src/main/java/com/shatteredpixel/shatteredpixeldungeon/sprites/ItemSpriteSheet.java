@@ -509,6 +509,12 @@ public class ItemSpriteSheet {
 		assignItemRect(HOD_MANUAL,           16, 16);
 	}
 
+	//Red Eyes · Penitence, the first combined E.G.O: the two weapons crossed
+	public static final int RED_EYES_PENITENCE   = xy(6, 19);
+	static{
+		assignItemRect(RED_EYES_PENITENCE,   16, 16);
+	}
+
 	//an enkephalin box, not an item: only the icon of the warehouse resource
 	public static final int ENKEPHALIN_BOX       = xy(2, 19);
 	static{
