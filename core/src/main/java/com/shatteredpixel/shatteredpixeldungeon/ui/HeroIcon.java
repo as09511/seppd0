@@ -78,6 +78,10 @@ public class HeroIcon extends Image {
 	public static final int TRAINING_SEPHIRAH    = 12;
 	public static final int LITERATURE_LIBRARIAN = 13;
 	public static final int BLOODY_DESIRE   = 38;
+	//Netzach
+	public static final int NEUTRALIZING_GAS = 39;
+	public static final int OUR_GALAXY      = 67;
+	public static final int DA_CAPO         = 68;
 
 	//cleric spells
 	public static final int GUIDING_LIGHT   = 40;

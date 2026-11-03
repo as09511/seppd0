@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod.BloodyDesire;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach.NeutralizingGas;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Electricity;
@@ -1323,6 +1324,11 @@ public abstract class Char extends Actor {
 
 		if (sprite != null && buff(Challenge.SpectatorFreeze.class) != null){
 			return false; //can't add buffs while frozen and game is loaded
+		}
+
+		//Netzach's mental corruption neutralizing gas: allies inside can't be given debuffs
+		if (NeutralizingGas.blocks(this, buff)){
+			return false;
 		}
 
 		buffs.add( buff );

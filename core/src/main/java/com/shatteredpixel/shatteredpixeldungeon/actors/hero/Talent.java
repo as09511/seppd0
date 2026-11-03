@@ -267,6 +267,12 @@ public enum Talent {
 	HP_BULLET(11, 3), COLLAPSE_AMPOULE(12, 3), SAFETY_SECURED(13, 3),
 	//Art Floor Librarian T3
 	INCOMPREHENSIBLE(14, 3), FERVENT_EMOTION(15, 3), FINALE(16, 3),
+	//Neutralizing Gas T4
+	WIDE_SPRAY(206, 4), PURIFYING_MIST(207, 4), LINGERING_GAS(208, 4),
+	//Our Galaxy T4
+	STARLIGHT(209, 4), STARFALL(210, 4), GALAXY_EMBRACE(211, 4),
+	//Da Capo T4
+	ENCORE(212, 4), FORTISSIMO(213, 4), FERMATA(214, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one

@@ -29,6 +29,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod.ManagerCall;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod.BloodyDesire;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod.RedEye;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach.DaCapoMovement;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach.NeutralizingGas;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach.OurGalaxy;
 import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
@@ -447,6 +450,8 @@ public enum HeroClass {
 				return new ArmorAbility[]{new AnomalyManual(), new RegretStrike(), new SolemnLamentVolley()};
 			case HOD:
 				return new ArmorAbility[]{new ManagerCall(), new BloodyDesire(), new RedEye()};
+			case NETZACH:
+				return new ArmorAbility[]{new NeutralizingGas(), new OurGalaxy(), new DaCapoMovement()};
 		}
 	}
 
