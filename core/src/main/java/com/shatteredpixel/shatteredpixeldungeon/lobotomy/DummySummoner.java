@@ -25,6 +25,8 @@ package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -39,17 +41,18 @@ import com.watabou.utils.Reflection;
 
 import java.util.ArrayList;
 
-//testing tool, summons a training dummy next to the hero
+//testing tool, summons a training dummy (or a quest npc) next to the hero
 public class DummySummoner extends Item {
 
 	public static final String AC_SUMMON = "SUMMON";
 
 	@SuppressWarnings("unchecked")
-	private static final Class<? extends TrainingDummy>[] DUMMIES = new Class[]{
+	private static final Class<? extends Mob>[] DUMMIES = new Class[]{
 			TrainingDummy.Resistant.class,
 			TrainingDummy.Weak.class,
 			TrainingDummy.PaleWeak.class,
-			TrainingDummy.Ally.class
+			TrainingDummy.Ally.class,
+			Angela.class
 	};
 
 	{
@@ -92,7 +95,7 @@ public class DummySummoner extends Item {
 						return;
 					}
 
-					TrainingDummy dummy = Reflection.newInstance(DUMMIES[index]);
+					Mob dummy = Reflection.newInstance(DUMMIES[index]);
 					GameScene.add(dummy);
 					ScrollOfTeleportation.appear(dummy, Random.element(cells));
 				}
