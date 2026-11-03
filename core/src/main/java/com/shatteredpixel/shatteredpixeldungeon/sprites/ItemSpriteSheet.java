@@ -509,6 +509,12 @@ public class ItemSpriteSheet {
 		assignItemRect(HOD_MANUAL,           16, 16);
 	}
 
+	//an enkephalin box, not an item: only the icon of the warehouse resource
+	public static final int ENKEPHALIN_BOX       = xy(2, 19);
+	static{
+		assignItemRect(ENKEPHALIN_BOX,       16, 16);
+	}
+
 	private static final int WANDS              =                           xy(1, 14);  //16 slots
 	public static final int WAND_MAGIC_MISSILE  = WANDS+0;
 	public static final int WAND_FIREBOLT       = WANDS+1;

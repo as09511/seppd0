@@ -31,7 +31,9 @@ import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.effects.BannerSprites;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.services.news.News;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndWarehouse;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.AvailableUpdateData;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.Updates;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
@@ -58,7 +60,6 @@ import com.watabou.utils.DeviceCompat;
 import com.watabou.utils.GameMath;
 import com.watabou.utils.RectF;
 
-import java.util.Date;
 
 public class TitleScene extends PixelScene {
 
@@ -178,8 +179,14 @@ public class TitleScene extends PixelScene {
 		btnJournal.icon(Icons.get(Icons.JOURNAL));
 		add(btnJournal);
 
-		btnNews = new NewsButton(GREY_TR, Messages.get(this, "news"));
-		btnNews.icon(Icons.get(Icons.NEWS));
+		//the news button is replaced by the warehouse, which shows the resources shared by every game
+		btnNews = new StyledButton(GREY_TR, Messages.get(this, "warehouse")){
+			@Override
+			protected void onClick() {
+				ShatteredPixelDungeon.scene().addToFront(new WndWarehouse());
+			}
+		};
+		btnNews.icon(new ItemSprite(ItemSpriteSheet.ENKEPHALIN_BOX));
 		add(btnNews);
 
 		btnChanges = new ChangesButton(GREY_TR, Messages.get(this, "changes"));
@@ -318,46 +325,6 @@ public class TitleScene extends PixelScene {
 			btnExit.icon().alpha(alpha);
 		}
 
-	}
-
-	private static class NewsButton extends StyledButton {
-
-		public NewsButton(Chrome.Type type, String label ){
-			super(type, label);
-			if (SPDSettings.news()) News.checkForNews();
-		}
-
-		int unreadCount = -1;
-
-		@Override
-		public void update() {
-			super.update();
-
-			if (unreadCount == -1 && News.articlesAvailable()){
-				long lastRead = SPDSettings.newsLastRead();
-				if (lastRead == 0){
-					if (News.articles().get(0) != null) {
-						SPDSettings.newsLastRead(News.articles().get(0).date.getTime());
-					}
-				} else {
-					unreadCount = News.unreadArticles(new Date(SPDSettings.newsLastRead()));
-					if (unreadCount > 0) {
-						unreadCount = Math.min(unreadCount, 9);
-						text(text() + "(" + unreadCount + ")");
-					}
-				}
-			}
-
-			if (unreadCount > 0){
-				textColor(ColorMath.interpolate( 0xFFFFFF, Window.SHPX_COLOR, 0.5f + (float)Math.sin(Game.timeTotal*5)/2f));
-			}
-		}
-
-		@Override
-		protected void onClick() {
-			super.onClick();
-			ShatteredPixelDungeon.switchNoFade( NewsScene.class );
-		}
 	}
 
 	private static class ChangesButton extends StyledButton {

@@ -23,6 +23,16 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
+import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.Warehouse;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndBag;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndEgoExtract;
+import com.watabou.noosa.audio.Sample;
+import com.watabou.utils.Reflection;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -54,6 +64,7 @@ import java.util.ArrayList;
 
 //Angela, the AI secretary of L Corp. She waits by the stairs of floor 6, can't be harmed,
 //and offers the hero one of three Dawn ordeals, chosen at random when she appears.
+//In exchange for enkephalin boxes from the warehouse she also extracts or refines E.G.O, once each per game.
 public class Angela extends NPC {
 
 	{
@@ -101,28 +112,136 @@ public class Angela extends NPC {
 			Quest.type = Random.Int(3) + 1;
 		}
 
-		if (!Quest.given){
-			Game.runOnRenderThread(() -> GameScene.show(new WndOptions(
-					sprite(),
-					Messages.titleCase(name()),
-					Messages.get(Angela.class, "offer", Quest.ordealName()),
-					Messages.get(Angela.class, "accept"),
-					Messages.get(Angela.class, "decline")){
-				@Override
-				protected void onSelect( int index ) {
-					if (index == 0){
-						Quest.start();
-					} else {
-						yell(Messages.get(Angela.class, "declined"));
-					}
-				}
-			}));
-		} else if (!Quest.completed){
-			yell(Messages.get(Angela.class, "in_progress", Quest.ordealName()));
-		} else {
-			yell(Messages.get(Angela.class, "done"));
-		}
+		Game.runOnRenderThread(this::showMenu);
 		return true;
+	}
+
+	//Angela's services: the ordeal, E.G.O extraction and E.G.O refining, each paid for with enkephalin boxes
+	private void showMenu(){
+		GameScene.show(new WndOptions(
+				sprite(),
+				Messages.titleCase(name()),
+				Messages.get(Angela.class, "menu", Warehouse.enkephalin()),
+				Messages.get(Angela.class, "menu_ordeal", Quest.ordealName()),
+				Messages.get(Angela.class, Quest.extracted ? "menu_extract_used" : "menu_extract"),
+				Messages.get(Angela.class, Quest.refined ? "menu_refine_used" : "menu_refine"),
+				Messages.get(Angela.class, "menu_leave")){
+			@Override
+			protected boolean enabled( int index ) {
+				switch (index){
+					case 0: return !Quest.completed;
+					case 1: return !Quest.extracted;
+					case 2: return !Quest.refined;
+					default: return true;
+				}
+			}
+
+			@Override
+			protected void onSelect( int index ) {
+				switch (index){
+					case 0: ordeal(); break;
+					case 1: GameScene.show(new WndEgoExtract(Angela.this)); break;
+					case 2: refine(); break;
+				}
+			}
+		});
+	}
+
+	private void ordeal(){
+		if (Quest.given){
+			yell(Messages.get(Angela.class, "in_progress", Quest.ordealName()));
+			return;
+		}
+		GameScene.show(new WndOptions(
+				sprite(),
+				Messages.titleCase(name()),
+				Messages.get(Angela.class, "offer", Quest.ordealName(), Quest.ORDEAL_REWARD),
+				Messages.get(Angela.class, "accept"),
+				Messages.get(Angela.class, "decline")){
+			@Override
+			protected void onSelect( int index ) {
+				if (index == 0){
+					Quest.start();
+				} else {
+					yell(Messages.get(Angela.class, "declined"));
+				}
+			}
+		});
+	}
+
+	//called by WndEgoExtract once the hero has confirmed the extraction
+	public void extract( Class<? extends Item> cls ){
+		if (Quest.extracted) return;
+		Item item = Reflection.newInstance(cls);
+		if (item == null) return;
+		RiskLevel risk = Warehouse.risk(item);
+		int cost = Warehouse.extractCost(risk);
+		if (!Warehouse.spendEnkephalin(cost)){
+			yell(Messages.get(Angela.class, "not_enough"));
+			return;
+		}
+		Quest.extracted = true;
+		item.identify();
+		if (!item.doPickUp(Dungeon.hero, Dungeon.hero.pos)){
+			Dungeon.level.drop(item, Dungeon.hero.pos).sprite.drop();
+		}
+		Sample.INSTANCE.play(Assets.Sounds.EVOKE);
+		GLog.p(Messages.get(Angela.class, "extracted", item.name(), cost, Warehouse.enkephalin()));
+		yell(Messages.get(Angela.class, "extract_done"));
+	}
+
+	public static boolean refinable( Item item ){
+		return Warehouse.risk(item) != null && item.level() < 2;
+	}
+
+	private void refine(){
+		GameScene.selectItem(new WndBag.ItemSelector() {
+			@Override
+			public String textPrompt() {
+				return Messages.get(Angela.class, "refine_prompt");
+			}
+
+			@Override
+			public boolean itemSelectable( Item item ) {
+				return refinable(item);
+			}
+
+			@Override
+			public void onSelect( Item item ) {
+				if (item == null || !refinable(item)) return;
+				int cost = Warehouse.refineCost(Warehouse.risk(item));
+				boolean enough = Warehouse.enkephalin() >= cost;
+				String text = Messages.get(Angela.class, "refine_confirm", item.name(), cost, Warehouse.enkephalin());
+				if (!enough) text += "\n\n" + Messages.get(Angela.class, "not_enough");
+				GameScene.show(new WndOptions(
+						new ItemSprite(item),
+						Messages.titleCase(item.name()),
+						text,
+						Messages.get(Angela.class, "refine_yes", cost),
+						Messages.get(Angela.class, "cancel")){
+					@Override
+					protected boolean enabled( int index ) {
+						return index != 0 || enough;
+					}
+
+					@Override
+					protected void onSelect( int index ) {
+						if (index != 0 || Quest.refined || !refinable(item)) return;
+						if (!Warehouse.spendEnkephalin(cost)){
+							yell(Messages.get(Angela.class, "not_enough"));
+							return;
+						}
+						Quest.refined = true;
+						item.upgrade();
+						Item.updateQuickslot();
+						Dungeon.hero.sprite.emitter().start(Speck.factory(Speck.UP), 0.2f, 3);
+						Sample.INSTANCE.play(Assets.Sounds.EVOKE);
+						GLog.p(Messages.get(Angela.class, "refined", item.name(), cost, Warehouse.enkephalin()));
+						yell(Messages.get(Angela.class, "refine_done"));
+					}
+				});
+			}
+		});
 	}
 
 	public static class Quest {
@@ -133,16 +252,24 @@ public class Angela extends NPC {
 
 		public static final int AMBER_COUNT = 4;
 
+		//enkephalin boxes given for overcoming a Dawn ordeal
+		public static final int ORDEAL_REWARD = 10;
+
 		private static boolean spawned;
 		private static int type;
 		private static boolean given;
 		private static boolean completed;
+		//each of Angela's services can be used once per game
+		private static boolean extracted;
+		private static boolean refined;
 
 		public static void reset(){
 			spawned = false;
 			type = 0;
 			given = false;
 			completed = false;
+			extracted = false;
+			refined = false;
 		}
 
 		private static final String NODE      = "angela";
@@ -150,6 +277,8 @@ public class Angela extends NPC {
 		private static final String TYPE      = "type";
 		private static final String GIVEN     = "given";
 		private static final String COMPLETED = "completed";
+		private static final String EXTRACTED = "extracted";
+		private static final String REFINED   = "refined";
 
 		public static void storeInBundle( Bundle bundle ){
 			Bundle node = new Bundle();
@@ -157,6 +286,8 @@ public class Angela extends NPC {
 			node.put(TYPE, type);
 			node.put(GIVEN, given);
 			node.put(COMPLETED, completed);
+			node.put(EXTRACTED, extracted);
+			node.put(REFINED, refined);
 			bundle.put(NODE, node);
 		}
 
@@ -170,6 +301,16 @@ public class Angela extends NPC {
 			type = node.getInt(TYPE);
 			given = node.getBoolean(GIVEN);
 			completed = node.getBoolean(COMPLETED);
+			extracted = node.getBoolean(EXTRACTED);
+			refined = node.getBoolean(REFINED);
+		}
+
+		public static boolean extracted(){
+			return extracted;
+		}
+
+		public static boolean refined(){
+			return refined;
 		}
 
 		public static String ordealName(){
@@ -277,6 +418,8 @@ public class Angela extends NPC {
 				}
 			}
 			completed = true;
+			Warehouse.addEnkephalin(ORDEAL_REWARD);
+			GLog.p(Messages.get(Angela.class, "reward", ORDEAL_REWARD, Warehouse.enkephalin()));
 			showOrdealText("end_" + type);
 		}
 

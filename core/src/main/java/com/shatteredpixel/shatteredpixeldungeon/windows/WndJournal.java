@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.windows;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.Warehouse;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.AngelaSprite;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -100,6 +103,7 @@ public class WndJournal extends WndTabbed {
 	private NotesTab notesTab;
 	private CatalogTab catalogTab;
 	private BadgesTab badgesTab;
+	private WarehouseTab warehouseTab;
 	
 	public static int last_index = 0;
 
@@ -139,6 +143,11 @@ public class WndJournal extends WndTabbed {
 		add(badgesTab);
 		badgesTab.setRect(0, 0, width, height);
 		badgesTab.updateList();
+
+		warehouseTab = new WarehouseTab();
+		add(warehouseTab);
+		warehouseTab.setRect(0, 0, width, height);
+		warehouseTab.updateList();
 		
 		Tab[] tabs = {
 				new IconTab( Icons.JOURNAL.get() ) {
@@ -200,6 +209,18 @@ public class WndJournal extends WndTabbed {
 					protected String hoverText() {
 						return Messages.get(badgesTab, "title");
 					}
+				},
+				new IconTab( new ItemSprite(ItemSpriteSheet.ENKEPHALIN_BOX, null) ) {
+					protected void select( boolean value ) {
+						super.select( value );
+						warehouseTab.active = warehouseTab.visible = value;
+						if (value) last_index = 5;
+					}
+
+					@Override
+					protected String hoverText() {
+						return Messages.get(WndWarehouse.class, "title");
+					}
 				}
 		};
 
@@ -231,6 +252,53 @@ public class WndJournal extends WndTabbed {
 		alchemyTab.layout();
 		notesTab.layout();
 		catalogTab.layout();
+		warehouseTab.layout();
+	}
+
+	//the warehouse: resources shared by every game, and which of Angela's services this game has used
+	public static class WarehouseTab extends Component {
+
+		private ScrollingListPane list;
+
+		@Override
+		protected void createChildren() {
+			list = new ScrollingListPane();
+			add( list );
+		}
+
+		@Override
+		protected void layout() {
+			super.layout();
+			list.setRect( x, y, width, height);
+		}
+
+		public void updateList(){
+			list.addTitle(Messages.get(WndWarehouse.class, "title"));
+			ScrollingListPane.ListItem box = new ScrollingListPane.ListItem(
+					new ItemSprite(ItemSpriteSheet.ENKEPHALIN_BOX, null),
+					null,
+					Messages.get(WndWarehouse.class, "enkephalin", Warehouse.enkephalin())){
+				@Override
+				public boolean onClick( float x, float y ) {
+					if (inside(x, y)){
+						ShatteredPixelDungeon.scene().addToFront(new WndWarehouse());
+						return true;
+					}
+					return false;
+				}
+			};
+			list.addItem(box);
+
+			if (Dungeon.hero != null){
+				list.addTitle(Messages.get(WndWarehouse.class, "services"));
+				list.addItem(new ScrollingListPane.ListItem(new AngelaSprite(), null,
+						Messages.get(WndWarehouse.class, Angela.Quest.extracted() ? "extract_used" : "extract_ready")));
+				list.addItem(new ScrollingListPane.ListItem(new AngelaSprite(), null,
+						Messages.get(WndWarehouse.class, Angela.Quest.refined() ? "refine_used" : "refine_ready")));
+			}
+
+			list.setRect(x, y, width, height);
+		}
 	}
 	
 	public static class GuideTab extends Component {
