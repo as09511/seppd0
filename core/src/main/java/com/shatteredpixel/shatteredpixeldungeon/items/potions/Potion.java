@@ -263,7 +263,9 @@ public class Potion extends Item {
 	@Override
 	public void doThrow( final Hero hero ) {
 
-		if (isKnown()
+		//Netzach's collapse ampoule makes throwing healing potions intended, so no warning
+		boolean collapseAmpoule = this instanceof PotionOfHealing && hero.hasTalent(Talent.COLLAPSE_AMPOULE);
+		if (isKnown() && !collapseAmpoule
 				&& !mustThrowPots.contains(this.getClass())
 				&& !canThrowPots.contains(this.getClass())) {
 		

@@ -29,6 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Viscosity;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -91,11 +92,14 @@ public class ConcentratedEnkephalin extends Item {
 
 			hero.HP = hero.HT;
 			hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(heal), FloatingText.HEALING);
-			Buff.affect(hero, EnkephalinDebt.class).extend(heal);
+			//the same deferred damage as the viscosity glyph
+			Buff.affect(hero, Viscosity.DeferedDamage.class).extend(heal);
 
 			if (hero.hasTalent(Talent.OVERDOSE)){
 				Buff.prolong(hero, Overdose.class, Overdose.DURATION);
 			}
+			//additional dose and HP bullet supply
+			NetzachTrackers.onEnkephalinDrunk(hero);
 
 			Sample.INSTANCE.play(Assets.Sounds.DRINK);
 			GLog.i(Messages.get(this, "drink", heal));
@@ -129,6 +133,7 @@ public class ConcentratedEnkephalin extends Item {
 	//Netzach's healing outside of regeneration, with regenerator formula fix turning the overflow into a shield
 	public static void heal( Hero hero, int amount ){
 		if (amount <= 0 || !hero.isAlive()) return;
+		amount = Math.round(amount * NetzachTrackers.healFactor(hero));
 		int healed = Math.min(amount, hero.HT - hero.HP);
 		if (healed > 0){
 			hero.HP += healed;
@@ -187,20 +192,6 @@ public class ConcentratedEnkephalin extends Item {
 		floors.clear();
 		if (bundle.contains(FLOORS)){
 			for (int k : bundle.getIntArray(FLOORS)) floors.add(k);
-		}
-	}
-
-	//the health borrowed by the enkephalin, paid back 10% at a time each turn like viscosity
-	public static class EnkephalinDebt extends Viscosity.DeferedDamage {
-
-		@Override
-		public String name() {
-			return Messages.get(this, "name");
-		}
-
-		@Override
-		public String desc() {
-			return Messages.get(this, "desc", damage);
 		}
 	}
 

@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
@@ -51,13 +52,16 @@ public class Healing extends Buff {
 	@Override
 	public boolean act(){
 
-		//healing beyond max health counts for Netzach's regenerator formula fix
+		//Netzach's recovery efficiency adds to the health restored, not to how long it lasts
+		int heal = healingThisTick();
 		if (target instanceof Hero){
-			ConcentratedEnkephalin.onOverheal((Hero) target, healingThisTick() - (target.HT - target.HP));
+			heal = Math.round(heal * NetzachTrackers.healFactor((Hero) target));
+			//healing beyond max health counts for Netzach's regenerator formula fix
+			ConcentratedEnkephalin.onOverheal((Hero) target, heal - (target.HT - target.HP));
 		}
 
 		if (target.HP < target.HT) {
-			target.HP = Math.min(target.HT, target.HP + healingThisTick());
+			target.HP = Math.min(target.HT, target.HP + heal);
 
 			if (target.HP == target.HT && target instanceof Hero) {
 				((Hero) target).resting = false;

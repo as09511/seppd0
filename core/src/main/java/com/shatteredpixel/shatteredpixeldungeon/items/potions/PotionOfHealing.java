@@ -22,6 +22,12 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.potions;
 
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
+import com.watabou.noosa.audio.Sample;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bleeding;
@@ -53,6 +59,22 @@ public class PotionOfHealing extends Potion {
 		identify();
 		cure( hero );
 		heal( hero );
+	}
+
+	//Netzach's collapse ampoule: thrown at an enemy it hurts instead of shattering harmlessly
+	@Override
+	public void shatter( int cell ) {
+		Char ch = Actor.findChar(cell);
+		if (NetzachTrackers.collapseAmpoule(ch)){
+			identify();
+			if (Dungeon.level.heroFOV[cell]){
+				Sample.INSTANCE.play( Assets.Sounds.SHATTER );
+				CellEmitter.center(cell).burst(Speck.factory(Speck.HEALING), 6);
+				GLog.i( Messages.get(PotionOfHealing.class, "collapse") );
+			}
+			return;
+		}
+		super.shatter(cell);
 	}
 
 	public static void heal( Char ch ){

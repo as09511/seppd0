@@ -29,6 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Healing;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.VialOfBlood;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
@@ -82,6 +83,8 @@ public class Dewdrop extends Item {
 	public static boolean consumeDew(int quantity, Hero hero, boolean force){
 		//20 drops for a full heal
 		int effect = Math.round( hero.HT * 0.05f * quantity );
+		//Netzach's recovery efficiency
+		effect = Math.round( effect * NetzachTrackers.healFactor(hero) );
 
 		int heal = Math.min( hero.HT - hero.HP, effect );
 

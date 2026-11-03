@@ -261,6 +261,12 @@ public enum Talent {
 	EFFICIENT(1), HANGOVER(2), SLACKING(36), RESIGNATION(3),
 	//Netzach T2
 	BEER_VENDING(4), REGENERATOR_MK2(99), EXTRA_RATION(37), REGENERATOR_FIX(35), OVERDOSE(7),
+	//Netzach T3
+	ADDITIONAL_DOSE(9, 3), RECOVERY_EFFICIENCY(10, 3),
+	//Safety Team Sephirah T3
+	HP_BULLET(11, 3), COLLAPSE_AMPOULE(12, 3), SAFETY_SECURED(13, 3),
+	//Art Floor Librarian T3
+	INCOMPREHENSIBLE(14, 3), FERVENT_EMOTION(15, 3), FINALE(16, 3),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -1237,6 +1243,9 @@ public enum Talent {
 			case HOD:
 				Collections.addAll(tierTalents, POTENTIAL_DEV, TRAINING_RESULT);
 				break;
+			case NETZACH:
+				Collections.addAll(tierTalents, ADDITIONAL_DOSE, RECOVERY_EFFICIENCY);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1318,6 +1327,12 @@ public enum Talent {
 				break;
 			case LITERATURE_LIBRARIAN:
 				Collections.addAll(tierTalents, OBSESSION, COCOON, OLD_UMBRELLA);
+				break;
+			case SAFETY_SEPHIRAH:
+				Collections.addAll(tierTalents, HP_BULLET, COLLAPSE_AMPOULE, SAFETY_SECURED);
+				break;
+			case ART_LIBRARIAN:
+				Collections.addAll(tierTalents, INCOMPREHENSIBLE, FERVENT_EMOTION, FINALE);
 				break;
 		}
 		for (Talent talent : tierTalents){

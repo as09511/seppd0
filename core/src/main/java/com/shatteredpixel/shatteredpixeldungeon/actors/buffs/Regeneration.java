@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.SpiritForm;
@@ -87,6 +88,8 @@ public class Regeneration extends Buff {
 					if (hero.resting && hero.hasTalent(Talent.SLACKING)){
 						delay /= 1f + 0.5f*hero.pointsInTalent(Talent.SLACKING);
 					}
+					//safety team sephirah: 2x, or 3x at half health or less
+					delay *= NetzachTrackers.regenDelayFactor(hero);
 				}
 
 				//salt cube is turned off while regen is disabled.

@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod.BloodyDesire;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Electricity;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.StormCloud;
@@ -480,6 +481,11 @@ public abstract class Char extends Actor {
 				dmg *= HodTrackers.attackMultiplier((Hero) this, enemy);
 			}
 
+			//Netzach's finale: more damage against enemies with two or more debuffs
+			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.NETZACH){
+				dmg *= NetzachTrackers.attackMultiplier((Hero) this, enemy);
+			}
+
 			if (buff( PowerOfMany.PowerBuff.class) != null){
 				if (buff( BeamingRay.BeamingRayBoost.class) != null
 					&& buff( BeamingRay.BeamingRayBoost.class).object == enemy.id()){
@@ -564,6 +570,11 @@ public abstract class Char extends Actor {
 			//literature floor librarian's bleeding and cocoon
 			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.HOD){
 				HodTrackers.afterHit((Hero) this, enemy);
+			}
+
+			//the art floor librarian's debuffs
+			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.NETZACH){
+				NetzachTrackers.afterHit((Hero) this, enemy);
 			}
 
 			if (buff(FireImbue.class) != null)  buff(FireImbue.class).proc(enemy);

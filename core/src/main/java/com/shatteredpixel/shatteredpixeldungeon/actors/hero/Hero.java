@@ -101,6 +101,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap.Type;
 import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.KindOfWeapon;
@@ -1776,6 +1777,8 @@ public class Hero extends Char {
 		if (hasTalent(Talent.RESIGNATION) && HP <= HT*0.3f){
 			damage *= 1f - 0.1f*pointsInTalent(Talent.RESIGNATION);
 		}
+		//Netzach's safety secured: less damage taken while paying back deferred damage
+		damage *= NetzachTrackers.damageTakenFactor(this, src);
 
 		//abnormality response manual: 50% less damage taken
 		damage = AnomalyManual.onDamage(this, damage, src);
