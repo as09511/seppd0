@@ -85,6 +85,12 @@ public class EchoLoneliness extends EgoGun implements CombinedEgo {
 				5*lvl;          //+5 per level
 	}
 
+	//refined like an ALEPH E.G.O, as it is balanced as tier 5
+	@Override
+	public RiskLevel costRisk() {
+		return RiskLevel.ALEPH;
+	}
+
 	@Override
 	public int maxAmmo() {
 		return lonely ? LONELINESS_AMMO : ECHO_AMMO;
