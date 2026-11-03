@@ -25,11 +25,13 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Blindness;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vertigo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vulnerable;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Weakness;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -39,6 +41,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.effects.DaCapoScore;
 import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
@@ -52,23 +55,25 @@ import com.watabou.utils.Random;
 
 import java.util.ArrayList;
 
-//Netzach's third armor ability: da capo, a performance in four movements.
-//Each use damages and debuffs every enemy around him, walls and doors don't stop the music. Used again on the very next
-//turn the next movement plays, wider and stronger, with another score ring around him; any other action ends it:
-// 1st 5x5 12-24 weakness, 2nd 7x7 cripple, 3rd 9x9 vulnerable, finale 11x11 paralysis (2 turns on bosses), 5 turns each
+//Netzach's third armor ability: da capo, a performance in five movements.
+//Each use deals WHITE damage to every enemy around him and debuffs them, walls and doors don't stop the music. Used
+//again on the very next turn the next movement plays, wider and stronger, with another score ring around him; the
+//rings stay while the performance goes on, any other action ends it:
+// 1st 5x5 12-24 weakness, 2nd 7x7 blindness, 3rd 9x9 vertigo, 4th 11x11 vulnerable,
+// finale 13x13 amok (2 turns of paralysis on bosses), 5 turns each. In the finale the score spreads out and strikes.
 public class DaCapoMovement extends ArmorAbility {
 
 	{
-		baseChargeUse = 25f;
+		baseChargeUse = 20f;
 	}
 
-	public static final int MOVEMENTS = 4;
+	public static final int MOVEMENTS = 5;
 
 	//the next movement has to be played on the very next turn: the tracker outlives the 1 turn the ability takes
 	// by half a turn, so any other action lets it run out
 	private static final float WINDOW = 1.5f;
 
-	//5x5, 7x7, 9x9, then 11x11 for the finale
+	//5x5, 7x7, 9x9, 11x11, then 13x13 for the finale
 	public static int radius( int movement ){
 		return movement + 1;
 	}
@@ -102,7 +107,6 @@ public class DaCapoMovement extends ArmorAbility {
 		int movement = tracker == null ? 1 : tracker.next;
 
 		int r = radius(movement);
-		float duration = debuffDuration(hero);
 		ArrayList<Char> targets = new ArrayList<>();
 		for (Mob m : Dungeon.level.mobs.toArray(new Mob[0])){
 			if (m.alignment == Char.Alignment.ENEMY && m.isAlive()
@@ -110,36 +114,66 @@ public class DaCapoMovement extends ArmorAbility {
 				targets.add(m);
 			}
 		}
-		for (Char ch : targets){
-			ch.damage(Random.NormalIntRange(minDamage(hero, movement), maxDamage(hero, movement)), hero);
-			if (!ch.isAlive()) continue;
-			switch (movement){
-				case 1: default: Buff.prolong(ch, Weakness.class, duration); break;
-				case 2: Buff.prolong(ch, Cripple.class, duration); break;
-				case 3: Buff.prolong(ch, Vulnerable.class, duration); break;
-				case 4:
-					float paralysis = Char.hasProp(ch, Char.Property.BOSS) || Char.hasProp(ch, Char.Property.MINIBOSS)
-							? 2f : duration;
-					Buff.prolong(ch, Paralysis.class, paralysis);
-					break;
-			}
-		}
 
-		hero.sprite.parent.add(new DaCapoScore(hero.sprite, movement));
-		if (movement >= MOVEMENTS) PixelScene.shake(3, 0.6f);
 		Sample.INSTANCE.play(Assets.Sounds.BEACON, 1f, 0.8f + 0.1f*movement);
 		hero.sprite.showStatus(CharSprite.NEUTRAL, Messages.get(this, "movement_" + movement));
-
-		//after the last movement the performance starts over
-		if (movement >= MOVEMENTS){
-			Buff.detach(hero, Movement.class);
-		} else {
-			Buff.affect(hero, Movement.class, WINDOW).next = movement + 1;
-		}
-
 		hero.sprite.operate(hero.pos);
 		Invisibility.dispel();
+
+		//the finale: the score built up so far spreads out, striking each enemy as it reaches them
+		if (movement >= MOVEMENTS){
+			DaCapoScore score = tracker != null ? tracker.takeScore() : null;
+			Buff.detach(hero, Movement.class);
+			if (score == null || score.parent == null){
+				if (score != null) score.killAndErase();
+				score = new DaCapoScore(hero.sprite, DaCapoScore.MAX_RINGS);
+				hero.sprite.parent.add(score);
+			}
+			hero.busy();
+			PixelScene.shake(3, 0.6f);
+			score.spread(targets, ch -> strike(hero, ch, movement), () -> hero.spendAndNext(1f));
+			return;
+		}
+
+		for (Char ch : targets){
+			strike(hero, ch, movement);
+		}
+
+		if (tracker == null){
+			//attaching the tracker puts up the first ring of the score
+			tracker = Buff.prolong(hero, Movement.class, WINDOW);
+			tracker.next = 2;
+		} else {
+			Buff.prolong(hero, Movement.class, WINDOW);
+			tracker.next = movement + 1;
+			tracker.addRing();
+		}
+
 		hero.spendAndNext(1f);
+	}
+
+	private static void strike( Hero hero, Char ch, int movement ){
+		if (!ch.isAlive()) return;
+		int dmg = Random.NormalIntRange(minDamage(hero, movement), maxDamage(hero, movement));
+		dmg = DamageType.apply(ch, DamageType.WHITE, dmg);
+		if (dmg > 0) ch.damage(dmg, hero);
+		ch.incomingDamageType = null;
+		if (!ch.isAlive()) return;
+
+		float duration = debuffDuration(hero);
+		switch (movement){
+			case 1: default: Buff.prolong(ch, Weakness.class, duration); break;
+			case 2: Buff.prolong(ch, Blindness.class, duration); break;
+			case 3: Buff.prolong(ch, Vertigo.class, duration); break;
+			case 4: Buff.prolong(ch, Vulnerable.class, duration); break;
+			case 5:
+				if (Char.hasProp(ch, Char.Property.BOSS) || Char.hasProp(ch, Char.Property.MINIBOSS)){
+					Buff.prolong(ch, Paralysis.class, 2f);
+				} else {
+					Buff.prolong(ch, Amok.class, duration);
+				}
+				break;
+		}
 	}
 
 	@Override
@@ -178,7 +212,36 @@ public class DaCapoMovement extends ArmorAbility {
 
 		@Override
 		public String desc() {
-			return Messages.get(this, "desc", next);
+			return Messages.get(this, "desc", Messages.get(DaCapoMovement.class, "movement_" + next));
+		}
+
+		//the score stays around Netzach for as long as the performance goes on, one ring per movement played
+		private DaCapoScore score;
+
+		@Override
+		public void fx( boolean on ) {
+			if (on){
+				if (target.sprite == null || target.sprite.parent == null) return;
+				if (score != null && score.alive && score.parent == target.sprite.parent
+						&& score.target() == target.sprite) return;
+				score = new DaCapoScore(target.sprite, Math.max(1, Math.min(DaCapoScore.MAX_RINGS, next - 1)));
+				target.sprite.parent.add(score);
+			} else if (score != null){
+				score.fade();
+				score = null;
+			}
+		}
+
+		public void addRing(){
+			if (score == null) fx(true);
+			else if (score.rings() < next - 1) score.addRing();
+		}
+
+		//the finale takes the score over, so it isn't faded out when the tracker goes
+		public DaCapoScore takeScore(){
+			DaCapoScore s = score;
+			score = null;
+			return s;
 		}
 
 		private static final String NEXT = "next";
