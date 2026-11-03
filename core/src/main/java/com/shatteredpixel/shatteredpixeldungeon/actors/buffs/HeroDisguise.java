@@ -59,7 +59,7 @@ public class HeroDisguise extends FlavourBuff {
 			if (cls == null) {
 				do {
 					cls = Random.oneOf(HeroClass.values());
-				} while (cls == ((Hero) target).heroClass);
+				} while (cls == ((Hero) target).heroClass || cls.isRetired() || cls.isDebugOnly());
 			}
 
 			if (on) ((HeroSprite)target.sprite).disguise(cls);

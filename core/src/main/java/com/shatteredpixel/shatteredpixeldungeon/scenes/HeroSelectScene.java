@@ -195,8 +195,8 @@ public class HeroSelectScene extends PixelScene {
 		add(infoButton);
 
 		for (HeroClass cl : HeroClass.values()){
-			//the tester is a debugging tool, release builds don't show it
-			if (cl.isDebugOnly() && !DeviceCompat.isDebug()) continue;
+			//retired heroes are gone, testing classes only show in debug builds
+			if (!cl.isSelectable()) continue;
 			HeroBtn button = new HeroBtn(cl);
 			add(button);
 			heroBtns.add(button);
@@ -402,7 +402,7 @@ public class HeroSelectScene extends PixelScene {
 		add(fadeResetter);
 		resetFade();
 
-		if (GamesInProgress.selectedClass != null && GamesInProgress.selectedClass.isDebugOnly() && !DeviceCompat.isDebug()){
+		if (GamesInProgress.selectedClass != null && !GamesInProgress.selectedClass.isSelectable()){
 			GamesInProgress.selectedClass = null;
 		}
 		if (GamesInProgress.selectedClass != null){
@@ -840,7 +840,7 @@ public class HeroSelectScene extends PixelScene {
 
 			int unlockedCount = 0;
 			for (HeroClass cls : HeroClass.values()){
-				if (cls.isUnlocked()) unlockedCount++;
+				if (cls.isSelectable() && cls.isUnlocked()) unlockedCount++;
 			}
 
 			if (unlockedCount >= 2) {
@@ -855,7 +855,7 @@ public class HeroSelectScene extends PixelScene {
 							HeroClass randomCls;
 							do {
 								randomCls = Random.oneOf(HeroClass.values());
-							} while (!randomCls.isUnlocked() || randomCls.isDebugOnly());
+							} while (!randomCls.isUnlocked() || !randomCls.isSelectable() || randomCls.isDebugOnly());
 							setSelectedHero(randomCls);
 							GamesInProgress.randomizedClass = true;
 						}
@@ -955,7 +955,7 @@ public class HeroSelectScene extends PixelScene {
 							HeroClass randomCls;
 							do {
 								randomCls = Random.oneOf(HeroClass.values());
-							} while (!randomCls.isUnlocked() || randomCls.isDebugOnly());
+							} while (!randomCls.isUnlocked() || !randomCls.isSelectable() || randomCls.isDebugOnly());
 							setSelectedHero(randomCls);
 							GamesInProgress.randomizedClass = true;
 						} else {

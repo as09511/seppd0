@@ -166,6 +166,7 @@ public class Badges {
 		WILL_TO_STAND_TALL          ( 88 ), //victory as Malkuth
 		REASON_TO_DISCERN           ( 89 ), //victory as Yesod
 		HOPE_TO_BE_BETTER           ( 90 ), //victory as Hod
+		COURAGE_TO_LIVE_ON          ( 91 ), //victory as Netzach
 
 		//platinum
 		MANY_BUFFS                  ( 96 ),
@@ -1055,6 +1056,13 @@ public class Badges {
 			displayBadge( badge );
 		}
 
+		//the courage to go on living: obtain the seed of light as Netzach
+		if (Dungeon.hero.heroClass == HeroClass.NETZACH){
+			badge = Badge.COURAGE_TO_LIVE_ON;
+			local.add( badge );
+			displayBadge( badge );
+		}
+
 		badge = victoryClassBadges.get(Dungeon.hero.heroClass);
 		if (badge == null) return;
 		local.add( badge );
@@ -1388,7 +1396,7 @@ public class Badges {
 
 		if (badge == Badge.BOSS_SLAIN_1_ALL_CLASSES){
 			for (HeroClass cls : HeroClass.values()){
-				if (cls.isDebugOnly()) continue;
+				if (cls.isDebugOnly() || !firstBossClassBadges.containsKey(cls)) continue;
 				result += "\n";
 				if (isUnlocked(firstBossClassBadges.get(cls)))  result += "_" + Messages.titleCase(cls.title()) + "_";
 				else                                            result += Messages.titleCase(cls.title());
@@ -1399,7 +1407,7 @@ public class Badges {
 		} else if (badge == Badge.VICTORY_ALL_CLASSES) {
 
 			for (HeroClass cls : HeroClass.values()){
-				if (cls.isDebugOnly()) continue;
+				if (cls.isDebugOnly() || !victoryClassBadges.containsKey(cls)) continue;
 				result += "\n";
 				if (isUnlocked(victoryClassBadges.get(cls)))    result += "_" + Messages.titleCase(cls.title()) + "_";
 				else                                            result += Messages.titleCase(cls.title());

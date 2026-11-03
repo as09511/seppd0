@@ -144,6 +144,22 @@ public enum HeroClass {
 		return this == TESTER || this == TEST_NETZACH;
 	}
 
+	//Shattered's original six heroes can no longer be started. Their code and data stay, so old saves, rankings,
+	//badges and anything that borrows their talents, items or abilities keep working
+	public boolean isRetired(){
+		switch (this){
+			case WARRIOR: case MAGE: case ROGUE: case HUNTRESS: case DUELIST: case CLERIC:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	//shown on the hero select screen: not retired, and testing classes only in debug builds
+	public boolean isSelectable(){
+		return !isRetired() && (!isDebugOnly() || DeviceCompat.isDebug());
+	}
+
 	//the class the hero actually plays as
 	public HeroClass playedClass(){
 		return this == TEST_NETZACH ? NETZACH : this;
