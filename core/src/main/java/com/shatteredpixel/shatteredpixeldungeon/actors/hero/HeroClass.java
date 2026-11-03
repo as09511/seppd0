@@ -261,6 +261,8 @@ public enum HeroClass {
 		Dungeon.LimitedDrops.MAGICAL_HOLSTER.drop();
 
 		new PotionOfStrength().quantity(10).identify().collect();
+		new PotionOfExperience().quantity(30).identify().collect();
+		new PotionOfHealing().quantity(10).identify().collect();
 		new ScrollOfUpgrade().quantity(10).identify().collect();
 		new Dart().quantity(1).identify().collect();
 
