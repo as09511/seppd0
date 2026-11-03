@@ -62,6 +62,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Mimicry;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.DaCapo;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Laughter;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SoundOfAStar;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.EchoLoneliness;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyesPenitence;
 
 //every E.G.O equipment in the mod, add new E.G.O here
@@ -109,7 +110,8 @@ public class EgoCatalog {
 			LaughterArmor.class,
 			SoundOfAStar.class,
 			//combined E.G.O, made only by alchemy
-			RedEyesPenitence.class
+			RedEyesPenitence.class,
+			EchoLoneliness.class
 	};
 
 }

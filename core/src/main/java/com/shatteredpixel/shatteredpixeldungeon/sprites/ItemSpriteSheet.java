@@ -515,6 +515,13 @@ public class ItemSpriteSheet {
 		assignItemRect(RED_EYES_PENITENCE,   16, 16);
 	}
 
+	//Echo · Loneliness, the second combined E.G.O: the crossbow over the revolver.
+	//Takes one of the unused artifact slots
+	public static final int ECHO_LONELINESS      = xy(10, 17);
+	static{
+		assignItemRect(ECHO_LONELINESS,      16, 16);
+	}
+
 	//an enkephalin box, not an item: only the icon of the warehouse resource
 	public static final int ENKEPHALIN_BOX       = xy(2, 19);
 	static{
