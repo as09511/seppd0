@@ -58,7 +58,8 @@ public class WndEgoExtract extends Window {
 					list.addTitle(Messages.get(this, "risk", risk.title(), Warehouse.extractCost(risk)));
 					titled = true;
 				}
-				item.identify();
+				//a display copy: shows its stats without marking it as seen in the catalog
+				item.identify(false);
 				ScrollingListPane.ListItem row = new ScrollingListPane.ListItem(
 						new ItemSprite(item), null, Messages.titleCase(item.name())){
 					@Override
