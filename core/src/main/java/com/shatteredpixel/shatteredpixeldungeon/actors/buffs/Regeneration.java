@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.SpiritForm;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.ChaliceOfBlood;
@@ -74,6 +75,17 @@ public class Regeneration extends Buff {
 						//15% boost at +0, scaling to a 500% boost at +10
 						delay -= 1.33f + chaliceLevel*0.667f;
 						delay /= RingOfEnergy.artifactChargeMultiplier(target);
+					}
+				}
+
+				//Netzach: regenerator mk2 takes 2/3 turns off each point of health, slacking speeds up resting by 1.5x/2x
+				if (target instanceof Hero){
+					Hero hero = (Hero) target;
+					if (hero.hasTalent(Talent.REGENERATOR_MK2)){
+						delay = Math.max(1f, delay - 1 - hero.pointsInTalent(Talent.REGENERATOR_MK2));
+					}
+					if (hero.resting && hero.hasTalent(Talent.SLACKING)){
+						delay /= 1f + 0.5f*hero.pointsInTalent(Talent.SLACKING);
 					}
 				}
 

@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
+import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.VialOfBlood;
@@ -49,6 +50,11 @@ public class Healing extends Buff {
 	
 	@Override
 	public boolean act(){
+
+		//healing beyond max health counts for Netzach's regenerator formula fix
+		if (target instanceof Hero){
+			ConcentratedEnkephalin.onOverheal((Hero) target, healingThisTick() - (target.HT - target.HP));
+		}
 
 		if (target.HP < target.HT) {
 			target.HP = Math.min(target.HT, target.HP + healingThisTick());

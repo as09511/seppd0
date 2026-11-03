@@ -50,7 +50,8 @@ public class SupplyRation extends Food {
 				|| Dungeon.hero.hasTalent(Talent.ENLIGHTENING_MEAL)
 				|| Dungeon.hero.hasTalent(Talent.WORK_SNACK)
 				|| Dungeon.hero.hasTalent(Talent.RISK_REPORT)
-				|| Dungeon.hero.hasTalent(Talent.LUNCH_SEMINAR)){
+				|| Dungeon.hero.hasTalent(Talent.LUNCH_SEMINAR)
+				|| Dungeon.hero.hasTalent(Talent.BEER_VENDING)){
 			return 0;
 		} else {
 			return 1;

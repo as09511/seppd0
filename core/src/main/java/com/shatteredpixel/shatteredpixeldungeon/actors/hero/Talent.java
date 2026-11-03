@@ -61,6 +61,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.effects.SpellSprite;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.LeafParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
+import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
@@ -255,6 +256,11 @@ public enum Talent {
 	SLASH(200, 4), AXE(201, 4), SPARKLE(202, 4),
 	//Red Eye T4
 	LONG_GAZE(203, 4), VIGILANCE(204, 4), FEAST(205, 4),
+
+	//Netzach T1, icons are borrowed from other classes for now
+	EFFICIENT(1), HANGOVER(2), SLACKING(36), RESIGNATION(3),
+	//Netzach T2
+	BEER_VENDING(4), REGENERATOR_MK2(99), EXTRA_RATION(37), REGENERATOR_FIX(35), OVERDOSE(7),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -535,6 +541,7 @@ public enum Talent {
 				case MALKUTH:
 				case YESOD:
 				case HOD:
+				case NETZACH:
 					return 154; //borrowed for now
 			}
 		} else {
@@ -576,6 +583,16 @@ public enum Talent {
 		//for metamorphosis
 		if (talent == IRON_WILL && hero.heroClass != HeroClass.WARRIOR){
 			Buff.affect(hero, BrokenSeal.WarriorShield.class);
+		}
+
+		if (talent == EFFICIENT && hero.pointsInTalent(EFFICIENT) == 2){
+			if (hero.belongings.armor() != null && !ShardOfOblivion.passiveIDDisabled())  {
+				hero.belongings.armor.identify();
+			}
+		}
+		//more concentrated enkephalin charges show up on the quickslot right away
+		if (talent == EXTRA_RATION){
+			Item.updateQuickslot();
 		}
 
 		if (talent == VETERANS_INTUITION && hero.pointsInTalent(VETERANS_INTUITION) == 2){
@@ -682,6 +699,10 @@ public enum Talent {
 				hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(healing), FloatingText.HEALING);
 
 			}
+		}
+		//Netzach's beer vending machine: 10/15% of max health healed
+		if (hero.hasTalent(BEER_VENDING)){
+			ConcentratedEnkephalin.heal(hero, Math.round(hero.HT * (0.05f + 0.05f*hero.pointsInTalent(BEER_VENDING))));
 		}
 		//Hod's lunch seminar: exp from the hunger actually restored
 		HodManual.onFoodEaten(hero, Buff.affect(hero, Hunger.class).lastRestored());
@@ -794,6 +815,10 @@ public enum Talent {
 		if (item instanceof MeleeWeapon){
 			factor *= 1f + 1.5f*hero.pointsInTalent(ADVENTURERS_INTUITION); //instant at +2 (see onItemEquipped)
 			factor *= 1f + 0.75f*hero.pointsInTalent(VETERANS_INTUITION);
+		}
+		// Netzach: 2.5x/instant for armor (see onItemEquipped)
+		if (item instanceof Armor){
+			factor *= 1f + 1.5f*hero.pointsInTalent(EFFICIENT);
 		}
 		// Affected by both Warrior(2.5x/inst.) and Duelist(1.75x/2.5x) talents
 		if (item instanceof Armor){
@@ -947,6 +972,9 @@ public enum Talent {
 	public static void onItemEquipped( Hero hero, Item item ){
 		boolean identify = false;
 		if (hero.pointsInTalent(VETERANS_INTUITION) == 2 && item instanceof Armor){
+			identify = true;
+		}
+		if (hero.pointsInTalent(EFFICIENT) == 2 && item instanceof Armor){
 			identify = true;
 		}
 		if (hero.hasTalent(THIEFS_INTUITION) && item instanceof Ring){
@@ -1127,6 +1155,9 @@ public enum Talent {
 			case HOD:
 				Collections.addAll(tierTalents, REST_TIME, WORK_FAMILIARITY, PRACTICAL_EVAL, SAFETY_TRAINING);
 				break;
+			case NETZACH:
+				Collections.addAll(tierTalents, EFFICIENT, HANGOVER, SLACKING, RESIGNATION);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1164,6 +1195,9 @@ public enum Talent {
 				break;
 			case HOD:
 				Collections.addAll(tierTalents, LUNCH_SEMINAR, JOB_TRAINING, BASIC_FITNESS, DEMO_TRAINING, FIELD_ADAPTATION);
+				break;
+			case NETZACH:
+				Collections.addAll(tierTalents, BEER_VENDING, REGENERATOR_MK2, EXTRA_RATION, REGENERATOR_FIX, OVERDOSE);
 				break;
 		}
 		for (Talent talent : tierTalents){

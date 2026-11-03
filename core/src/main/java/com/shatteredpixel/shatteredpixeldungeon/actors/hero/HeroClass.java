@@ -60,6 +60,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.En
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.HeroicLeap;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Shockwave;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
+import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.Waterskin;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.AlchemistsToolkit;
@@ -123,6 +124,9 @@ public enum HeroClass {
 
 	//Hod, the Training Team's sephirah
 	HOD( HeroSubClass.TRAINING_SEPHIRAH, HeroSubClass.LITERATURE_LIBRARIAN ),
+
+	//Netzach, the Safety Team's sephirah
+	NETZACH( HeroSubClass.SAFETY_SEPHIRAH, HeroSubClass.ART_LIBRARIAN ),
 
 	//testing class, uses the warrior's sprite, talents and subclasses
 	TESTER( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR );
@@ -193,6 +197,10 @@ public enum HeroClass {
 				initHod( hero );
 				break;
 
+			case NETZACH:
+				initNetzach( hero );
+				break;
+
 			case TESTER:
 				initTester( hero );
 				break;
@@ -251,6 +259,20 @@ public enum HeroClass {
 		new PotionOfExperience().identify();
 
 		Buff.affect(hero, HodManual.class);
+	}
+
+	private static void initNetzach( Hero hero ) {
+		ConcentratedEnkephalin enkephalin = new ConcentratedEnkephalin();
+		enkephalin.identify().collect();
+
+		ThrowingStone stones = new ThrowingStone();
+		stones.identify().collect();
+
+		Dungeon.quickslot.setSlot(0, enkephalin);
+		Dungeon.quickslot.setSlot(1, stones);
+
+		new ScrollOfLullaby().identify();
+		new PotionOfHealing().identify();
 	}
 
 	private static void initTester( Hero hero ) {
@@ -448,6 +470,8 @@ public enum HeroClass {
 				return Assets.Sprites.YESOD;
 			case HOD:
 				return Assets.Sprites.HOD;
+			case NETZACH:
+				return Assets.Sprites.NETZACH;
 		}
 	}
 
@@ -471,6 +495,8 @@ public enum HeroClass {
 				return Assets.Splashes.YESOD;
 			case HOD:
 				return Assets.Splashes.HOD;
+			case NETZACH:
+				return Assets.Splashes.NETZACH;
 		}
 	}
 	

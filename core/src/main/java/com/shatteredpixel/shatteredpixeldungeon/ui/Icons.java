@@ -485,6 +485,8 @@ public enum Icons {
 				return new ItemSprite(ItemSpriteSheet.YESOD_SCARF);
 			case HOD:
 				return new ItemSprite(ItemSpriteSheet.HOD_MANUAL);
+			case NETZACH:
+				return new ItemSprite(ItemSpriteSheet.CONCENTRATED_ENKEPHALIN);
 			case TESTER:
 				return new ItemSprite(ItemSpriteSheet.CRYSTAL_CHEST);
 			default:

@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
+import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MalkuthNotebook;
@@ -109,6 +110,9 @@ public class VaultMirror extends NPC {
 				case HOD:
 					hodTraining = true;
 					break;
+				case NETZACH:
+					reward = new ConcentratedEnkephalin().identify(false);
+					break;
 			}
 		Random.popGenerator();
 	}
@@ -149,6 +153,9 @@ public class VaultMirror extends NPC {
 								break;
 							case HOD:
 								sceneText += Messages.get(VaultMirror.class, "scene_hod");
+								break;
+							case NETZACH:
+								sceneText += Messages.get(VaultMirror.class, "scene_netzach");
 								break;
 						}
 						sceneText += "\n\n" + Messages.get(VaultMirror.class, "scene_final");

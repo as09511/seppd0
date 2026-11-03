@@ -924,6 +924,12 @@ public class ItemSpriteSheet {
 		assignItemRect(VIAL,        12, 12);
 	}
 
+	//Netzach's concentrated enkephalin, in a free slot after the bags
+	public static final int CONCENTRATED_ENKEPHALIN = xy(16, 31);
+	static{
+		assignItemRect(CONCENTRATED_ENKEPHALIN, 16, 16);
+	}
+
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots
 	public static final int GUIDE_PAGE  = DOCUMENTS+0;
 	public static final int ALCH_PAGE   = DOCUMENTS+1;

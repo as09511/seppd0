@@ -60,7 +60,11 @@ public enum HeroSubClass {
 
 	//Hod
 	TRAINING_SEPHIRAH(HeroIcon.TRAINING_SEPHIRAH),
-	LITERATURE_LIBRARIAN(HeroIcon.LITERATURE_LIBRARIAN);
+	LITERATURE_LIBRARIAN(HeroIcon.LITERATURE_LIBRARIAN),
+
+	//Netzach, icons are borrowed for now
+	SAFETY_SEPHIRAH(HeroIcon.WARDEN),
+	ART_LIBRARIAN(HeroIcon.WARLOCK);
 
 	int icon;
 

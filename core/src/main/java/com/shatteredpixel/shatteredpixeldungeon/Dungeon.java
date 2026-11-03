@@ -47,6 +47,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Ghost;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Imp;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Wandmaker;
 import com.shatteredpixel.shatteredpixeldungeon.items.Amulet;
+import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -518,6 +519,9 @@ public class Dungeon {
 
 		//Yesod's surveillance camera and commission talents
 		YesodTrackers.onLevelArrived( hero, level );
+
+		//Netzach's concentrated enkephalin recharges on each new floor
+		ConcentratedEnkephalin.onLevelArrived( hero );
 
 		//Hod's vault training only lasts inside the vault
 		if (!(level instanceof VaultLevel) && hero.buff(HodManual.VaultTraining.class) != null){

@@ -101,6 +101,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap.Type;
 import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
+import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.KindOfWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
@@ -735,6 +736,13 @@ public class Hero extends Char {
 		if (goldenRoad != null && !(wep instanceof MissileWeapon)){
 			dmg += goldenRoad.damageBonus();
 		}
+
+		//Netzach's hangover: +1/+2 damage while taking delayed damage
+		if (hasTalent(Talent.HANGOVER) && buff(Viscosity.DeferedDamage.class) != null){
+			dmg += pointsInTalent(Talent.HANGOVER);
+		}
+		//Netzach's overdose: 15/25% more damage for a while after concentrated enkephalin
+		dmg = Math.round(dmg * ConcentratedEnkephalin.Overdose.damageFactor(this));
 
 		//swift response: +1~2/+2~3 melee damage while blessed
 		if (hasTalent(Talent.SWIFT_RESPONSE) && buff(Bless.class) != null && !(wep instanceof MissileWeapon)){
@@ -1762,6 +1770,11 @@ public class Hero extends Char {
 		//black flame: 50% more damage taken
 		if (hasTalent(Talent.BLACK_FLAME)){
 			damage *= 1.5f;
+		}
+
+		//Netzach's resignation: 10/20% less damage taken at 30% health or less
+		if (hasTalent(Talent.RESIGNATION) && HP <= HT*0.3f){
+			damage *= 1f - 0.1f*pointsInTalent(Talent.RESIGNATION);
 		}
 
 		//abnormality response manual: 50% less damage taken
