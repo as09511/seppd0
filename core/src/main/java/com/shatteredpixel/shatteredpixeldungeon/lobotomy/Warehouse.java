@@ -38,17 +38,22 @@ public class Warehouse {
 	public static final String WAREHOUSE_FILE = "warehouse.dat";
 
 	private static final String ENKEPHALIN = "enkephalin";
+	private static final String WELCOMED   = "welcomed";
 
 	private static boolean loaded = false;
 	private static int enkephalin = 0;
+	//whether Angela's welcome gift has been given, it can only ever be given once
+	private static boolean welcomed = false;
 
 	private static void load(){
 		if (loaded) return;
 		try {
 			Bundle bundle = FileUtils.bundleFromFile( WAREHOUSE_FILE );
 			enkephalin = Math.max(0, bundle.getInt( ENKEPHALIN ));
+			welcomed = bundle.getBoolean( WELCOMED );
 		} catch (IOException e){
 			enkephalin = 0;
+			welcomed = false;
 		}
 		loaded = true;
 	}
@@ -56,6 +61,7 @@ public class Warehouse {
 	private static void save(){
 		Bundle bundle = new Bundle();
 		bundle.put( ENKEPHALIN, enkephalin );
+		bundle.put( WELCOMED, welcomed );
 		try {
 			FileUtils.bundleToFile( WAREHOUSE_FILE, bundle );
 		} catch (IOException e){
@@ -66,6 +72,21 @@ public class Warehouse {
 	public static int enkephalin(){
 		load();
 		return enkephalin;
+	}
+
+	public static boolean welcomed(){
+		load();
+		return welcomed;
+	}
+
+	//gives the welcome gift and records it in the same save, returns false if it was already given
+	public static boolean claimWelcome( int amount ){
+		load();
+		if (welcomed) return false;
+		welcomed = true;
+		enkephalin = Math.max(0, enkephalin + amount);
+		save();
+		return true;
 	}
 
 	public static void addEnkephalin( int amount ){

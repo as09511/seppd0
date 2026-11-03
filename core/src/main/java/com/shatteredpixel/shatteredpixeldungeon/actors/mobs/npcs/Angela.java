@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
@@ -53,6 +54,7 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.FruitOfUnderstandingSpri
 import com.shatteredpixel.shatteredpixeldungeon.sprites.PerfectFoodSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndQuest;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndTitledMessage;
 import com.watabou.noosa.Game;
 import com.watabou.utils.Bundle;
@@ -112,8 +114,40 @@ public class Angela extends NPC {
 			Quest.type = Random.Int(3) + 1;
 		}
 
+		//the very first talk with Angela on this profile: her welcome, the badge and the gift
+		if (!Warehouse.welcomed()){
+			boolean before = Badges.isUnlocked(Badges.Badge.WELCOME_TO_LOBOTOMY);
+			//a profile that already has the badge has met her before, so it gets no second gift
+			boolean gift = !before && Warehouse.claimWelcome(WELCOME_REWARD);
+			if (before) Warehouse.claimWelcome(0);
+			Badges.validateWelcomeToLobotomy();
+			if (gift){
+				GLog.p(Messages.get(Angela.class, "welcome_reward", WELCOME_REWARD, Warehouse.enkephalin()));
+				Game.runOnRenderThread(() -> showWelcome(1));
+				return true;
+			}
+		}
+
 		Game.runOnRenderThread(this::showMenu);
 		return true;
+	}
+
+	//enkephalin boxes given once ever, with the welcome badge
+	public static final int WELCOME_REWARD = 100;
+	private static final int WELCOME_PAGES = 3;
+
+	private void showWelcome( int page ){
+		GameScene.show(new WndQuest(this, Messages.get(Angela.class, "welcome_" + page, WELCOME_REWARD)){
+			@Override
+			public void hide() {
+				super.hide();
+				if (page < WELCOME_PAGES){
+					showWelcome(page + 1);
+				} else {
+					showMenu();
+				}
+			}
+		});
 	}
 
 	//Angela's services: the ordeal, E.G.O extraction and E.G.O refining, each paid for with enkephalin boxes

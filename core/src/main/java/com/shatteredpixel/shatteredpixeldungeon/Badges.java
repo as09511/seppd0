@@ -98,6 +98,7 @@ public class Badges {
 		RESEARCHER_1                ( 22, BadgeType.JOURNAL ),
 		GAMES_PLAYED_1              ( 23, BadgeType.GLOBAL ),
 		HIGH_SCORE_1                ( 24 ),
+		WELCOME_TO_LOBOTOMY         ( 25, BadgeType.JOURNAL ), //first talk with Angela, unlocks in seeded runs too like the warehouse it rewards
 
 		//silver
 		NO_MONSTERS_SLAIN           ( 32 ),
@@ -1106,6 +1107,12 @@ public class Badges {
 		}
 	}
 	
+	//welcome to Lobotomy Corporation: the first talk with Angela, on any save of this profile
+	public static void validateWelcomeToLobotomy() {
+		displayBadge( Badge.WELCOME_TO_LOBOTOMY );
+		saveGlobal();
+	}
+
 	public static void validateGamesPlayed() {
 		Badge badge = null;
 		if (Rankings.INSTANCE.totalNumber >= 10 || Rankings.INSTANCE.wonNumber >= 1) {
