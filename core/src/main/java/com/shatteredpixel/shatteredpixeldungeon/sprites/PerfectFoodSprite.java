@@ -25,7 +25,7 @@ package com.shatteredpixel.shatteredpixeldungeon.sprites;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.watabou.noosa.TextureFilm;
 
-//Perfect Food, Dawn of Amber: a dark red domed larva dotted with glowing orange eyes
+//Perfect Food, Dawn of Amber: a dark red domed larva dotted with orange pus
 public class PerfectFoodSprite extends MobSprite {
 
 	public PerfectFoodSprite() {
