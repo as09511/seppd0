@@ -193,7 +193,7 @@ public class Angela extends NPC {
 			protected void onSelect( int index ) {
 				switch (entries.get(index)){
 					case MENU_ORDEAL:  ordeal(); break;
-					case MENU_EXTRACT: GameScene.show(new WndEgoExtract(Angela.this)); break;
+					case MENU_EXTRACT: WndEgoExtract.open(Angela.this); break;
 					case MENU_REFINE:  refine(); break;
 				}
 			}

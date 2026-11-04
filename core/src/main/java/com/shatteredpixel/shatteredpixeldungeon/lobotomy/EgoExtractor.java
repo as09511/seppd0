@@ -74,7 +74,7 @@ public class EgoExtractor extends Item {
 
 	//the same paged list as Angela's extraction, but free and with every E.G.O, combined ones included
 	private void chooseRisk(Hero hero){
-		GameScene.show(new WndEgoExtract(new WndEgoExtract.Picker() {
+		WndEgoExtract.open(new WndEgoExtract.Picker() {
 			@Override
 			public boolean includes(Item item) {
 				return riskOf(item) != null;
@@ -98,7 +98,7 @@ public class EgoExtractor extends Item {
 				}
 				GLog.p(Messages.get(EgoExtractor.class, "extracted", item.name()));
 			}
-		}));
+		});
 	}
 
 	@Override

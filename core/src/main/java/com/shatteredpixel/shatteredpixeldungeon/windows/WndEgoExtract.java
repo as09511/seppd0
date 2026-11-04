@@ -34,7 +34,6 @@ import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RedButton;
-import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ScrollingListPane;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.watabou.utils.Reflection;
@@ -43,7 +42,7 @@ import java.util.ArrayList;
 
 //E.G.O extraction, for Angela (every E.G.O but combined ones, priced in enkephalin boxes) or the tester's
 //extractor (every E.G.O, free), grouped by risk level.
-//Each page holds one risk level, at most PAGE_SIZE E.G.O; a level with more is split over several pages.
+//A risk level is chosen first, then its E.G.O are listed PAGE_SIZE to a page.
 //Picking one asks for confirmation before anything is spent.
 public class WndEgoExtract extends Window {
 
@@ -91,61 +90,60 @@ public class WndEgoExtract extends Window {
 
 	private final Picker picker;
 
-	//one page of the list: a risk level and up to PAGE_SIZE E.G.O of it
-	private static class Page {
-		RiskLevel risk;
-		ArrayList<Class<? extends Item>> items = new ArrayList<>();
-		int part, parts;
+	//every E.G.O of a risk level the picker offers, in catalog order
+	private static ArrayList<Class<? extends Item>> egoOf( Picker picker, RiskLevel risk ){
+		ArrayList<Class<? extends Item>> all = new ArrayList<>();
+		for (Class<? extends Item> cls : EgoCatalog.ALL){
+			Item item = Reflection.newInstance(cls);
+			if (item == null || !picker.includes(item) || Warehouse.risk(item) != risk) continue;
+			all.add(cls);
+		}
+		return all;
 	}
 
-	private static ArrayList<Page> pages( Picker picker ){
-		ArrayList<Page> pages = new ArrayList<>();
+	//Angela's extraction starts by choosing a risk level
+	public static void open( Angela angela ){
+		open(new AngelaPicker(angela));
+	}
+
+	public static void open( Picker picker ){
+		final ArrayList<RiskLevel> risks = new ArrayList<>();
+		ArrayList<String> names = new ArrayList<>();
 		for (RiskLevel risk : RiskLevel.values()){
-			ArrayList<Class<? extends Item>> all = new ArrayList<>();
-			for (Class<? extends Item> cls : EgoCatalog.ALL){
-				Item item = Reflection.newInstance(cls);
-				if (item == null || !picker.includes(item) || Warehouse.risk(item) != risk) continue;
-				all.add(cls);
-			}
-			int parts = (all.size() + PAGE_SIZE - 1) / PAGE_SIZE;
-			for (int i = 0; i < parts; i++){
-				Page page = new Page();
-				page.risk = risk;
-				page.items.addAll(all.subList(i*PAGE_SIZE, Math.min(all.size(), (i+1)*PAGE_SIZE)));
-				page.part = i+1;
-				page.parts = parts;
-				pages.add(page);
+			int count = egoOf(picker, risk).size();
+			if (count > 0){
+				risks.add(risk);
+				names.add(picker.riskTitle(risk) + " (" + count + ")");
 			}
 		}
-		return pages;
+		GameScene.show(new WndOptions(picker.title(), Messages.get(WndEgoExtract.class, "choose_risk"),
+				names.toArray(new String[0])){
+			@Override
+			protected void onSelect( int index ) {
+				GameScene.show(new WndEgoExtract(picker, risks.get(index), 0));
+			}
+		});
 	}
 
-	public WndEgoExtract( Angela angela ){
-		this(new AngelaPicker(angela), 0);
-	}
-
-	public WndEgoExtract( Picker picker ){
-		this(picker, 0);
-	}
-
-	public WndEgoExtract( Picker picker, int index ){
+	//one risk level, PAGE_SIZE E.G.O per page
+	public WndEgoExtract( Picker picker, RiskLevel risk, int index ){
 		super();
 		this.picker = picker;
 
-		ArrayList<Page> pages = pages(picker);
-		index = Math.max(0, Math.min(index, pages.size()-1));
+		ArrayList<Class<? extends Item>> all = egoOf(picker, risk);
+		int pages = Math.max(1, (all.size() + PAGE_SIZE - 1) / PAGE_SIZE);
+		index = Math.max(0, Math.min(index, pages-1));
 		final int current = index;
-		Page page = pages.get(index);
 
 		list = new ScrollingListPane();
 		add( list );
 
 		list.addTitle(picker.title());
-		String riskTitle = picker.riskTitle(page.risk);
-		if (page.parts > 1) riskTitle += " (" + page.part + "/" + page.parts + ")";
+		String riskTitle = picker.riskTitle(risk);
+		if (pages > 1) riskTitle += " (" + (current+1) + "/" + pages + ")";
 		list.addTitle(riskTitle);
 
-		for (Class<? extends Item> cls : page.items){
+		for (Class<? extends Item> cls : all.subList(current*PAGE_SIZE, Math.min(all.size(), (current+1)*PAGE_SIZE))){
 			Item item = Reflection.newInstance(cls);
 			//a display copy: shows its stats without marking it as seen in the catalog
 			item.identify(false);
@@ -165,33 +163,39 @@ public class WndEgoExtract extends Window {
 			@Override
 			protected void onClick() {
 				hide();
-				GameScene.show(new WndEgoExtract(picker, current-1));
+				GameScene.show(new WndEgoExtract(picker, risk, current-1));
 			}
 		};
 		prev.enable(current > 0);
 		add(prev);
 
-		RenderedTextBlock pageNo = PixelScene.renderTextBlock((current+1) + " / " + pages.size(), 8);
-		add(pageNo);
+		//back to choosing a risk level
+		RedButton back = new RedButton(Messages.get(this, "back")){
+			@Override
+			protected void onClick() {
+				hide();
+				open(picker);
+			}
+		};
+		add(back);
 
 		RedButton next = new RedButton(Messages.get(this, "next")){
 			@Override
 			protected void onClick() {
 				hide();
-				GameScene.show(new WndEgoExtract(picker, current+1));
+				GameScene.show(new WndEgoExtract(picker, risk, current+1));
 			}
 		};
-		next.enable(current < pages.size()-1);
+		next.enable(current < pages-1);
 		add(next);
 
 		int listHeight = Math.min((int)(PixelScene.uiCamera.height * 0.9f) - BTN_HEIGHT - GAP, (int)list.content().height());
 		resize(WIDTH, listHeight + GAP + BTN_HEIGHT);
 		list.setRect(0, 0, width, listHeight);
-		int btnW = (WIDTH - 30) / 2;
+		float btnW = (WIDTH - 2*GAP) / 3f;
 		prev.setRect(0, listHeight + GAP, btnW, BTN_HEIGHT);
-		next.setRect(WIDTH - btnW, listHeight + GAP, btnW, BTN_HEIGHT);
-		pageNo.setPos(btnW + (WIDTH - 2*btnW - pageNo.width())/2f, listHeight + GAP + (BTN_HEIGHT - pageNo.height())/2f);
-		PixelScene.align(pageNo);
+		back.setRect(btnW + GAP, listHeight + GAP, btnW, BTN_HEIGHT);
+		next.setRect(2*(btnW + GAP), listHeight + GAP, btnW, BTN_HEIGHT);
 	}
 
 	//the game moves windows aside while the inventory is open, the list has to follow
