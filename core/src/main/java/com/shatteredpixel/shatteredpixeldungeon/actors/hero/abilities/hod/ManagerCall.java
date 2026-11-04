@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.LCorpManager;
@@ -150,6 +151,11 @@ public class ManagerCall extends ArmorAbility {
 		manager.sprite.emitter().burst(Speck.factory(Speck.LIGHT), 6);
 		Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
 		managerID = manager.id();
+
+		//easter egg: a cornered training sephirah lashes out at her staff
+		if (hero.subClass == HeroSubClass.TRAINING_SEPHIRAH && hero.HP <= hero.HT/4){
+			GLog.n("%s: \"%s\" ", Messages.titleCase(hero.name()), Messages.get(this, "desperate"));
+		}
 
 		hero.sprite.operate(hero.pos);
 		hero.spendAndNext(Actor.TICK);
