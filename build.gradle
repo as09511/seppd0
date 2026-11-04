@@ -16,8 +16,8 @@ allprojects {
         appPackageName = 'com.seppd0.lobotomypixeldungeon'
 
         //Full releases gets +2 on version code, needed for an F-Droid quirk
-        appVersionCode = 927
-        appVersionName = '0.4.0'
+        appVersionCode = 928
+        appVersionName = '0.4.1'
 
         appJavaCompatibility = JavaVersion.VERSION_11
 
