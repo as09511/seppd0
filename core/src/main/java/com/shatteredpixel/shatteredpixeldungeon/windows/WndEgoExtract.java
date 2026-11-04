@@ -41,7 +41,8 @@ import com.watabou.utils.Reflection;
 
 import java.util.ArrayList;
 
-//Angela's E.G.O extraction: every E.G.O, grouped by risk level with its price in enkephalin boxes.
+//E.G.O extraction, for Angela (every E.G.O but combined ones, priced in enkephalin boxes) or the tester's
+//extractor (every E.G.O, free), grouped by risk level.
 //Each page holds one risk level, at most PAGE_SIZE E.G.O; a level with more is split over several pages.
 //Picking one asks for confirmation before anything is spent.
 public class WndEgoExtract extends Window {
@@ -53,6 +54,43 @@ public class WndEgoExtract extends Window {
 
 	private ScrollingListPane list;
 
+	//what the list is for: Angela's paid extraction, or the tester's free extractor
+	public interface Picker {
+		boolean includes( Item item );
+		String title();
+		String riskTitle( RiskLevel risk );
+		void pick( WndEgoExtract wnd, Class<? extends Item> cls, Item item );
+	}
+
+	//Angela: every E.G.O except combined ones, priced in enkephalin boxes with a confirmation
+	private static class AngelaPicker implements Picker {
+		private final Angela angela;
+		AngelaPicker( Angela angela ){ this.angela = angela; }
+
+		@Override
+		public boolean includes( Item item ) {
+			//combined E.G.O can only be made at an alchemy pot
+			return !(item instanceof CombinedEgo);
+		}
+
+		@Override
+		public String title() {
+			return Messages.get(WndEgoExtract.class, "title", Warehouse.enkephalin());
+		}
+
+		@Override
+		public String riskTitle( RiskLevel risk ) {
+			return Messages.get(WndEgoExtract.class, "risk", risk.title(), Warehouse.extractCost(risk));
+		}
+
+		@Override
+		public void pick( WndEgoExtract wnd, Class<? extends Item> cls, Item item ) {
+			wnd.confirm(angela, cls, item);
+		}
+	}
+
+	private final Picker picker;
+
 	//one page of the list: a risk level and up to PAGE_SIZE E.G.O of it
 	private static class Page {
 		RiskLevel risk;
@@ -60,14 +98,13 @@ public class WndEgoExtract extends Window {
 		int part, parts;
 	}
 
-	private static ArrayList<Page> pages(){
+	private static ArrayList<Page> pages( Picker picker ){
 		ArrayList<Page> pages = new ArrayList<>();
 		for (RiskLevel risk : RiskLevel.values()){
 			ArrayList<Class<? extends Item>> all = new ArrayList<>();
 			for (Class<? extends Item> cls : EgoCatalog.ALL){
 				Item item = Reflection.newInstance(cls);
-				//combined E.G.O can only be made at an alchemy pot
-				if (item == null || item instanceof CombinedEgo || Warehouse.risk(item) != risk) continue;
+				if (item == null || !picker.includes(item) || Warehouse.risk(item) != risk) continue;
 				all.add(cls);
 			}
 			int parts = (all.size() + PAGE_SIZE - 1) / PAGE_SIZE;
@@ -84,13 +121,18 @@ public class WndEgoExtract extends Window {
 	}
 
 	public WndEgoExtract( Angela angela ){
-		this(angela, 0);
+		this(new AngelaPicker(angela), 0);
 	}
 
-	public WndEgoExtract( Angela angela, int index ){
-		super();
+	public WndEgoExtract( Picker picker ){
+		this(picker, 0);
+	}
 
-		ArrayList<Page> pages = pages();
+	public WndEgoExtract( Picker picker, int index ){
+		super();
+		this.picker = picker;
+
+		ArrayList<Page> pages = pages(picker);
 		index = Math.max(0, Math.min(index, pages.size()-1));
 		final int current = index;
 		Page page = pages.get(index);
@@ -98,8 +140,8 @@ public class WndEgoExtract extends Window {
 		list = new ScrollingListPane();
 		add( list );
 
-		list.addTitle(Messages.get(this, "title", Warehouse.enkephalin()));
-		String riskTitle = Messages.get(this, "risk", page.risk.title(), Warehouse.extractCost(page.risk));
+		list.addTitle(picker.title());
+		String riskTitle = picker.riskTitle(page.risk);
 		if (page.parts > 1) riskTitle += " (" + page.part + "/" + page.parts + ")";
 		list.addTitle(riskTitle);
 
@@ -112,7 +154,7 @@ public class WndEgoExtract extends Window {
 				@Override
 				public boolean onClick( float x, float y ) {
 					if (!inside(x, y)) return false;
-					confirm(angela, cls, item);
+					picker.pick(WndEgoExtract.this, cls, item);
 					return true;
 				}
 			};
@@ -123,7 +165,7 @@ public class WndEgoExtract extends Window {
 			@Override
 			protected void onClick() {
 				hide();
-				GameScene.show(new WndEgoExtract(angela, current-1));
+				GameScene.show(new WndEgoExtract(picker, current-1));
 			}
 		};
 		prev.enable(current > 0);
@@ -136,7 +178,7 @@ public class WndEgoExtract extends Window {
 			@Override
 			protected void onClick() {
 				hide();
-				GameScene.show(new WndEgoExtract(angela, current+1));
+				GameScene.show(new WndEgoExtract(picker, current+1));
 			}
 		};
 		next.enable(current < pages.size()-1);
@@ -159,7 +201,7 @@ public class WndEgoExtract extends Window {
 		if (list != null) list.setRect(list.left(), list.top(), list.width(), list.height());
 	}
 
-	private void confirm( Angela angela, Class<? extends Item> cls, Item item ){
+	void confirm( Angela angela, Class<? extends Item> cls, Item item ){
 		int cost = Warehouse.extractCost(Warehouse.risk(item));
 		boolean enough = Warehouse.enkephalin() >= cost;
 		String text = Messages.get(this, "confirm", item.name(), cost, Warehouse.enkephalin());

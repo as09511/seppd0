@@ -39,8 +39,12 @@ import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.ui.ActionIndicator;
+import com.shatteredpixel.shatteredpixeldungeon.ui.HeroIcon;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.Visual;
 import com.watabou.noosa.audio.Sample;
 
 import java.util.ArrayList;
@@ -184,6 +188,15 @@ public class AlteredLamp extends EgoGun implements CombinedEgo {
 		return charmBonus(attacker, defender, damage);
 	}
 
+	//while equipped, charming can also be used straight from the action button, like a duelist's ability
+	@Override
+	public void activate(Char ch) {
+		super.activate(ch);
+		if (ch instanceof Hero){
+			Buff.affect(ch, CharmButton.class).refreshAction();
+		}
+	}
+
 	@Override
 	public ArrayList<String> actions(Hero hero) {
 		ArrayList<String> actions = super.actions(hero);
@@ -225,6 +238,8 @@ public class AlteredLamp extends EgoGun implements CombinedEgo {
 			Sample.INSTANCE.play(Assets.Sounds.CHARMS);
 			Buff.affect(hero, Lamp.CharmCooldown.class).set(CHARM_COOLDOWN);
 			updateQuickslot();
+			CharmButton button = hero.buff(CharmButton.class);
+			if (button != null) button.refreshAction();
 
 			hero.sprite.zap(cell);
 			Invisibility.dispel();
@@ -256,5 +271,76 @@ public class AlteredLamp extends EgoGun implements CombinedEgo {
 			outQuantity = 1;
 		}
 
+	}
+
+	//shows charming on the action button while this is equipped and charming is ready,
+	//without taking the button over from another ability, and goes away once it is unequipped
+	public static class CharmButton extends Buff implements ActionIndicator.Action {
+
+		{
+			type = buffType.NEUTRAL;
+		}
+
+		private AlteredLamp weapon(){
+			if (target instanceof Hero && ((Hero) target).belongings.weapon() instanceof AlteredLamp){
+				return (AlteredLamp) ((Hero) target).belongings.weapon();
+			}
+			return null;
+		}
+
+		@Override
+		public boolean act() {
+			if (weapon() == null){
+				detach();
+			} else {
+				refreshAction();
+				spend(TICK);
+			}
+			return true;
+		}
+
+		public void refreshAction(){
+			if (weapon() != null && target.buff(Lamp.CharmCooldown.class) == null){
+				if (ActionIndicator.action == null) ActionIndicator.setAction(this);
+			} else {
+				ActionIndicator.clearAction(this);
+			}
+		}
+
+		@Override
+		public void fx(boolean on) {
+			if (on) refreshAction();
+		}
+
+		@Override
+		public void detach() {
+			super.detach();
+			ActionIndicator.clearAction(this);
+		}
+
+		@Override
+		public String actionName() {
+			return Messages.get(AlteredLamp.class, "ac_charm");
+		}
+
+		@Override
+		public Visual primaryVisual() {
+			AlteredLamp wep = weapon();
+			if (wep == null) return new HeroIcon(this);
+			return new ItemSprite(wep);
+		}
+
+		@Override
+		public int indicatorColor() {
+			return 0xE0A040;
+		}
+
+		@Override
+		public void doAction() {
+			AlteredLamp wep = weapon();
+			if (wep != null){
+				wep.execute((Hero) target, AC_CHARM);
+			}
+		}
 	}
 }
