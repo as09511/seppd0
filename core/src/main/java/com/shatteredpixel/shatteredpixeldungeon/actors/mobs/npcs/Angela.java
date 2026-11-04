@@ -36,6 +36,7 @@ import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Reflection;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.CheersForTheBeginning;
@@ -160,6 +161,7 @@ public class Angela extends NPC {
 	private static final int MENU_EXTRACT = 1;
 	private static final int MENU_REFINE  = 2;
 	private static final int MENU_LEAVE   = 3;
+	private static final int MENU_ASIDE   = 4;
 
 	//Angela's services: the ordeal (floor 6 only), E.G.O extraction and E.G.O refining, paid for with enkephalin boxes
 	private void showMenu(){
@@ -173,6 +175,8 @@ public class Angela extends NPC {
 		labels.add(Messages.get(Angela.class, Quest.extracted ? "menu_extract_used" : "menu_extract"));
 		entries.add(MENU_REFINE);
 		labels.add(Messages.get(Angela.class, Quest.refined ? "menu_refine_used" : "menu_refine"));
+		entries.add(MENU_ASIDE);
+		labels.add(Messages.get(Angela.class, "menu_aside"));
 		entries.add(MENU_LEAVE);
 		labels.add(Messages.get(Angela.class, "menu_leave"));
 
@@ -197,9 +201,33 @@ public class Angela extends NPC {
 					case MENU_ORDEAL:  ordeal(); break;
 					case MENU_EXTRACT: WndEgoExtract.open(Angela.this); break;
 					case MENU_REFINE:  refine(); break;
+					case MENU_ASIDE:   stepAside(); break;
 				}
 			}
 		});
+	}
+
+	//Angela never walks around, so she swaps places with the hero when asked, in case she stands in the way
+	private void stepAside(){
+		Hero hero = Dungeon.hero;
+		if (hero == null || !hero.isAlive() || Dungeon.level.distance(pos, hero.pos) != 1) return;
+		//she is immovable so nothing knocks her around, which also rules out the usual ally swap: done by hand,
+		// the same way Char.interact swaps two characters
+		if (hero.rooted || hero.paralysed > 0) return;
+		int oldPos = pos;
+		int newPos = hero.pos;
+
+		hero.pos = oldPos;
+		moveSprite(oldPos, newPos);
+		move(newPos);
+
+		hero.pos = newPos;
+		hero.sprite.move(newPos, oldPos);
+		hero.move(oldPos);
+
+		yell(Messages.get(Angela.class, "aside"));
+		//the swap happens from her menu, outside the hero's own action, so the turn goes on from here
+		hero.spendAndNext(1 / hero.speed());
 	}
 
 	private static final String OFFERS_ORDEAL = "offers_ordeal";
@@ -407,7 +435,9 @@ public class Angela extends NPC {
 			if (entranceRoom == null) return null;
 
 			int entrance = level.entrance();
+			int reachable = reachableCells(level, entrance, -1);
 			ArrayList<Integer> near = new ArrayList<>();
+			ArrayList<Integer> inTheWay = new ArrayList<>();
 			ArrayList<Integer> inRoom = new ArrayList<>();
 			for (Point p : entranceRoom.getPoints()){
 				int cell = level.pointToCell(p);
@@ -421,9 +451,15 @@ public class Angela extends NPC {
 					if (level.map[cell + i] == Terrain.DOOR) byDoor = true;
 				}
 				if (byDoor) continue;
+				//cells where she would stand in the way are only a last resort, she can still be asked to step aside
+				if (cutsOff(level, cell, reachable)){
+					inTheWay.add(cell);
+					continue;
+				}
 				inRoom.add(cell);
 				if (level.distance(cell, entrance) <= 2) near.add(cell);
 			}
+			if (near.isEmpty() && inRoom.isEmpty()) inRoom = inTheWay;
 			if (near.isEmpty() && inRoom.isEmpty()) return null;
 
 			Angela angela = new Angela();
@@ -431,6 +467,23 @@ public class Angela extends NPC {
 			angela.pos = Random.element(near.isEmpty() ? inRoom : near);
 			level.mobs.add(angela);
 			return angela;
+		}
+
+		//how many cells can be walked to from the entrance, with one cell taken by someone who never moves
+		private static int reachableCells( Level level, int from, int blocked ){
+			boolean[] passable = level.passable.clone();
+			if (blocked >= 0) passable[blocked] = false;
+			PathFinder.buildDistanceMap(from, passable);
+			int count = 0;
+			for (int d : PathFinder.distance){
+				if (d < Integer.MAX_VALUE) count++;
+			}
+			return count;
+		}
+
+		//standing here would leave some part of the floor that could be reached before out of reach
+		private static boolean cutsOff( Level level, int cell, int reachable ){
+			return reachableCells(level, level.entrance(), cell) < reachable - 1;
 		}
 
 		public static void start(){
