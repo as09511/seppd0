@@ -154,7 +154,7 @@ public class ManagerCall extends ArmorAbility {
 
 		//easter egg: a cornered training sephirah lashes out at her staff
 		if (hero.subClass == HeroSubClass.TRAINING_SEPHIRAH && hero.HP <= hero.HT/4){
-			GLog.n("%s: \"%s\" ", Messages.titleCase(hero.name()), Messages.get(this, "desperate"));
+			GLog.n("%s: \"%s\" ", Messages.titleCase(hero.heroClass.title()), Messages.get(this, "desperate"));
 		}
 
 		hero.sprite.operate(hero.pos);
