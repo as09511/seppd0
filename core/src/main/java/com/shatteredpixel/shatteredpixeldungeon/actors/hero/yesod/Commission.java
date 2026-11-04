@@ -22,7 +22,6 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod;
 
-
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CommissionTint;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
