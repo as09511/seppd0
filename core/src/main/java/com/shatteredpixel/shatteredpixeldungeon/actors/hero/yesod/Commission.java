@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod;
 
+
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CommissionTint;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -44,6 +45,8 @@ public class Commission extends Buff {
 	{
 		type = buffType.NEGATIVE;
 		announced = true;
+		//a dwarf ghoul that collapses beside another loses its buffs until it gets back up, the mark has to stay
+		revivePersists = true;
 	}
 
 	//the target is picked while the level loads, before the game log exists, so it's announced on its first turn
