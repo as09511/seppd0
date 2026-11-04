@@ -38,6 +38,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.CheersForTheBeginning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.Doubt;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.FruitOfUnderstanding;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.OrdealMob;
@@ -49,6 +50,7 @@ import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.AngelaSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.CheersForTheBeginningSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.DoubtSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.FruitOfUnderstandingSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.PerfectFoodSprite;
@@ -115,7 +117,7 @@ public class Angela extends NPC {
 		//an Angela summoned by the Tester picks her ordeal on the spot
 		if (offersOrdeal && Quest.type == 0){
 			Quest.spawned = true;
-			Quest.type = Random.Int(3) + 1;
+			Quest.type = Random.Int(4) + 1;
 		}
 
 		//the very first talk with Angela on this profile: her welcome, the badge and the gift
@@ -316,6 +318,7 @@ public class Angela extends NPC {
 		public static final int GREEN   = 1; //Doubt
 		public static final int VIOLET  = 2; //Fruit of Understanding
 		public static final int AMBER   = 3; //Perfect Food x4, in the corridors
+		public static final int CRIMSON = 4; //Cheers for the Beginning, anywhere on the floor
 
 		public static final int AMBER_COUNT = 4;
 
@@ -390,7 +393,7 @@ public class Angela extends NPC {
 			if (placeNearEntrance(level, entranceRoom, true) == null) return;
 
 			spawned = true;
-			type = Random.Int(3) + 1;
+			type = Random.Int(4) + 1;
 			given = false;
 			completed = false;
 		}
@@ -452,6 +455,10 @@ public class Angela extends NPC {
 						place(food, cell);
 					}
 					break;
+				case CRIMSON:
+					CheersForTheBeginning cheers = new CheersForTheBeginning();
+					place(cheers, level.randomRespawnCell(cheers));
+					break;
 			}
 
 			GLog.n(ordealName());
@@ -512,6 +519,7 @@ public class Angela extends NPC {
 					case GREEN: default: icon = new DoubtSprite(); break;
 					case VIOLET: icon = new FruitOfUnderstandingSprite(); break;
 					case AMBER: icon = new PerfectFoodSprite(); break;
+					case CRIMSON: icon = new CheersForTheBeginningSprite(); break;
 				}
 				GameScene.show(new WndTitledMessage(icon, title, text));
 			});

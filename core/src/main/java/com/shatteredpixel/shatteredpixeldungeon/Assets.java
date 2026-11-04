@@ -293,6 +293,7 @@ public class Assets {
 		public static final String LCORP_EMPLOYEE = "sprites/lcorp_employee.png";
 		public static final String ANGELA   = "sprites/angela.png";
 		public static final String DOUBT    = "sprites/doubt.png";
+		public static final String CHEERS_FOR_THE_BEGINNING = "sprites/cheers_for_the_beginning.png";
 		public static final String FRUIT_OF_UNDERSTANDING = "sprites/fruit_of_understanding.png";
 		public static final String PERFECT_FOOD = "sprites/perfect_food.png";
 		public static final String AVATARS  = "sprites/avatars.png";
