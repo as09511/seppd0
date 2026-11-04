@@ -103,6 +103,11 @@ public abstract class EgoGun extends EgoWeapon {
 		return damageType;
 	}
 
+	//a gun can roll its bullets' damage itself (e.g. sneak attacks), -1 keeps the normal thrown weapon roll
+	protected int shotDamageRoll(Char owner, Shot shot){
+		return -1;
+	}
+
 	//bullet-only on-hit effects, after the damage type is applied
 	protected int shotProc(Char attacker, Char defender, int damage){
 		return damage;
@@ -329,7 +334,9 @@ public abstract class EgoGun extends EgoWeapon {
 
 		@Override
 		public int damageRoll(Char owner) {
-			return super.damageRoll(owner) + RingOfSharpshooting.levelDamageBonus(owner);
+			int damage = gun.shotDamageRoll(owner, this);
+			if (damage < 0) damage = super.damageRoll(owner);
+			return damage + RingOfSharpshooting.levelDamageBonus(owner);
 		}
 
 		@Override

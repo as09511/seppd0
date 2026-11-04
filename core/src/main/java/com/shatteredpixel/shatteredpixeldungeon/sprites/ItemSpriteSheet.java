@@ -522,6 +522,12 @@ public class ItemSpriteSheet {
 		assignItemRect(ECHO_LONELINESS,      16, 16);
 	}
 
+	//altered E.G.O Lamp, the third combined E.G.O: a long black crossbow. Takes another unused artifact slot
+	public static final int ALTERED_LAMP         = xy(11, 17);
+	static{
+		assignItemRect(ALTERED_LAMP,         16, 16);
+	}
+
 	//an enkephalin box, not an item: only the icon of the warehouse resource
 	public static final int ENKEPHALIN_BOX       = xy(2, 19);
 	static{

@@ -62,6 +62,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Mimicry;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.DaCapo;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Laughter;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.SoundOfAStar;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.AlteredLamp;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.EchoLoneliness;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyesPenitence;
 
@@ -111,7 +112,8 @@ public class EgoCatalog {
 			SoundOfAStar.class,
 			//combined E.G.O, made only by alchemy
 			RedEyesPenitence.class,
-			EchoLoneliness.class
+			EchoLoneliness.class,
+			AlteredLamp.class
 	};
 
 }

@@ -57,6 +57,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.spells.SummonElemental;
 import com.shatteredpixel.shatteredpixeldungeon.items.spells.TelekineticGrab;
 import com.shatteredpixel.shatteredpixeldungeon.items.spells.UnstableSpell;
 import com.shatteredpixel.shatteredpixeldungeon.items.spells.WildEnergy;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.AlteredLamp;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.EchoLoneliness;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyesPenitence;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.Trinket;
@@ -216,7 +217,8 @@ public abstract class Recipe {
 		new WildEnergy.Recipe(),
 		new StewedMeat.twoMeat(),
 		new RedEyesPenitence.Recipe(),
-		new EchoLoneliness.Recipe()
+		new EchoLoneliness.Recipe(),
+		new AlteredLamp.Recipe()
 	};
 	
 	private static Recipe[] threeIngredientRecipes = new Recipe[]{

@@ -91,6 +91,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Lucky;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.AlteredLamp;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.EgoWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.darts.Dart;
@@ -922,7 +923,9 @@ public abstract class Mob extends Char {
 
 	public boolean surprisedBy( Char enemy, boolean attacking ){
 		return enemy == Dungeon.hero
-				&& (enemy.invisible > 0 || !enemySeen || (fieldOfView != null && fieldOfView.length == Dungeon.level.length() && !fieldOfView[enemy.pos]))
+				&& (enemy.invisible > 0 || !enemySeen || (fieldOfView != null && fieldOfView.length == Dungeon.level.length() && !fieldOfView[enemy.pos])
+					//altered E.G.O Lamp: an enemy it charmed is always caught off guard
+					|| AlteredLamp.charmedBy(this, enemy))
 				&& (!attacking || enemy.canSurpriseAttack());
 	}
 

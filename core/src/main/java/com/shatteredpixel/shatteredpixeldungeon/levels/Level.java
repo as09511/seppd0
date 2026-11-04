@@ -68,6 +68,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.TargetedCell;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.FlowParticle;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.SacrificialParticle;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.WindParticle;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.AlteredLamp;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -1457,6 +1458,8 @@ public abstract class Level implements Bundlable {
 					}
 				}
 				mindVisRange = Math.max(mindVisRange, EyeOfNewt.mindVisionRange());
+				//altered E.G.O Lamp: 2 tiles, or 1 more on top of the others
+				mindVisRange = AlteredLamp.mindVisionRange((Hero) c, mindVisRange);
 			}
 
 			if (mindVisRange >= 1) {

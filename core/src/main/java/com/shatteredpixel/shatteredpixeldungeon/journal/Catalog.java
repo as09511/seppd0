@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Dewdrop;
 import com.shatteredpixel.shatteredpixeldungeon.items.EnergyCrystal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.AlteredLamp;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.EchoLoneliness;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.RedEyesPenitence;
 import com.shatteredpixel.shatteredpixeldungeon.items.Gold;
@@ -199,6 +200,7 @@ public enum Catalog {
 		//combined E.G.O are never generated, so they are listed by hand
 		MELEE_WEAPONS.addItems(RedEyesPenitence.class);
 		MELEE_WEAPONS.addItems(EchoLoneliness.class);
+		MELEE_WEAPONS.addItems(AlteredLamp.class);
 
 		ARMOR.addItems(Generator.Category.ARMOR.classes);
 
