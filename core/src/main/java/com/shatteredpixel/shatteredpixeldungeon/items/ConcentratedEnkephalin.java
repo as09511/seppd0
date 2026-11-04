@@ -130,6 +130,16 @@ public class ConcentratedEnkephalin extends Item {
 		GLog.p(Messages.get(this, "recharged", charges, max));
 	}
 
+	//the vault mirror's copy is handed over fully charged, and only recharges on floors not yet visited
+	public void fillForVault( Hero hero ){
+		charges = maxCharges(hero);
+		for (int g : Dungeon.generatedLevels){
+			floors.add((g % 1000) * 100 + g / 1000);
+		}
+		floors.add(Dungeon.depth * 100 + Dungeon.branch);
+		updateQuickslot();
+	}
+
 	//Netzach's healing outside of regeneration, with regenerator formula fix turning the overflow into a shield
 	public static void heal( Hero hero, int amount ){
 		if (amount <= 0 || !hero.isAlive()) return;

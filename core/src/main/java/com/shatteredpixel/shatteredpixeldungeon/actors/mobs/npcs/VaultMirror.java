@@ -174,6 +174,10 @@ public class VaultMirror extends NPC {
 									hodTraining = false;
 								} else if (index == 0) {
 									GameScene.show(new WndTitledMessage(sprite(), Messages.titleCase(name()), Messages.get(VaultMirror.class, "scene_take")));
+									//Netzach's enkephalin is generated with the level, so it is filled to the current maximum on pickup
+									if (reward instanceof ConcentratedEnkephalin){
+										((ConcentratedEnkephalin) reward).fillForVault((Hero) c);
+									}
 									if (reward.doPickUp((Hero) c)) {
 										GLog.i( Messages.capitalize(Messages.get(Dungeon.hero, "you_now_have", reward.name())) );
 									} else {
