@@ -22,7 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -86,7 +86,7 @@ public class SolemnLament extends EgoGun {
 	@Override
 	protected void onShotHit(Hero hero, Char ch, boolean hit) {
 		if (hit && ch.isAlive()){
-			int dmg = Math.max(0, HodTrackers.boostDirectDamage(hero, ch, new Shot(this).damageRoll(hero)) - ch.drRoll());
+			int dmg = HeroDamageBonus.direct(hero, ch, new Shot(this).damageRoll(hero), ch.drRoll());
 			dmg = DamageType.apply(ch, DamageType.BLACK, dmg);
 			ch.damage(dmg, hero);
 		}

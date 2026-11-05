@@ -748,12 +748,7 @@ public class Hero extends Char {
 			dmg += goldenRoad.damageBonus();
 		}
 
-		//Netzach's hangover: +1/+2 damage while taking delayed damage
-		if (hasTalent(Talent.HANGOVER) && buff(Viscosity.DeferedDamage.class) != null){
-			dmg += 1 + pointsInTalent(Talent.HANGOVER);
-		}
-		//Netzach's overdose: 15/25% more damage for a while after concentrated enkephalin
-		dmg = Math.round(dmg * ConcentratedEnkephalin.Overdose.damageFactor(this));
+		//Netzach's hangover and overdose moved to HeroDamageBonus, so they apply to every kind of damage once
 
 		//swift response: +1~2/+2~3 melee damage while blessed
 		if (hasTalent(Talent.SWIFT_RESPONSE) && buff(Bless.class) != null && !(wep instanceof MissileWeapon)){

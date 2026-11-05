@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.malkuth;
 
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -115,7 +116,7 @@ public class FourthMatch extends ArmorAbility {
 							if (ch != null && ch != hero && ch.alignment != hero.alignment){
 								//lit first, so kills count as burning kills
 								Buff.affect(ch, Burning.class).reignite(ch, burnDuration(hero));
-								ch.damage(Random.NormalIntRange(12, 40), hero);
+								ch.damage(HeroDamageBonus.direct(hero, ch, Random.NormalIntRange(12, 40)), hero);
 								if (ch.isAlive() && hero.hasTalent(Talent.FADING_FLAME)){
 									Buff.prolong(ch, Slow.class, 2f*hero.pointsInTalent(Talent.FADING_FLAME));
 								}

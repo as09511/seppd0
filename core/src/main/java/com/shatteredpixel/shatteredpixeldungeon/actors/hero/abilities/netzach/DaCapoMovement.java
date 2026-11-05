@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach;
 
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -154,7 +155,7 @@ public class DaCapoMovement extends ArmorAbility {
 
 	private static void strike( Hero hero, Char ch, int movement ){
 		if (!ch.isAlive()) return;
-		int dmg = Random.NormalIntRange(minDamage(hero, movement), maxDamage(hero, movement));
+		int dmg = HeroDamageBonus.direct(hero, ch, Random.NormalIntRange(minDamage(hero, movement), maxDamage(hero, movement)));
 		dmg = DamageType.apply(ch, DamageType.WHITE, dmg);
 		if (dmg > 0) ch.damage(dmg, hero);
 		ch.incomingDamageType = null;

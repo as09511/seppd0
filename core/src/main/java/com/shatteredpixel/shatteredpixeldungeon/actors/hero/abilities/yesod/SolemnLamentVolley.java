@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod;
 
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -97,7 +98,7 @@ public class SolemnLamentVolley extends ArmorAbility {
 					boolean hit = hero.shoot(ch, new EgoGun.Shot(gun));
 					if (hit && ch.isAlive()){
 						//like the E.G.O itself, a separate BLACK hit follows the WHITE one
-						int dmg = Math.max(0, new EgoGun.Shot(gun).damageRoll(hero) - ch.drRoll());
+						int dmg = HeroDamageBonus.direct(hero, ch, new EgoGun.Shot(gun).damageRoll(hero), ch.drRoll());
 						dmg = DamageType.apply(ch, DamageType.BLACK, dmg);
 						ch.damage(dmg, hero);
 					}

@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach;
 
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -97,7 +98,7 @@ public class OurGalaxy extends ArmorAbility {
 			hero.sprite.parent.add(new FallingStar(ch.sprite.center(), () -> {
 				if (ch.isAlive()){
 					int before = ch.HP + ch.shielding();
-					ch.damage(Random.NormalIntRange(minDamage(hero), maxDamage(hero)), hero);
+					ch.damage(HeroDamageBonus.direct(hero, ch, Random.NormalIntRange(minDamage(hero), maxDamage(hero))), hero);
 					dealt[0] += Math.max(0, before - (ch.HP + ch.shielding()));
 					if (ch.sprite != null) ch.sprite.emitter().burst(Speck.factory(Speck.STAR), 6);
 				}

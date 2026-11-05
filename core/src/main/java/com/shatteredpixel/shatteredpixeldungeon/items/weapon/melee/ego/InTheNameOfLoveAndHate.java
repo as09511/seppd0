@@ -22,7 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -287,7 +287,7 @@ public class InTheNameOfLoveAndHate extends EgoGun {
 		for (Char ch : targets){
 			if (!ch.isAlive()) continue;
 			int dmg = augment.damageFactor(Random.NormalIntRange(arcanaMin(lvl), arcanaMax(lvl)));
-			dmg = HodTrackers.boostDirectDamage(hero, ch, dmg);
+			dmg = HeroDamageBonus.direct(hero, ch, dmg);
 			dmg = DamageType.apply(ch, type, dmg);
 			ch.damage(dmg, hero);
 		}

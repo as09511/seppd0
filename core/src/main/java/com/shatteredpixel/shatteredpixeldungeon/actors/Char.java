@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors;
 
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Prediction;
@@ -482,14 +483,9 @@ public abstract class Char extends Actor {
 				if (enemy.buff(Analyzed.class) != null && Dungeon.hero.pointsInTalent(Talent.GO_VISUALIZATION) >= 2) dmg *= 1.2f;
 			}
 
-			//Hod's training results and the literature floor librarian's bonus on rooted enemies
-			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.HOD){
-				dmg *= HodTrackers.attackMultiplier((Hero) this, enemy);
-			}
-
-			//Netzach's finale: more damage against enemies with two or more debuffs
-			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.NETZACH){
-				dmg *= NetzachTrackers.attackMultiplier((Hero) this, enemy);
+			//the sephirot's damage dealt bonuses that apply before armor (Hod, Netzach)
+			if (this instanceof Hero){
+				dmg = HeroDamageBonus.beforeArmor((Hero) this, enemy, dmg);
 			}
 
 			if (buff( PowerOfMany.PowerBuff.class) != null){
@@ -540,9 +536,9 @@ public abstract class Char extends Actor {
 			if (effectiveDamage >= 0) {
 				effectiveDamage = Math.max(effectiveDamage - dr, 0);
 
-				//Yesod's subclass damage bonuses (viper Yesod, charge, black flame) apply after armor, added together
-				if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.YESOD){
-					effectiveDamage = Math.round(effectiveDamage * YesodTrackers.attackMultiplier((Hero) this));
+				//the damage dealt bonuses that apply after armor (Yesod's viper Yesod, charge, black flame)
+				if (this instanceof Hero){
+					effectiveDamage = HeroDamageBonus.afterArmor((Hero) this, effectiveDamage);
 				}
 
 				if (enemy.buff(Viscosity.ViscosityTracker.class) != null) {

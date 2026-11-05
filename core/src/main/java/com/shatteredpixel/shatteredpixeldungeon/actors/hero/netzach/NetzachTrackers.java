@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach;
 
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
@@ -93,7 +94,7 @@ public class NetzachTrackers {
 				|| !hero.hasTalent(Talent.COLLAPSE_AMPOULE)) return false;
 		int heal = Math.round((0.8f * hero.HT + 14) * healFactor(hero));
 		int damage = Math.round(heal * (0.5f + 0.5f*hero.pointsInTalent(Talent.COLLAPSE_AMPOULE)));
-		target.damage(damage, hero);
+		target.damage(HeroDamageBonus.direct(hero, target, damage), hero);
 		return true;
 	}
 
