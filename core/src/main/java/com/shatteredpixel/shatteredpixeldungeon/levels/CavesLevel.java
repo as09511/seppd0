@@ -92,10 +92,10 @@ public class CavesLevel extends RegularLevel {
 		return Blacksmith.Quest.spawn(super.initRooms());
 	}
 
-	//Angela waits by the stairs of floor 11 to trade E.G.O for enkephalin
+	//Angela waits by the stairs of floor 11 with the Noon ordeal and to trade E.G.O for enkephalin
 	@Override
 	protected void createMobs() {
-		if (Dungeon.depth == 11) Angela.Quest.spawnTrader(this, roomEntrance);
+		if (Dungeon.depth == 11) Angela.Quest.spawnNoon(this, roomEntrance);
 		super.createMobs();
 	}
 	

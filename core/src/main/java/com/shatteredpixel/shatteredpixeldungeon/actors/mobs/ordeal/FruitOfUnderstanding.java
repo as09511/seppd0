@@ -57,7 +57,7 @@ public class FruitOfUnderstanding extends OrdealMob {
 		EXP = 12;
 		baseSpeed = 0.5f;
 
-		attackType = DamageType.WHITE;
+		attackType = DamageType.BLACK;
 		damageMultipliers = new float[]{1.0f, 1.5f, 1.0f, 1.0f};
 	}
 

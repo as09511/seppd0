@@ -42,8 +42,12 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.CheersForTheBeginning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.Doubt;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.FruitOfUnderstanding;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.GrantUsLove;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.HarmonyOfSkin;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.OrdealMob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.PerfectFood;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.ProcessOfUnderstanding;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.Sweeper;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
@@ -54,7 +58,11 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CheersForTheBeginningSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.DoubtSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.FruitOfUnderstandingSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.GrantUsLoveSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.HarmonyOfSkinSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.PerfectFoodSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ProcessOfUnderstandingSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.SweeperSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndQuest;
@@ -68,7 +76,7 @@ import com.watabou.utils.Random;
 import java.util.ArrayList;
 
 //Angela, the AI secretary of L Corp. She waits by the stairs of floors 6, 11 and 16, can't be harmed,
-//and on floor 6 offers the hero one of three Dawn ordeals, chosen at random when she appears.
+//and offers the hero one of four Dawn ordeals on floor 6 and, once that is overcome, one of four Noon ordeals on floor 11.
 //In exchange for enkephalin boxes from the warehouse she also extracts or refines E.G.O, once each per game.
 public class Angela extends NPC {
 
@@ -78,9 +86,19 @@ public class Angela extends NPC {
 		properties.add(Property.IMMOVABLE);
 	}
 
-	//only the Angela of floor 6 (or one summoned by the Tester) offers the Dawn ordeal,
-	//the ones on floors 11 and 16 only trade E.G.O for enkephalin
-	private boolean offersOrdeal = true;
+	//the ordeal she offers: the Dawn on floor 6, the Noon on floor 11, none on floor 16.
+	//One summoned by the Tester offers whichever of the two comes next.
+	public static final int NONE = 0;
+	public static final int DAWN = 1;
+	public static final int NOON = 2;
+	private static final int NEXT = -1;
+
+	private int ordealTier = NEXT;
+
+	private int tier(){
+		if (ordealTier == NEXT) return Quest.completed ? NOON : DAWN;
+		return ordealTier;
+	}
 
 	@Override
 	public int defenseSkill( Char enemy ) {
@@ -115,10 +133,13 @@ public class Angela extends NPC {
 			return super.interact(c);
 		}
 
-		//an Angela summoned by the Tester picks her ordeal on the spot
-		if (offersOrdeal && Quest.type == 0){
+		//an Angela summoned by the Tester (or from an older save) picks her ordeal on the spot
+		if (tier() == DAWN && Quest.type == 0){
 			Quest.spawned = true;
 			Quest.type = Random.Int(4) + 1;
+		}
+		if (tier() == NOON && Quest.noonType == 0){
+			Quest.noonType = Random.Int(4) + 1;
 		}
 
 		//the very first talk with Angela on this profile: her welcome, the badge and the gift
@@ -167,9 +188,10 @@ public class Angela extends NPC {
 	private void showMenu(){
 		ArrayList<Integer> entries = new ArrayList<>();
 		ArrayList<String> labels = new ArrayList<>();
-		if (offersOrdeal){
+		int tier = tier();
+		if (tier != NONE){
 			entries.add(MENU_ORDEAL);
-			labels.add(Messages.get(Angela.class, "menu_ordeal", Quest.ordealName()));
+			labels.add(Messages.get(Angela.class, Quest.unlocked(tier) ? "menu_ordeal" : "menu_ordeal_locked", Quest.ordealName(tier)));
 		}
 		entries.add(MENU_EXTRACT);
 		labels.add(Messages.get(Angela.class, Quest.extracted ? "menu_extract_used" : "menu_extract"));
@@ -188,7 +210,7 @@ public class Angela extends NPC {
 			@Override
 			protected boolean enabled( int index ) {
 				switch (entries.get(index)){
-					case MENU_ORDEAL:  return !Quest.completed;
+					case MENU_ORDEAL:  return Quest.unlocked(tier) && !Quest.completed(tier);
 					case MENU_EXTRACT: return !Quest.extracted;
 					case MENU_REFINE:  return !Quest.refined;
 					default: return true;
@@ -198,7 +220,7 @@ public class Angela extends NPC {
 			@Override
 			protected void onSelect( int index ) {
 				switch (entries.get(index)){
-					case MENU_ORDEAL:  ordeal(); break;
+					case MENU_ORDEAL:  ordeal(tier); break;
 					case MENU_EXTRACT: WndEgoExtract.open(Angela.this); break;
 					case MENU_REFINE:  refine(); break;
 					case MENU_ASIDE:   stepAside(); break;
@@ -230,35 +252,44 @@ public class Angela extends NPC {
 		hero.spendAndNext(1 / hero.speed());
 	}
 
+	//older saves only stored whether she offered an ordeal at all
 	private static final String OFFERS_ORDEAL = "offers_ordeal";
+	private static final String ORDEAL_TIER   = "ordeal_tier";
 
 	@Override
 	public void storeInBundle( Bundle bundle ) {
 		super.storeInBundle(bundle);
-		bundle.put(OFFERS_ORDEAL, offersOrdeal);
+		bundle.put(ORDEAL_TIER, ordealTier);
 	}
 
 	@Override
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle(bundle);
-		offersOrdeal = !bundle.contains(OFFERS_ORDEAL) || bundle.getBoolean(OFFERS_ORDEAL);
+		if (bundle.contains(ORDEAL_TIER)){
+			ordealTier = bundle.getInt(ORDEAL_TIER);
+		} else if (!bundle.contains(OFFERS_ORDEAL) || bundle.getBoolean(OFFERS_ORDEAL)){
+			ordealTier = DAWN;
+		} else {
+			//the trader of floor 11 from before the Noon ordeals now offers them
+			ordealTier = Dungeon.depth == 11 ? NOON : NONE;
+		}
 	}
 
-	private void ordeal(){
-		if (Quest.given){
-			yell(Messages.get(Angela.class, "in_progress", Quest.ordealName()));
+	private void ordeal( int tier ){
+		if (Quest.given(tier)){
+			yell(Messages.get(Angela.class, "in_progress", Quest.ordealName(tier)));
 			return;
 		}
 		GameScene.show(new WndOptions(
 				sprite(),
 				Messages.titleCase(name()),
-				Messages.get(Angela.class, "offer", Quest.ordealName(), Quest.ORDEAL_REWARD),
+				Messages.get(Angela.class, "offer", Quest.ordealName(tier), Quest.reward(tier)),
 				Messages.get(Angela.class, "accept"),
 				Messages.get(Angela.class, "decline")){
 			@Override
 			protected void onSelect( int index ) {
 				if (index == 0){
-					Quest.start();
+					Quest.start(tier);
 				} else {
 					yell(Messages.get(Angela.class, "declined"));
 				}
@@ -350,13 +381,23 @@ public class Angela extends NPC {
 
 		public static final int AMBER_COUNT = 4;
 
-		//enkephalin boxes given for overcoming a Dawn ordeal
+		//the Noon ordeals of floor 11
+		public static final int NOON_GREEN   = 1; //Process of Understanding
+		public static final int NOON_VIOLET  = 2; //Grant Us Love, falling into the hero's room
+		public static final int NOON_INDIGO  = 3; //Sweepers x3, as a pack
+		public static final int NOON_CRIMSON = 4; //Harmony of Skin, splitting into two Cheers for the Beginning
+
+		//enkephalin boxes given for overcoming a Dawn or a Noon ordeal
 		public static final int ORDEAL_REWARD = 10;
+		public static final int NOON_REWARD   = 20;
 
 		private static boolean spawned;
 		private static int type;
 		private static boolean given;
 		private static boolean completed;
+		private static int noonType;
+		private static boolean noonGiven;
+		private static boolean noonCompleted;
 		//each of Angela's services can be used once per game
 		private static boolean extracted;
 		private static boolean refined;
@@ -366,6 +407,9 @@ public class Angela extends NPC {
 			type = 0;
 			given = false;
 			completed = false;
+			noonType = 0;
+			noonGiven = false;
+			noonCompleted = false;
 			extracted = false;
 			refined = false;
 		}
@@ -377,6 +421,9 @@ public class Angela extends NPC {
 		private static final String COMPLETED = "completed";
 		private static final String EXTRACTED = "extracted";
 		private static final String REFINED   = "refined";
+		private static final String NOON_TYPE      = "noon_type";
+		private static final String NOON_GIVEN     = "noon_given";
+		private static final String NOON_COMPLETED = "noon_completed";
 
 		public static void storeInBundle( Bundle bundle ){
 			Bundle node = new Bundle();
@@ -386,6 +433,9 @@ public class Angela extends NPC {
 			node.put(COMPLETED, completed);
 			node.put(EXTRACTED, extracted);
 			node.put(REFINED, refined);
+			node.put(NOON_TYPE, noonType);
+			node.put(NOON_GIVEN, noonGiven);
+			node.put(NOON_COMPLETED, noonCompleted);
 			bundle.put(NODE, node);
 		}
 
@@ -401,6 +451,9 @@ public class Angela extends NPC {
 			completed = node.getBoolean(COMPLETED);
 			extracted = node.getBoolean(EXTRACTED);
 			refined = node.getBoolean(REFINED);
+			noonType = node.getInt(NOON_TYPE);
+			noonGiven = node.getBoolean(NOON_GIVEN);
+			noonCompleted = node.getBoolean(NOON_COMPLETED);
 		}
 
 		public static boolean extracted(){
@@ -412,13 +465,35 @@ public class Angela extends NPC {
 		}
 
 		public static String ordealName(){
+			return ordealName(DAWN);
+		}
+
+		public static String ordealName( int tier ){
+			if (tier == NOON) return Messages.get(Angela.class, "noon_" + noonType);
 			return Messages.get(Angela.class, "ordeal_" + type);
+		}
+
+		//the Noon ordeal waits until the Dawn one has been overcome
+		public static boolean unlocked( int tier ){
+			return tier != NOON || completed;
+		}
+
+		public static boolean given( int tier ){
+			return tier == NOON ? noonGiven : given;
+		}
+
+		public static boolean completed( int tier ){
+			return tier == NOON ? noonCompleted : completed;
+		}
+
+		public static int reward( int tier ){
+			return tier == NOON ? NOON_REWARD : ORDEAL_REWARD;
 		}
 
 		//places Angela near the entrance stairs of floor 6 while it is being built, with her ordeal
 		public static void spawn( Level level, Room entranceRoom ){
 			if (spawned) return;
-			if (placeNearEntrance(level, entranceRoom, true) == null) return;
+			if (placeNearEntrance(level, entranceRoom, DAWN) == null) return;
 
 			spawned = true;
 			type = Random.Int(4) + 1;
@@ -426,12 +501,20 @@ public class Angela extends NPC {
 			completed = false;
 		}
 
-		//places an Angela without an ordeal near the entrance stairs of floors 11 and 16
-		public static void spawnTrader( Level level, Room entranceRoom ){
-			placeNearEntrance(level, entranceRoom, false);
+		//places an Angela with the Noon ordeal near the entrance stairs of floor 11
+		public static void spawnNoon( Level level, Room entranceRoom ){
+			if (placeNearEntrance(level, entranceRoom, NOON) == null) return;
+			noonType = Random.Int(4) + 1;
+			noonGiven = false;
+			noonCompleted = false;
 		}
 
-		private static Angela placeNearEntrance( Level level, Room entranceRoom, boolean offersOrdeal ){
+		//places an Angela without an ordeal near the entrance stairs of floor 16
+		public static void spawnTrader( Level level, Room entranceRoom ){
+			placeNearEntrance(level, entranceRoom, NONE);
+		}
+
+		private static Angela placeNearEntrance( Level level, Room entranceRoom, int ordealTier ){
 			if (entranceRoom == null) return null;
 
 			int entrance = level.entrance();
@@ -463,7 +546,7 @@ public class Angela extends NPC {
 			if (near.isEmpty() && inRoom.isEmpty()) return null;
 
 			Angela angela = new Angela();
-			angela.offersOrdeal = offersOrdeal;
+			angela.ordealTier = ordealTier;
 			angela.pos = Random.element(near.isEmpty() ? inRoom : near);
 			level.mobs.add(angela);
 			return angela;
@@ -486,7 +569,11 @@ public class Angela extends NPC {
 			return reachableCells(level, level.entrance(), cell) < reachable - 1;
 		}
 
-		public static void start(){
+		public static void start( int tier ){
+			if (tier == NOON){
+				startNoon();
+				return;
+			}
 			given = true;
 
 			Level level = Dungeon.level;
@@ -515,7 +602,48 @@ public class Angela extends NPC {
 			}
 
 			GLog.n(ordealName());
-			showOrdealText("start_" + type);
+			showOrdealText(DAWN, "start_" + type);
+		}
+
+		private static void startNoon(){
+			noonGiven = true;
+			GLog.n(ordealName(NOON));
+
+			Level level = Dungeon.level;
+			switch (noonType){
+				case NOON_GREEN: default:
+					ProcessOfUnderstanding process = new ProcessOfUnderstanding();
+					place(process, level.randomRespawnCell(process));
+					break;
+				case NOON_VIOLET:
+					//it falls into the room the hero is standing in
+					GrantUsLove.warn(level, Dungeon.hero.pos);
+					break;
+				case NOON_INDIGO:
+					//the pack comes out together, somewhere away from the hero
+					Sweeper first = new Sweeper();
+					place(first, level.randomRespawnCell(first));
+					for (int i = 1; i < Sweeper.COUNT; i++){
+						Sweeper next = new Sweeper();
+						int cell = -1;
+						if (first.pos >= 0){
+							ArrayList<Integer> near = new ArrayList<>();
+							for (int n : PathFinder.NEIGHBOURS8){
+								int c = first.pos + n;
+								if (level.passable[c] && !level.solid[c] && Actor.findChar(c) == null) near.add(c);
+							}
+							if (!near.isEmpty()) cell = Random.element(near);
+						}
+						place(next, cell == -1 ? level.randomRespawnCell(next) : cell);
+					}
+					break;
+				case NOON_CRIMSON:
+					HarmonyOfSkin harmony = new HarmonyOfSkin();
+					place(harmony, level.randomRespawnCell(harmony));
+					break;
+			}
+
+			showOrdealText(NOON, "noon_start_" + noonType);
 		}
 
 		//corridor cells free for a larva, optionally only those out of the hero's sight
@@ -533,7 +661,7 @@ public class Angela extends NPC {
 			return result;
 		}
 
-		private static void place( Mob mob, int cell ){
+		public static void place( Mob mob, int cell ){
 			if (cell == -1 || Actor.findChar(cell) != null){
 				Level level = Dungeon.level;
 				int tries = 0;
@@ -548,31 +676,42 @@ public class Angela extends NPC {
 			GameScene.add(mob);
 		}
 
-		//called whenever an ordeal monster dies, the ordeal ends once none are left on the floor
-		public static void onOrdealMobSlain(){
-			if (!given || completed) return;
+		//called whenever an ordeal monster dies, the ordeal ends once none of its own are left on the floor
+		public static void onOrdealMobSlain( int tier ){
+			if (!given(tier) || completed(tier)) return;
 			for (Mob m : Dungeon.level.mobs){
-				if (m instanceof OrdealMob && m.isAlive()){
+				if (m instanceof OrdealMob && ((OrdealMob) m).tier() == tier && m.isAlive()){
 					return;
 				}
 			}
-			completed = true;
-			Warehouse.addEnkephalin(ORDEAL_REWARD);
-			GLog.p(Messages.get(Angela.class, "reward", ORDEAL_REWARD, Warehouse.enkephalin()));
-			showOrdealText("end_" + type);
+			int reward = reward(tier);
+			if (tier == NOON) noonCompleted = true;
+			else completed = true;
+			Warehouse.addEnkephalin(reward);
+			GLog.p(Messages.get(Angela.class, "reward", reward, Warehouse.enkephalin()));
+			showOrdealText(tier, tier == NOON ? "noon_end_" + noonType : "end_" + type);
 		}
 
-		private static void showOrdealText( String key ){
-			String title = ordealName();
+		private static void showOrdealText( int tier, String key ){
+			String title = ordealName(tier);
 			String text = Messages.get(Angela.class, key);
-			int t = type;
+			int t = tier == NOON ? noonType : type;
 			Game.runOnRenderThread(() -> {
 				CharSprite icon;
-				switch (t){
-					case GREEN: default: icon = new DoubtSprite(); break;
-					case VIOLET: icon = new FruitOfUnderstandingSprite(); break;
-					case AMBER: icon = new PerfectFoodSprite(); break;
-					case CRIMSON: icon = new CheersForTheBeginningSprite(); break;
+				if (tier == NOON){
+					switch (t){
+						case NOON_GREEN: default: icon = new ProcessOfUnderstandingSprite(); break;
+						case NOON_VIOLET: icon = new GrantUsLoveSprite(); break;
+						case NOON_INDIGO: icon = new SweeperSprite(); break;
+						case NOON_CRIMSON: icon = new HarmonyOfSkinSprite(); break;
+					}
+				} else {
+					switch (t){
+						case GREEN: default: icon = new DoubtSprite(); break;
+						case VIOLET: icon = new FruitOfUnderstandingSprite(); break;
+						case AMBER: icon = new PerfectFoodSprite(); break;
+						case CRIMSON: icon = new CheersForTheBeginningSprite(); break;
+					}
 				}
 				GameScene.show(new WndTitledMessage(icon, title, text));
 			});

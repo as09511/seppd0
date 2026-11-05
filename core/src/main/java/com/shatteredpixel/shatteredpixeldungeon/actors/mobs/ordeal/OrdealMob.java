@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.watabou.utils.Bundle;
 
 //a monster summoned by one of Angela's ordeals. Its attacks deal a damage type,
 //and the ordeal ends once the last of them on the floor is slain.
@@ -40,6 +41,23 @@ public abstract class OrdealMob extends Mob {
 
 	protected DamageType attackType = DamageType.RED;
 	protected RiskLevel risk = RiskLevel.TETH;
+
+	//which of Angela's ordeals this monster belongs to: Angela.DAWN or Angela.NOON
+	protected int tier = Angela.DAWN;
+
+	public int tier(){
+		return tier;
+	}
+
+	//a Dawn monster called up by a Noon one (the Harmony of Skin's Cheers) counts toward the Noon ordeal
+	public OrdealMob noon(){
+		tier = Angela.NOON;
+		maxLvl = NOON_MAX_LVL;
+		return this;
+	}
+
+	//Noon monsters still give experience to a hero a few levels further down
+	public static final int NOON_MAX_LVL = 20;
 
 	@Override
 	public String info() {
@@ -55,6 +73,21 @@ public abstract class OrdealMob extends Mob {
 	@Override
 	public void die( Object cause ) {
 		super.die(cause);
-		Angela.Quest.onOrdealMobSlain();
+		Angela.Quest.onOrdealMobSlain(tier);
+	}
+
+	private static final String TIER = "ordeal_tier";
+
+	@Override
+	public void storeInBundle( Bundle bundle ) {
+		super.storeInBundle(bundle);
+		bundle.put(TIER, tier);
+	}
+
+	@Override
+	public void restoreFromBundle( Bundle bundle ) {
+		super.restoreFromBundle(bundle);
+		if (bundle.contains(TIER)) tier = bundle.getInt(TIER);
+		if (tier == Angela.NOON) maxLvl = NOON_MAX_LVL;
 	}
 }

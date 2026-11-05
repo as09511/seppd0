@@ -103,6 +103,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Necromancer;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Tengu;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.MirrorImage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.PrismaticImage;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.Sweeper;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Splash;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle;
@@ -1214,6 +1215,8 @@ public abstract class Char extends Actor {
 	public void die( Object src ) {
 		//Hod's sparkle: a deep wound's bleeding spreads when its bearer dies
 		BloodyDesire.onDeath(this);
+		//the Noon of Indigo's sweepers feed on anyone who dies near them
+		Sweeper.onDeath(this);
 
 		//something else is forcing death, so remove death mark to prevent conflicts
 		if (buff(DeathMark.DeathMarkTracker.class) != null){

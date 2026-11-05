@@ -296,6 +296,10 @@ public class Assets {
 		public static final String CHEERS_FOR_THE_BEGINNING = "sprites/cheers_for_the_beginning.png";
 		public static final String FRUIT_OF_UNDERSTANDING = "sprites/fruit_of_understanding.png";
 		public static final String PERFECT_FOOD = "sprites/perfect_food.png";
+		public static final String PROCESS_OF_UNDERSTANDING = "sprites/process_of_understanding.png";
+		public static final String GRANT_US_LOVE = "sprites/grant_us_love.png";
+		public static final String SWEEPER  = "sprites/sweeper.png";
+		public static final String HARMONY_OF_SKIN = "sprites/harmony_of_skin.png";
 		public static final String AVATARS  = "sprites/avatars.png";
 		public static final String PET      = "sprites/pet.png";
 		public static final String AMULET   = "sprites/amulet.png";
