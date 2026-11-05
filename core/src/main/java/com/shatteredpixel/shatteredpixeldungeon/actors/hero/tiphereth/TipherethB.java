@@ -23,7 +23,6 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.PrismaticGuard;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
@@ -45,7 +44,7 @@ import com.watabou.utils.Random;
 import java.util.ArrayList;
 
 //Tiphereth B: the HQ sephirah's scroll of prismatic image calls her instead of a prismatic image.
-//She is a prismatic image with 1.5x the health that doesn't hide away between fights: she takes part of the
+//She is a prismatic image with 1.5x Tiphereth's max health that doesn't hide away between fights: she takes part of the
 //health damage Tiphereth takes, slowly recovers like a prismatic guard, comes back to Tiphereth's side from
 //3 or more tiles away and follows her between floors. Like a prismatic image she fades for a few turns when she
 //falls, and another scroll of prismatic image brings her back to full health.
@@ -88,11 +87,11 @@ public class TipherethB extends PrismaticImage {
 		return null;
 	}
 
-	//1.5x a prismatic image's health, precious one adds +40/70/100%
+	//1.5x Tiphereth's max health, precious one adds +40/70/100%
 	public static int maxHealth( Hero hero ){
 		float mult = BASE_HEALTH;
 		if (hero.hasTalent(Talent.PRECIOUS_ONE)) mult *= 1.1f + 0.3f*hero.pointsInTalent(Talent.PRECIOUS_ONE);
-		return Math.max(1, Math.round(PrismaticGuard.maxHP(hero) * mult));
+		return Math.max(1, Math.round(hero.HT * mult));
 	}
 
 	//the share of Tiphereth's health damage she takes: 50%, value disposal 60/70/80%
