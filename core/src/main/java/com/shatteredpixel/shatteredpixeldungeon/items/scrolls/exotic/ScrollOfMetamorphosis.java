@@ -258,6 +258,10 @@ public class ScrollOfMetamorphosis extends ExoticScroll {
 						}
 					}
 				}
+				//talents that need another sephirah's own item or buff would do nothing
+				if (cls != Dungeon.hero.heroClass.playedClass()) {
+					clsTalentsAtTier.removeIf(Talent::classBound);
+				}
 				if (!replacingIsInSet && !clsTalentsAtTier.isEmpty()) {
 					options.put(Random.element(clsTalentsAtTier), Dungeon.hero.pointsInTalent(replacing));
 				}

@@ -49,13 +49,6 @@ public class YesodTrackers {
 		}
 	}
 
-	//document review: how many points have already handed out a charge, so a memory extraction reset can't farm them
-	public static class DocumentReviewGranted extends CounterBuff {
-		{
-			revivePersists = true;
-		}
-	}
-
 	//emergency response: the depth it was last used on, it works once per floor
 	public static class EmergencyResponseUsed extends Buff {
 		{

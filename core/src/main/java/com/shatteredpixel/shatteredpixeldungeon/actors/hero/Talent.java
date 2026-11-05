@@ -654,13 +654,8 @@ public enum Talent {
 
 		//document review: each point is one free identification, offered right away
 		if (talent == DOCUMENT_REVIEW){
-			YesodTrackers.DocumentReviewGranted granted = Buff.affect(hero, YesodTrackers.DocumentReviewGranted.class);
-			int points = hero.pointsInTalent(DOCUMENT_REVIEW);
-			if (points > granted.count()) {
-				granted.countUp(points - granted.count());
-				Buff.count(hero, YesodTrackers.DocumentReviewCharges.class, 1);
-				YesodScarf.openDocumentReview(hero);
-			}
+			Buff.count(hero, YesodTrackers.DocumentReviewCharges.class, 1);
+			YesodScarf.openDocumentReview(hero);
 		}
 
 		if (talent == HEIGHTENED_SENSES || talent == FARSIGHT || talent == DIVINE_SENSE || talent == FIELD_SURVEILLANCE || talent == YESOD_FARSIGHT){
@@ -704,14 +699,28 @@ public enum Talent {
 		}
 	}
 
+	//talents that only work with another sephirah's own item or buff, never offered by talent metamorph
+	public boolean classBound(){
+		switch (this){
+			//Malkuth's notebook
+			case OVERTIME: case EMERGENCY_MANUAL: case JOINT_COMMAND:
+			//Yesod's info power and analysis
+			case RISK_REPORT: case GO_VISUALIZATION: case DATABASE: case EMERGENCY_RESPONSE:
+			//Hod's manual stacks and exp bonus
+			case REST_TIME: case PRACTICAL_EVAL: case SAFETY_TRAINING:
+			case JOB_TRAINING: case BASIC_FITNESS: case DEMO_TRAINING: case FIELD_ADAPTATION:
+			//Netzach's concentrated enkephalin
+			case HANGOVER: case EXTRA_RATION: case OVERDOSE:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 	//scroll of memory extraction: every talent goes back to 0 points, so all points can be spent again
 	public static int resetTalents( Hero hero ){
-		//document review only hands out its free identifications once per point
-		int review = hero.pointsInTalent(DOCUMENT_REVIEW);
-		YesodTrackers.DocumentReviewGranted granted = Buff.affect(hero, YesodTrackers.DocumentReviewGranted.class);
-		if (review > granted.count()){
-			granted.countUp(review - granted.count());
-		}
+		//document review hands out its identifications again when retaken, so unused ones go with the points
+		Buff.detach(hero, YesodTrackers.DocumentReviewCharges.class);
 
 		int refunded = 0;
 		for (LinkedHashMap<Talent, Integer> tier : hero.talents){
