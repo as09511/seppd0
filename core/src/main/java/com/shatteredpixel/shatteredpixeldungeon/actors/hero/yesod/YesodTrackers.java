@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.GnollExile;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -181,7 +182,7 @@ public class YesodTrackers {
 			for (Mob m : level.mobs){
 				if (m.alignment == Char.Alignment.ENEMY && m.isAlive()
 						&& !Char.hasProp(m, Char.Property.BOSS) && !Char.hasProp(m, Char.Property.MINIBOSS)
-						&& !Char.hasProp(m, Char.Property.IMMOVABLE)){
+						&& !Char.hasProp(m, Char.Property.IMMOVABLE) && !GnollExile.peaceful(m)){
 					candidates.add(m);
 				}
 			}

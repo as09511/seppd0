@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.hod;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.GnollExile;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -123,7 +124,8 @@ public class BloodyDesire extends ArmorAbility {
 		if (spread < 1f) return;
 		for (int n : PathFinder.NEIGHBOURS8){
 			Char other = Actor.findChar(ch.pos + n);
-			if (other != null && other.isAlive() && other != hero && other.alignment != hero.alignment){
+			if (other != null && other.isAlive() && other != hero && other.alignment != hero.alignment
+					&& !GnollExile.peaceful(other)){
 				Bleeding ob = Buff.affect(other, Bleeding.class);
 				if (ob.level() < spread) ob.extend(spread - ob.level());
 			}

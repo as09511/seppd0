@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Commission;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -142,6 +143,12 @@ public class GnollExile extends Gnoll {
 
 	private int seenNotifyCooldown = 0;
 
+	//a gnoll exile that has not turned on the hero yet. Effects the hero did not aim at it
+	//(a commission mark, spreading analysis or bleeding) leave it alone, so it doesn't turn hostile for no reason
+	public static boolean peaceful( Char ch ){
+		return ch instanceof GnollExile && ((GnollExile) ch).state == ((GnollExile) ch).PASSIVE;
+	}
+
 	//gnoll exiles wander around while passive
 	private class Passive extends Mob.Wandering {
 
@@ -149,7 +156,8 @@ public class GnollExile extends Gnoll {
 		public boolean act( boolean enemyInFOV, boolean justAlerted ) {
 
 			for (Buff b : buffs()){
-				if (b.type == Buff.buffType.NEGATIVE){
+				//a commission mark from an earlier save is only a target marker, not an attack
+				if (b.type == Buff.buffType.NEGATIVE && !(b instanceof Commission)){
 					//swap to aggro if we've been debuffed
 					state = WANDERING;
 					return true;

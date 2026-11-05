@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.GnollExile;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import java.util.Collections;
@@ -303,7 +304,8 @@ public class YesodScarf extends Item {
 			if (hero.hasTalent(Talent.INFO_SPREAD)){
 				ArrayList<Mob> others = new ArrayList<>();
 				for (Mob m : Dungeon.level.mobs){
-					if (m != ch && m.isAlive() && m.alignment == Char.Alignment.ENEMY && Dungeon.level.heroFOV[m.pos]){
+					if (m != ch && m.isAlive() && m.alignment == Char.Alignment.ENEMY && Dungeon.level.heroFOV[m.pos]
+							&& !GnollExile.peaceful(m)){
 						others.add(m);
 					}
 				}

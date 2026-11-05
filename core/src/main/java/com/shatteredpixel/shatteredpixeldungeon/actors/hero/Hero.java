@@ -741,7 +741,7 @@ public class Hero extends Char {
 
 		//Netzach's hangover: +1/+2 damage while taking delayed damage
 		if (hasTalent(Talent.HANGOVER) && buff(Viscosity.DeferedDamage.class) != null){
-			dmg += pointsInTalent(Talent.HANGOVER);
+			dmg += 1 + pointsInTalent(Talent.HANGOVER);
 		}
 		//Netzach's overdose: 15/25% more damage for a while after concentrated enkephalin
 		dmg = Math.round(dmg * ConcentratedEnkephalin.Overdose.damageFactor(this));
