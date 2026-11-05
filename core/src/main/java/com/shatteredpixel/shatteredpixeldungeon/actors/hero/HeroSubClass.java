@@ -64,7 +64,11 @@ public enum HeroSubClass {
 
 	//Netzach, icons are borrowed for now
 	SAFETY_SEPHIRAH(HeroIcon.SAFETY_SEPHIRAH),
-	ART_LIBRARIAN(HeroIcon.WARLOCK);
+	ART_LIBRARIAN(HeroIcon.WARLOCK),
+
+	//Tiphereth, icons are borrowed for now
+	HQ_SEPHIRAH(HeroIcon.WARDEN),
+	SCIENCE_LIBRARIAN(HeroIcon.MONK);
 
 	int icon;
 

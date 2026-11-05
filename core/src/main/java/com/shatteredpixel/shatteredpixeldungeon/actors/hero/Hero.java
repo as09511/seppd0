@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.AnomalyManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
@@ -709,6 +710,9 @@ public class Hero extends Char {
 			dr += buff(HoldFast.class).armorBonus();
 		}
 
+		//Tiphereth's physical interference shield: +0~2/0~4 armor
+		dr += TipherethTrackers.physicalShield(this);
+
 		//the Golden Road trades armor for melee damage
 		GoldRush.GoldenRoad goldenRoad = buff(GoldRush.GoldenRoad.class);
 		if (goldenRoad != null){
@@ -723,6 +727,8 @@ public class Hero extends Char {
 		KindOfWeapon wep = belongings.attackingWeapon();
 		int dmg;
 
+		//Tiphereth's expectation: every 5th/4th attack rolls its maximum damage
+		maxDamageRoll = TipherethTrackers.expectationHit(this);
 		if (!RingOfForce.fightingUnarmed(this)) {
 			dmg = wep.damageRoll( this );
 
@@ -732,6 +738,12 @@ public class Hero extends Char {
 			if (RingOfForce.unarmedGetsWeaponAugment(this)){
 				dmg = ((Weapon)belongings.attackingWeapon()).augment.damageFactor(dmg);
 			}
+		}
+		maxDamageRoll = false;
+
+		//Tiphereth's pride: +1/+2 melee damage while two or more enemies are in sight
+		if (!(wep instanceof MissileWeapon)){
+			dmg += TipherethTrackers.prideBonus(this);
 		}
 
 		GoldRush.GoldenRoad goldenRoad = buff(GoldRush.GoldenRoad.class);
@@ -773,7 +785,13 @@ public class Hero extends Char {
 	}
 
 	//damage rolls that come from the hero can have their RNG influenced by clover
+	//set while a roll should land on its maximum, for Tiphereth's expectation
+	private static boolean maxDamageRoll = false;
+
 	public static int heroDamageIntRange(int min, int max ){
+		if (maxDamageRoll){
+			return max;
+		}
 		if (Random.Float() < ThirteenLeafClover.alterHeroDamageChance()){
 			return ThirteenLeafClover.alterDamageRoll(min, max);
 		} else {
@@ -1705,6 +1723,9 @@ public class Hero extends Char {
 		if (HodTrackers.reflects(this, enemy, damage)){
 			return 0;
 		}
+
+		//Tiphereth's preemptive defense: shielding the first time each enemy lands a hit
+		TipherethTrackers.onHitBy(this, enemy);
 		
 		if (damage > 0 && subClass == HeroSubClass.BERSERKER){
 			Berserk berserk = Buff.affect(this, Berserk.class);
@@ -1765,6 +1786,9 @@ public class Hero extends Char {
 			Buff.detach(this, Drowsy.class);
 			GLog.w( Messages.get(this, "pain_resist") );
 		}
+
+		//Tiphereth's trauma prevention shield: elemental damage is reduced by part of her armor
+		dmg = TipherethTrackers.traumaShield(this, dmg, src);
 
 		//temporarily assign to a float to avoid rounding a bunch
 		float damage = dmg;

@@ -67,6 +67,7 @@ public class YesodScarf extends Item {
 	public static final String AC_ANALYZE = "ANALYZE";
 	public static final String AC_DETECT  = "DETECT";
 	public static final String AC_PREDICT = "PREDICT";
+	public static final String AC_APPRAISE = "APPRAISE";
 	public static final String AC_REVIEW  = "REVIEW";
 	public static final String AC_CENSOR  = "CENSOR";
 	public static final String AC_CHARGE  = "CHARGE";
@@ -75,6 +76,13 @@ public class YesodScarf extends Item {
 	public static final int DETECT_COST  = 2;
 	public static final int PREDICT_COST = 3;
 	public static final int CENSOR_COST  = 5;
+	public static final int APPRAISE_COST = 20;
+	//document review: identifying costs 3/5 less info
+	private static final int[] REVIEW_DISCOUNT = {0, 3, 5};
+
+	public static int appraiseCost( Hero hero ){
+		return APPRAISE_COST - REVIEW_DISCOUNT[Math.min(2, hero.pointsInTalent(Talent.DOCUMENT_REVIEW))];
+	}
 	//info exchange: gold value of one point of info in shops
 	public static final int INFO_EXCHANGE_GOLD = 75;
 
@@ -98,6 +106,7 @@ public class YesodScarf extends Item {
 			actions.add(AC_ANALYZE);
 			actions.add(AC_DETECT);
 			actions.add(AC_PREDICT);
+			actions.add(AC_APPRAISE);
 			if (hero.subClass == HeroSubClass.INFO_SEPHIRAH) actions.add(AC_CENSOR);
 			if (hero.subClass == HeroSubClass.TECH_LIBRARIAN) actions.add(AC_CHARGE);
 		}
@@ -113,6 +122,7 @@ public class YesodScarf extends Item {
 			case AC_ANALYZE: return Messages.get(this, "ac_analyze", ANALYZE_COST);
 			case AC_DETECT:  return Messages.get(this, "ac_detect", DETECT_COST);
 			case AC_PREDICT: return Messages.get(this, "ac_predict", PREDICT_COST);
+			case AC_APPRAISE: return Messages.get(this, "ac_appraise", appraiseCost(hero));
 			case AC_REVIEW:  return Messages.get(this, "ac_review", reviewCharges(hero));
 			case AC_CENSOR:  return Messages.get(this, "ac_censor", CENSOR_COST);
 			case AC_CHARGE:  return Messages.get(this, "ac_charge");
@@ -168,6 +178,9 @@ public class YesodScarf extends Item {
 					hero.spendAndNext(1f);
 				}
 				break;
+			case AC_APPRAISE:
+				if (canPay(appraiseCost(hero))) appraise(hero);
+				break;
 			case AC_CENSOR:
 				if (canPay(CENSOR_COST)){
 					InfoPower.get().spend(CENSOR_COST);
@@ -185,7 +198,7 @@ public class YesodScarf extends Item {
 	private ArrayList<String> abilities( Hero hero ){
 		ArrayList<String> list = new ArrayList<>();
 		for (String a : actions(hero)){
-			if (a.equals(AC_ANALYZE) || a.equals(AC_DETECT) || a.equals(AC_PREDICT)
+			if (a.equals(AC_ANALYZE) || a.equals(AC_DETECT) || a.equals(AC_PREDICT) || a.equals(AC_APPRAISE)
 					|| a.equals(AC_CENSOR) || a.equals(AC_CHARGE) || a.equals(AC_REVIEW)){
 				list.add(a);
 			}
@@ -199,6 +212,7 @@ public class YesodScarf extends Item {
 			case AC_ANALYZE: return info >= ANALYZE_COST;
 			case AC_DETECT:  return info >= DETECT_COST;
 			case AC_PREDICT: return info >= PREDICT_COST;
+			case AC_APPRAISE: return Dungeon.hero != null && info >= appraiseCost(Dungeon.hero);
 			case AC_CENSOR:  return info >= CENSOR_COST;
 			case AC_CHARGE:  return info > 0;
 			default:         return true;
@@ -332,7 +346,48 @@ public class YesodScarf extends Item {
 		}
 	};
 
-	//document review talent: free identifications, one per talent point
+	//appraisal: spends info to identify one item
+	private static void appraise( Hero hero ){
+		boolean anyUnknown = false;
+		for (Item i : hero.belongings){
+			if (!i.isIdentified()){
+				anyUnknown = true;
+				break;
+			}
+		}
+		if (!anyUnknown){
+			GLog.i(Messages.get(YesodScarf.class, "appraise_nothing"));
+			return;
+		}
+		GameScene.selectItem(new WndBag.ItemSelector() {
+			@Override
+			public String textPrompt() {
+				return Messages.get(YesodScarf.class, "review_prompt");
+			}
+
+			@Override
+			public boolean itemSelectable(Item item) {
+				return !item.isIdentified();
+			}
+
+			@Override
+			public void onSelect(Item item) {
+				Hero h = Dungeon.hero;
+				if (item == null || item.isIdentified() || h == null) return;
+				InfoPower p = InfoPower.get();
+				if (p == null || !p.spend(appraiseCost(h))) return;
+				item.identify();
+				GLog.p(Messages.get(YesodScarf.class, "review_done", item.name()));
+				h.sprite.emitter().burst(Speck.factory(Speck.DISCOVER), 6);
+				Sample.INSTANCE.play(Assets.Sounds.READ);
+				updateQuickslot();
+				h.sprite.operate(h.pos);
+				h.spendAndNext(1f);
+			}
+		});
+	}
+
+	//document review charges from before the talent was reworked: free identifications, one per talent point
 	public static int reviewCharges( Hero hero ){
 		YesodTrackers.DocumentReviewCharges c = hero.buff(YesodTrackers.DocumentReviewCharges.class);
 		return c == null ? 0 : (int)c.count();
@@ -398,6 +453,7 @@ public class YesodScarf extends Item {
 	public String desc() {
 		String desc = super.desc();
 		desc += "\n\n" + Messages.get(this, "effect", ANALYZE_COST, (int)Analyzed.DURATION, DETECT_COST, DETECT_RANGE, PREDICT_COST);
+		desc += "\n\n" + Messages.get(this, "effect_appraise", Dungeon.hero != null ? appraiseCost(Dungeon.hero) : APPRAISE_COST);
 		if (Dungeon.hero != null && Dungeon.hero.subClass == HeroSubClass.INFO_SEPHIRAH){
 			desc += "\n\n" + Messages.get(this, "effect_info", CENSOR_COST, (int)CENSOR_DURATION, INFO_EXCHANGE_GOLD);
 		} else if (Dungeon.hero != null && Dungeon.hero.subClass == HeroSubClass.TECH_LIBRARIAN){

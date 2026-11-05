@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLevitation;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.SolemnLamentVolley;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.RegretStrike;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.AnomalyManual;
@@ -133,6 +136,9 @@ public enum HeroClass {
 	//Netzach, the Safety Team's sephirah
 	NETZACH( HeroSubClass.SAFETY_SEPHIRAH, HeroSubClass.ART_LIBRARIAN ),
 
+	//Tiphereth, the Central Command Team's sephirah
+	TIPHERETH( HeroSubClass.HQ_SEPHIRAH, HeroSubClass.SCIENCE_LIBRARIAN ),
+
 	//testing class, uses the warrior's sprite, talents and subclasses
 	TESTER( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
 
@@ -240,6 +246,10 @@ public enum HeroClass {
 				initTestNetzach( hero );
 				break;
 
+			case TIPHERETH:
+				initTiphereth( hero );
+				break;
+
 			case TESTER:
 				initTester( hero );
 				break;
@@ -312,6 +322,23 @@ public enum HeroClass {
 
 		new ScrollOfLullaby().identify();
 		new PotionOfHealing().identify();
+	}
+
+	private static void initTiphereth( Hero hero ) {
+		//her ribbon starts tied to the standard-issue baton
+		TipherethRibbon ribbon = new TipherethRibbon();
+		if (hero.belongings.weapon instanceof MeleeWeapon){
+			((MeleeWeapon) hero.belongings.weapon).affixRibbon(ribbon);
+		} else {
+			ribbon.collect();
+		}
+
+		ThrowingStone stones = new ThrowingStone();
+		stones.identify().collect();
+		Dungeon.quickslot.setSlot(0, stones);
+
+		new ScrollOfMirrorImage().identify();
+		new PotionOfLevitation().identify();
 	}
 
 	//level 30 right away, with both the subclass and the armor ability items ready to use
@@ -524,6 +551,8 @@ public enum HeroClass {
 			case NETZACH:
 			case TEST_NETZACH:
 				return Assets.Sprites.NETZACH;
+			case TIPHERETH:
+				return Assets.Sprites.TIPHERETH;
 		}
 	}
 
@@ -550,6 +579,8 @@ public enum HeroClass {
 			case NETZACH:
 			case TEST_NETZACH:
 				return Assets.Splashes.NETZACH;
+			case TIPHERETH:
+				return Assets.Splashes.TIPHERETH;
 		}
 	}
 	

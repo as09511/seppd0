@@ -21,12 +21,16 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImage;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.items.YesodScarf;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.Statistics;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -273,6 +277,11 @@ public enum Talent {
 	STARLIGHT(209, 4), STARFALL(210, 4), GALAXY_EMBRACE(211, 4),
 	//Da Capo T4
 	TRANCE(212, 4), FORTISSIMO(213, 4), FERMATA(214, 4),
+
+	//Tiphereth T1, icons are borrowed from other classes for now
+	PRIDE(5), PRECISE_INSPECTION(1), PREEMPTIVE_DEFENSE(35), SNEAKY(66),
+	//Tiphereth T2
+	SHARED_MEAL(4), EXPECTATION(137), MAINTENANCE(98), PHYSICAL_SHIELD(99), TRAUMA_SHIELD(102),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -554,6 +563,7 @@ public enum Talent {
 				case YESOD:
 				case HOD:
 				case NETZACH:
+				case TIPHERETH:
 					return 154; //borrowed for now
 			}
 		} else {
@@ -597,9 +607,29 @@ public enum Talent {
 			Buff.affect(hero, BrokenSeal.WarriorShield.class);
 		}
 
-		if (talent == EFFICIENT && hero.pointsInTalent(EFFICIENT) == 2){
+		//Netzach's efficiency: the worn armor right away, and at +2 four random kinds of potion
+		if (talent == EFFICIENT && hero.pointsInTalent(EFFICIENT) == 1){
 			if (hero.belongings.armor() != null && !ShardOfOblivion.passiveIDDisabled())  {
 				hero.belongings.armor.identify();
+			}
+		}
+		if (talent == EFFICIENT && hero.pointsInTalent(EFFICIENT) == 2){
+			ArrayList<Class<? extends Potion>> unknown = new ArrayList<>(Potion.getUnknown());
+			Random.shuffle(unknown);
+			int known = 0;
+			for (Class<? extends Potion> cls : unknown){
+				if (known >= 4) break;
+				Potion p = Reflection.newInstance(cls);
+				if (p == null) continue;
+				p.setKnown();
+				known++;
+			}
+			if (known > 0) GLog.p(Messages.get(Talent.class, "efficient_potions", known));
+		}
+		//Tiphereth's precise inspection +2: the wielded weapon right away
+		if (talent == PRECISE_INSPECTION && hero.pointsInTalent(PRECISE_INSPECTION) == 2){
+			if (hero.belongings.weapon() != null && !ShardOfOblivion.passiveIDDisabled()){
+				hero.belongings.weapon.identify();
 			}
 		}
 		//more concentrated enkephalin charges show up on the quickslot right away
@@ -650,12 +680,6 @@ public enum Talent {
 					}
 				}
 			}
-		}
-
-		//document review: each point is one free identification, offered right away
-		if (talent == DOCUMENT_REVIEW){
-			Buff.count(hero, YesodTrackers.DocumentReviewCharges.class, 1);
-			YesodScarf.openDocumentReview(hero);
 		}
 
 		if (talent == HEIGHTENED_SENSES || talent == FARSIGHT || talent == DIVINE_SENSE || talent == FIELD_SURVEILLANCE || talent == YESOD_FARSIGHT){
@@ -755,6 +779,10 @@ public enum Talent {
 		//Netzach's beer vending machine: 10/15% of max health healed
 		if (hero.hasTalent(BEER_VENDING)){
 			ConcentratedEnkephalin.heal(hero, Math.round(hero.HT * (0.05f + 0.05f*hero.pointsInTalent(BEER_VENDING))));
+		}
+		//Tiphereth's shared meal: 1/2 mirror images join her at the table
+		if (hero.hasTalent(SHARED_MEAL)){
+			ScrollOfMirrorImage.spawnImages(hero, hero.pointsInTalent(SHARED_MEAL));
 		}
 		//Hod's lunch seminar: exp from the hunger actually restored
 		HodManual.onFoodEaten(hero, Buff.affect(hero, Hunger.class).lastRestored());
@@ -856,21 +884,21 @@ public enum Talent {
 		float factor = 1f;
 
 		// Affected by both Warrior(1.75x/2.5x) and Duelist(2.5x/inst.) talents
-		// Malkuth: 1.75x/2.5x for weapons and armor
-		if (item instanceof MeleeWeapon || item instanceof Armor){
-			factor *= 1f + 0.75f*hero.pointsInTalent(THOROUGH_RECORDS);
+		// Malkuth's work order: 2.5x for weapons and armor (and instant for known kinds at +2, see onItemCollected)
+		if ((item instanceof MeleeWeapon || item instanceof Armor) && hero.hasTalent(THOROUGH_RECORDS)){
+			factor *= 2.5f;
 		}
-		// Hod: 1.5x/2x for weapons, armor and rings
+		// Tiphereth's precise inspection: 2.5x for weapons and armor (instant on equip for weapons at +2)
+		if ((item instanceof MeleeWeapon || item instanceof Armor) && hero.hasTalent(PRECISE_INSPECTION)){
+			factor *= 2.5f;
+		}
+		// Hod: 2x/3x for weapons, armor and rings
 		if (item instanceof MeleeWeapon || item instanceof Armor || item instanceof Ring){
-			factor *= 1f + 0.5f*hero.pointsInTalent(WORK_FAMILIARITY);
+			factor *= 1f + hero.pointsInTalent(WORK_FAMILIARITY);
 		}
 		if (item instanceof MeleeWeapon){
 			factor *= 1f + 1.5f*hero.pointsInTalent(ADVENTURERS_INTUITION); //instant at +2 (see onItemEquipped)
 			factor *= 1f + 0.75f*hero.pointsInTalent(VETERANS_INTUITION);
-		}
-		// Netzach: 2.5x/instant for armor (see onItemEquipped)
-		if (item instanceof Armor){
-			factor *= 1f + 1.5f*hero.pointsInTalent(EFFICIENT);
 		}
 		// Affected by both Warrior(2.5x/inst.) and Duelist(1.75x/2.5x) talents
 		if (item instanceof Armor){
@@ -1026,7 +1054,12 @@ public enum Talent {
 		if (hero.pointsInTalent(VETERANS_INTUITION) == 2 && item instanceof Armor){
 			identify = true;
 		}
-		if (hero.pointsInTalent(EFFICIENT) == 2 && item instanceof Armor){
+		//Netzach's efficiency: armor is identified as soon as it's worn
+		if (hero.hasTalent(EFFICIENT) && item instanceof Armor){
+			identify = true;
+		}
+		//Tiphereth's precise inspection +2: weapons are identified as soon as they're wielded
+		if (hero.pointsInTalent(PRECISE_INSPECTION) == 2 && item instanceof Weapon){
 			identify = true;
 		}
 		if (hero.hasTalent(THIEFS_INTUITION) && item instanceof Ring){
@@ -1055,6 +1088,16 @@ public enum Talent {
 	}
 
 	public static void onItemCollected( Hero hero, Item item ){
+		//Malkuth's work order +2: a weapon or armor of a kind identified before this run is known on pickup
+		if (hero.pointsInTalent(THOROUGH_RECORDS) == 2 && (item instanceof Weapon || item instanceof Armor)
+				&& !item.isIdentified() && Statistics.itemTypesDiscovered.contains(item.getClass())){
+			if (ShardOfOblivion.passiveIDDisabled()){
+				if (item instanceof Weapon) ((Weapon) item).setIDReady();
+				else ((Armor) item).setIDReady();
+			} else {
+				item.identify();
+			}
+		}
 		if (hero.pointsInTalent(THIEFS_INTUITION) == 2){
 			if (item instanceof Ring) ((Ring) item).setKnown();
 		}
@@ -1064,6 +1107,9 @@ public enum Talent {
 
 		//Hod's practical evaluation
 		dmg = HodManual.onAttackProc(hero, enemy, dmg);
+
+		//Tiphereth's sneaky: surprise attacks cripple
+		TipherethTrackers.onAttack(hero, enemy);
 
 		//spore: 10/20/30% of the damage as bleeding on burning enemies
 		if (hero.hasTalent(SPORE) && enemy.buff(Burning.class) != null && dmg > 0){
@@ -1212,6 +1258,9 @@ public enum Talent {
 			case NETZACH:
 				Collections.addAll(tierTalents, EFFICIENT, HANGOVER, SLACKING, RESIGNATION);
 				break;
+			case TIPHERETH:
+				Collections.addAll(tierTalents, PRIDE, PRECISE_INSPECTION, PREEMPTIVE_DEFENSE, SNEAKY);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1252,6 +1301,9 @@ public enum Talent {
 				break;
 			case NETZACH:
 				Collections.addAll(tierTalents, BEER_VENDING, REGENERATOR_MK2, EXTRA_RATION, REGENERATOR_FIX, OVERDOSE);
+				break;
+			case TIPHERETH:
+				Collections.addAll(tierTalents, SHARED_MEAL, EXPECTATION, MAINTENANCE, PHYSICAL_SHIELD, TRAUMA_SHIELD);
 				break;
 		}
 		for (Talent talent : tierTalents){

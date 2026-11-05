@@ -259,6 +259,7 @@ public class Assets {
 		public static final String YESOD    = "splashes/yesod.png";
 		public static final String HOD      = "splashes/hod.png";
 		public static final String NETZACH  = "splashes/netzach.png";
+		public static final String TIPHERETH = "splashes/tiphereth.png";
 
 		public static final String SEWERS   = "splashes/sewers.jpg";
 		public static final String PRISON   = "splashes/prison.jpg";
@@ -290,6 +291,8 @@ public class Assets {
 		public static final String YESOD    = "sprites/yesod.png";
 		public static final String HOD      = "sprites/hod.png";
 		public static final String NETZACH  = "sprites/netzach.png";
+		public static final String TIPHERETH = "sprites/tiphereth.png";
+		public static final String TIPHERETH_B = "sprites/tiphereth_b.png";
 		public static final String LCORP_EMPLOYEE = "sprites/lcorp_employee.png";
 		public static final String ANGELA   = "sprites/angela.png";
 		public static final String DOUBT    = "sprites/doubt.png";

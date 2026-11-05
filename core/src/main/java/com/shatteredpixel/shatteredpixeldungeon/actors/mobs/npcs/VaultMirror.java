@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
+import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -113,6 +115,11 @@ public class VaultMirror extends NPC {
 				case NETZACH:
 					reward = new ConcentratedEnkephalin().identify(false);
 					break;
+				case TIPHERETH:
+					//a second ribbon, already holding its upgrade and an enchantment, like the warrior's seal
+					reward = new TipherethRibbon().upgrade().identify(false);
+					((TipherethRibbon) reward).setEnchantment(Weapon.Enchantment.random());
+					break;
 			}
 		Random.popGenerator();
 	}
@@ -156,6 +163,9 @@ public class VaultMirror extends NPC {
 								break;
 							case NETZACH:
 								sceneText += Messages.get(VaultMirror.class, "scene_netzach");
+								break;
+							case TIPHERETH:
+								sceneText += Messages.get(VaultMirror.class, "scene_tiphereth");
 								break;
 						}
 						sceneText += "\n\n" + Messages.get(VaultMirror.class, "scene_final");

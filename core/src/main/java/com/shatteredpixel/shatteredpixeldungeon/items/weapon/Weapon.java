@@ -373,6 +373,11 @@ abstract public class Weapon extends KindOfWeapon {
 	public Item upgrade() {
 		return upgrade(false);
 	}
+
+	//whether upgrading can never remove this weapon's enchantment
+	protected boolean enchantKeptOnUpgrade(){
+		return false;
+	}
 	
 	public Item upgrade(boolean enchant ) {
 
@@ -392,7 +397,8 @@ abstract public class Weapon extends KindOfWeapon {
 				if (Random.Int(3) == 0) enchant(null);
 
 			//otherwise chance to lose enchant is 10/20/40/80/100% when upgrading from +4/5/6/7/8
-			} else if (level() >= 4 && Random.Float(10) < Math.pow(2, level()-4)){
+			// (Tiphereth's ribbon with maintenance +2 keeps it safe)
+			} else if (!enchantKeptOnUpgrade() && level() >= 4 && Random.Float(10) < Math.pow(2, level()-4)){
 				enchant(null);
 			}
 

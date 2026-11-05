@@ -39,6 +39,11 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.HolyWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.KindOfWeapon;
+import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
+import com.watabou.noosa.particles.Emitter;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfForce;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRecharging;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
@@ -63,6 +68,106 @@ import java.util.ArrayList;
 public class MeleeWeapon extends Weapon {
 
 	public static String AC_ABILITY = "ABILITY";
+	public static final String AC_DETACH_RIBBON = "DETACH_RIBBON";
+
+	//Tiphereth's ribbon, if it is tied to this weapon
+	protected TipherethRibbon ribbon;
+
+	public TipherethRibbon checkRibbon(){
+		return ribbon;
+	}
+
+	public void affixRibbon( TipherethRibbon ribbon ){
+		this.ribbon = ribbon;
+		if (ribbon.level() > 0){
+			//doesn't trigger upgrading logic such as affecting curses/enchantments
+			level(trueLevel() + 1);
+		}
+		if (ribbon.getEnchantment() != null){
+			enchant(ribbon.getEnchantment());
+		}
+		updateQuickslot();
+	}
+
+	public TipherethRibbon detachRibbon(){
+		if (ribbon == null) return null;
+		TipherethRibbon detaching = ribbon;
+		ribbon = null;
+		if (detaching.level() > 0){
+			degrade();
+		}
+		if (detaching.canTransferEnchantment()){
+			enchant(null);
+		} else {
+			detaching.setEnchantment(null);
+		}
+		updateQuickslot();
+		return detaching;
+	}
+
+	@Override
+	public Weapon enchant( Enchantment ench ) {
+		super.enchant(ench);
+		//the ribbon always notes the enchantment, it only carries it with the maintenance talent
+		if (ribbon != null) ribbon.setEnchantment(ench);
+		return this;
+	}
+
+	@Override
+	public Item upgrade( boolean enchant ) {
+		//the ribbon soaks up the first upgrade of the weapon it is tied to
+		if (ribbon != null && ribbon.level() == 0) ribbon.upgrade();
+		return super.upgrade(enchant);
+	}
+
+	@Override
+	protected boolean enchantKeptOnUpgrade() {
+		return ribbon != null && TipherethRibbon.keepsEnchantment();
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		//weapons can be kept in bones between runs, the ribbon cannot
+		ribbon = null;
+	}
+
+	//moving to a new weapon offers to retie the ribbon from the old one
+	@Override
+	public boolean doEquip( Hero hero ) {
+		KindOfWeapon old = hero.belongings.weapon;
+		boolean equipped = super.doEquip(hero);
+		if (equipped && hero.belongings.weapon == this && ribbon == null && hero.heroClass == HeroClass.TIPHERETH
+				&& old instanceof MeleeWeapon && old != this && ((MeleeWeapon) old).ribbon != null){
+			TipherethRibbon r = ((MeleeWeapon) old).ribbon;
+			if (cursedKnown && (!cursed || (r.getEnchantment() != null && r.getEnchantment().curse()))){
+				GameScene.show(new WndOptions(new ItemSprite(ItemSpriteSheet.TIPHERETH_RIBBON),
+						Messages.titleCase(r.trueName()),
+						Messages.get(MeleeWeapon.class, "ribbon_transfer"),
+						Messages.get(MeleeWeapon.class, "ribbon_transfer_yes"),
+						Messages.get(MeleeWeapon.class, "ribbon_transfer_no")){
+					@Override
+					protected void onSelect( int index ) {
+						if (index == 0){
+							r.affixToWeapon(MeleeWeapon.this, old);
+							updateQuickslot();
+						}
+					}
+				});
+			}
+		}
+		return equipped;
+	}
+
+	@Override
+	public Emitter emitter() {
+		if (ribbon == null) return super.emitter();
+		Emitter emitter = new Emitter();
+		emitter.pos(ItemSpriteSheet.film.width(image)/2f + 2f, ItemSpriteSheet.film.height(image)/3f);
+		emitter.fillTarget = false;
+		emitter.pour(Speck.factory( Speck.YELLOW_LIGHT ), 0.6f);
+		return emitter;
+	}
 
 	@Override
 	public void activate(Char ch) {
@@ -88,11 +193,15 @@ public class MeleeWeapon extends Weapon {
 		if (isEquipped(hero) && hero.heroClass == HeroClass.DUELIST){
 			actions.add(AC_ABILITY);
 		}
+		if (ribbon != null) actions.add(AC_DETACH_RIBBON);
 		return actions;
 	}
 
 	@Override
 	public String actionName(String action, Hero hero) {
+		if (action.equals(AC_DETACH_RIBBON)){
+			return Messages.upperCase(Messages.get(MeleeWeapon.class, "ac_detach_ribbon"));
+		}
 		if (action.equals(AC_ABILITY)){
 			return Messages.upperCase(Messages.get(this, "ability_name"));
 		} else {
@@ -103,6 +212,17 @@ public class MeleeWeapon extends Weapon {
 	@Override
 	public void execute(Hero hero, String action) {
 		super.execute(hero, action);
+
+		if (action.equals(AC_DETACH_RIBBON) && ribbon != null){
+			TipherethRibbon detaching = detachRibbon();
+			GLog.i(Messages.get(MeleeWeapon.class, "detach_ribbon"));
+			hero.sprite.operate(hero.pos);
+			if (!detaching.collect()){
+				Dungeon.level.drop(detaching, hero.pos);
+			}
+			updateQuickslot();
+			return;
+		}
 
 		if (action.equals(AC_ABILITY)){
 			usesTargeting = false;
@@ -299,6 +419,8 @@ public class MeleeWeapon extends Weapon {
 			if (exStr > 0) {
 				damage += Hero.heroDamageIntRange( 0, exStr );
 			}
+			//Tiphereth's ribbon: +1 melee damage
+			if (ribbon != null) damage += TipherethRibbon.DAMAGE_BONUS;
 		}
 		return damage;
 	}
@@ -326,6 +448,10 @@ public class MeleeWeapon extends Weapon {
 
 		String statsInfo = statsInfo();
 		if (!statsInfo.equals("")) info += "\n\n" + statsInfo;
+
+		if (ribbon != null){
+			info += "\n\n" + Messages.get(MeleeWeapon.class, "ribbon_attached", TipherethRibbon.DAMAGE_BONUS);
+		}
 
 		switch (augment) {
 			case SPEED:
@@ -403,6 +529,7 @@ public class MeleeWeapon extends Weapon {
 
 	@Override
 	public int value() {
+		if (ribbon != null) return 0;
 		int price = 20 * tier;
 		if (hasGoodEnchant()) {
 			price *= 1.5f;
@@ -420,6 +547,20 @@ public class MeleeWeapon extends Weapon {
 			price = 1;
 		}
 		return price;
+	}
+
+	private static final String RIBBON = "tiphereth_ribbon";
+
+	@Override
+	public void storeInBundle( Bundle bundle ) {
+		super.storeInBundle(bundle);
+		if (ribbon != null) bundle.put(RIBBON, ribbon);
+	}
+
+	@Override
+	public void restoreFromBundle( Bundle bundle ) {
+		super.restoreFromBundle(bundle);
+		ribbon = bundle.contains(RIBBON) ? (TipherethRibbon) bundle.get(RIBBON) : null;
 	}
 
 	public static class Charger extends Buff implements ActionIndicator.Action {

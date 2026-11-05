@@ -488,6 +488,8 @@ public enum Icons {
 			case NETZACH:
 			case TEST_NETZACH:
 				return new ItemSprite(ItemSpriteSheet.CONCENTRATED_ENKEPHALIN);
+			case TIPHERETH:
+				return new ItemSprite(ItemSpriteSheet.TIPHERETH_RIBBON);
 			case TESTER:
 				return new ItemSprite(ItemSpriteSheet.CRYSTAL_CHEST);
 			default:
