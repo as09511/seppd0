@@ -130,6 +130,14 @@ public class ConcentratedEnkephalin extends Item {
 		GLog.p(Messages.get(this, "recharged", charges, max));
 	}
 
+	//losing extra ration keeps charges within the new maximum
+	public static void clampCharges( Hero hero ){
+		int max = maxCharges(hero);
+		for (ConcentratedEnkephalin e : hero.belongings.getAllItems(ConcentratedEnkephalin.class)){
+			e.charges = Math.min(e.charges, max);
+		}
+	}
+
 	//the vault mirror's copy is handed over fully charged, and only recharges on floors not yet visited
 	public void fillForVault( Hero hero ){
 		charges = maxCharges(hero);

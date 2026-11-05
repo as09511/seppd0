@@ -654,8 +654,13 @@ public enum Talent {
 
 		//document review: each point is one free identification, offered right away
 		if (talent == DOCUMENT_REVIEW){
-			Buff.count(hero, YesodTrackers.DocumentReviewCharges.class, 1);
-			YesodScarf.openDocumentReview(hero);
+			YesodTrackers.DocumentReviewGranted granted = Buff.affect(hero, YesodTrackers.DocumentReviewGranted.class);
+			int points = hero.pointsInTalent(DOCUMENT_REVIEW);
+			if (points > granted.count()) {
+				granted.countUp(points - granted.count());
+				Buff.count(hero, YesodTrackers.DocumentReviewCharges.class, 1);
+				YesodScarf.openDocumentReview(hero);
+			}
 		}
 
 		if (talent == HEIGHTENED_SENSES || talent == FARSIGHT || talent == DIVINE_SENSE || talent == FIELD_SURVEILLANCE || talent == YESOD_FARSIGHT){
@@ -697,6 +702,32 @@ public enum Talent {
 		if (talent == SPIRIT_FORM){
 			Dungeon.hero.updateHT(false);
 		}
+	}
+
+	//scroll of memory extraction: every talent goes back to 0 points, so all points can be spent again
+	public static int resetTalents( Hero hero ){
+		//document review only hands out its free identifications once per point
+		int review = hero.pointsInTalent(DOCUMENT_REVIEW);
+		YesodTrackers.DocumentReviewGranted granted = Buff.affect(hero, YesodTrackers.DocumentReviewGranted.class);
+		if (review > granted.count()){
+			granted.countUp(review - granted.count());
+		}
+
+		int refunded = 0;
+		for (LinkedHashMap<Talent, Integer> tier : hero.talents){
+			for (Talent t : tier.keySet()){
+				refunded += tier.get(t);
+				tier.put(t, 0);
+			}
+		}
+
+		//effects that were applied when the talents were taken
+		hero.updateHT(false);
+		ConcentratedEnkephalin.clampCharges(hero);
+		Dungeon.observe();
+		BuffIndicator.refreshHero();
+		Item.updateQuickslot();
+		return refunded;
 	}
 
 	public static class CachedRationsDropped extends CounterBuff{{revivePersists = true;}};

@@ -37,6 +37,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.TalentButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.TalentsPane;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.IconTitle;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.watabou.noosa.audio.Sample;
@@ -55,17 +56,44 @@ public class ScrollOfMetamorphosis extends ExoticScroll {
 	}
 
 	protected static boolean identifiedByUse = false;
-	
+
+	//Sefirot: the scroll of memory extraction resets every talent and refunds the points.
+	//The metamorphosis windows below are kept for the cursed wand's metamorph effect.
 	@Override
 	public void doRead() {
 		if (!isKnown()) {
-			identify();
-			curItem = detach(curUser.belongings.backpack);
-			identifiedByUse = true;
-		} else {
-			identifiedByUse = false;
+			extract();
+			return;
 		}
-		GameScene.show(new WndMetamorphChoose());
+		GameScene.show(new WndOptions(new ItemSprite(this),
+				Messages.titleCase(name()),
+				Messages.get(ScrollOfMetamorphosis.class, "confirm"),
+				Messages.get(ScrollOfMetamorphosis.class, "confirm_yes"),
+				Messages.get(ScrollOfMetamorphosis.class, "confirm_no")) {
+			@Override
+			protected void onSelect(int index) {
+				if (index == 0) {
+					extract();
+				}
+			}
+		});
+	}
+
+	private void extract(){
+		detach(curUser.belongings.backpack);
+		identify();
+
+		int refunded = Talent.resetTalents(curUser);
+
+		curUser.sprite.emitter().start(Speck.factory(Speck.CHANGE), 0.2f, 10);
+		Sample.INSTANCE.play(Assets.Sounds.READ);
+		if (refunded > 0) {
+			GLog.p(Messages.get(ScrollOfMetamorphosis.class, "extracted", refunded));
+		} else {
+			GLog.i(Messages.get(ScrollOfMetamorphosis.class, "nothing"));
+		}
+
+		readAnimation();
 	}
 
 	public static void onMetamorph( Talent oldTalent, Talent newTalent ){
