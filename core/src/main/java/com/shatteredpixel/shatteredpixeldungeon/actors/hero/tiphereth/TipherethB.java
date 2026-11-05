@@ -20,56 +20,79 @@
  */
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth;
 
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.PrismaticGuard;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.MirrorImage;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.PrismaticImage;
+import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation;
+import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.TipherethBSprite;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
 import java.util.ArrayList;
 
-//Tiphereth B, called by the HQ sephirah's prisma scroll of mirror image. A mirror image that stays in sight:
-//she has 1.5x Tiphereth's max health, takes part of the health damage Tiphereth takes, and comes back to her side
-//whenever she ends up 3 or more tiles away.
-public class TipherethB extends MirrorImage {
+//Tiphereth B: the HQ sephirah's scroll of prismatic image calls her instead of a prismatic image.
+//She is a prismatic image with 1.5x the health that doesn't hide away between fights: she takes part of the
+//health damage Tiphereth takes, slowly recovers like a prismatic guard, comes back to Tiphereth's side from
+//3 or more tiles away and follows her between floors. Like a prismatic image she fades for a few turns when she
+//falls, and another scroll of prismatic image brings her back to full health.
+public class TipherethB extends PrismaticImage {
 
 	public static final float BASE_HEALTH = 1.5f;
 	public static final int RETURN_DISTANCE = 3;
+	//the same pace a prismatic guard heals at
+	public static final float REGEN = 0.1f;
 
 	{
 		spriteClass = TipherethBSprite.class;
-		intelligentAlly = true;
+		//she stays out instead of hiding away when no enemy is in sight
+		WANDERING = new Stay();
 	}
 
+	//plain wandering, without the prismatic image's return into the guard
+	private class Stay extends Mob.Wandering {}
+
 	private int ownerID = -1;
+	private float partialRegen = 0;
 
 	public Hero owner(){
 		Actor a = Actor.findById(ownerID);
 		return a instanceof Hero ? (Hero) a : null;
 	}
 
-	//the Tiphereth B on this floor, if she is alive
+	//the Tiphereth B on this floor that can take damage
 	public static TipherethB get(){
+		TipherethB b = find();
+		return b != null && b.isAlive() ? b : null;
+	}
+
+	//the Tiphereth B on this floor, also while she is fading after falling
+	public static TipherethB find(){
 		if (Dungeon.level == null) return null;
 		for (Mob m : Dungeon.level.mobs){
-			if (m instanceof TipherethB && m.isAlive()) return (TipherethB) m;
+			if (m instanceof TipherethB && m.isActive()) return (TipherethB) m;
 		}
 		return null;
 	}
 
-	//precious one: +40/70/100% health
+	//1.5x a prismatic image's health, precious one adds +40/70/100%
 	public static int maxHealth( Hero hero ){
 		float mult = BASE_HEALTH;
 		if (hero.hasTalent(Talent.PRECIOUS_ONE)) mult *= 1.1f + 0.3f*hero.pointsInTalent(Talent.PRECIOUS_ONE);
-		return Math.max(1, Math.round(hero.HT * mult));
+		return Math.max(1, Math.round(PrismaticGuard.maxHP(hero) * mult));
 	}
 
 	//the share of Tiphereth's health damage she takes: 50%, value disposal 60/70/80%
@@ -77,24 +100,56 @@ public class TipherethB extends MirrorImage {
 		return 0.5f + 0.1f*hero.pointsInTalent(Talent.VALUE_DISPOSAL);
 	}
 
+	//the HQ sephirah reading a scroll of prismatic image: Tiphereth B comes to her side, or is healed if she is here
+	public static void call( Hero hero ){
+		TipherethB b = find();
+		if (b != null){
+			b.HP = b.HT;
+			b.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(b.HT), FloatingText.HEALING);
+			return;
+		}
+		ArrayList<Integer> cells = new ArrayList<>();
+		for (int n : PathFinder.NEIGHBOURS8){
+			int c = hero.pos + n;
+			if (Dungeon.level.passable[c] && Actor.findChar(c) == null) cells.add(c);
+		}
+		if (cells.isEmpty()){
+			GLog.w(Messages.get(TipherethB.class, "no_space"));
+			return;
+		}
+		b = new TipherethB();
+		int max = maxHealth(hero);
+		b.duplicate(hero, max);
+		GameScene.add(b);
+		ScrollOfTeleportation.appear(b, Random.element(cells));
+		b.sprite.emitter().burst(Speck.factory(Speck.LIGHT), 8);
+		GLog.p(Messages.get(TipherethB.class, "called"));
+	}
+
 	@Override
-	public void duplicate( Hero hero ) {
-		super.duplicate(hero);
+	public void duplicate( Hero hero, int HP ) {
+		super.duplicate(hero, HP);
 		ownerID = hero.id();
-		//she fights in the open, unlike a mirror image
-		Buff.detach(this, MirrorInvis.class);
-		HT = HP = maxHealth(hero);
+		HT = maxHealth(hero);
+		this.HP = Math.min(HP, HT);
 	}
 
 	@Override
 	protected boolean act() {
 		Hero hero = owner();
-		if (hero != null){
-			//keeps up with Tiphereth's max health, at the same fraction
+		if (hero != null && isAlive()){
+			//keeps up with her max health as Tiphereth grows, at the same fraction
 			int newHT = maxHealth(hero);
 			if (newHT != HT){
 				HP = Math.max(1, Math.round(HP * newHT / (float) HT));
 				HT = newHT;
+			}
+			if (HP < HT && Regeneration.regenOn()){
+				partialRegen += REGEN;
+				if (partialRegen >= 1){
+					HP = Math.min(HT, HP + 1);
+					partialRegen -= 1;
+				}
 			}
 			armTier = hero.tier();
 			if (Dungeon.level.distance(pos, hero.pos) >= RETURN_DISTANCE) returnTo(hero);
@@ -108,14 +163,13 @@ public class TipherethB extends MirrorImage {
 			int c = hero.pos + n;
 			if (Dungeon.level.passable[c] && Actor.findChar(c) == null) cells.add(c);
 		}
-		if (!cells.isEmpty()) ScrollOfTeleportation.appear(this, Random.element(cells));
+		if (!cells.isEmpty()){
+			ScrollOfTeleportation.appear(this, Random.element(cells));
+			Sample.INSTANCE.play(Assets.Sounds.TELEPORT, 0.5f);
+		}
 	}
 
-	@Override
-	public int drRoll() {
-		return super.drRoll() + TipherethTrackers.physicalShield(this);
-	}
-
+	//her armor is Tiphereth's own roll, physical interference shield included
 	@Override
 	public void damage( int dmg, Object src ) {
 		super.damage(TipherethTrackers.traumaShield(this, dmg, src), src);
@@ -127,16 +181,19 @@ public class TipherethB extends MirrorImage {
 	}
 
 	private static final String OWNER = "owner";
+	private static final String PARTIAL = "partial_regen";
 
 	@Override
 	public void storeInBundle( Bundle bundle ) {
 		super.storeInBundle(bundle);
 		bundle.put(OWNER, ownerID);
+		bundle.put(PARTIAL, partialRegen);
 	}
 
 	@Override
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle(bundle);
 		ownerID = bundle.getInt(OWNER);
+		partialRegen = bundle.getFloat(PARTIAL);
 	}
 }

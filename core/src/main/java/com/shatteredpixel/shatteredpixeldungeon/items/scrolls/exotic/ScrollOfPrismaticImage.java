@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.scrolls.exotic;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethB;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -43,6 +45,16 @@ public class ScrollOfPrismaticImage extends ExoticScroll {
 	public void doRead() {
 
 		detach(curUser.belongings.backpack);
+
+		//Tiphereth's HQ sephirah calls Tiphereth B instead of a prismatic image
+		if (curUser.subClass == HeroSubClass.HQ_SEPHIRAH){
+			TipherethB.call(curUser);
+			identify();
+			Sample.INSTANCE.play( Assets.Sounds.READ );
+			readAnimation();
+			return;
+		}
+
 		boolean found = false;
 		for (Mob m : Dungeon.level.mobs.toArray(new Mob[0])){
 			if (m instanceof PrismaticImage){

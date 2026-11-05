@@ -25,7 +25,7 @@ import com.watabou.noosa.Image;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfForce;
-import com.shatteredpixel.shatteredpixeldungeon.items.PrismaMirrorScroll;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.exotic.ScrollOfPrismaticImage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Hunger;
@@ -177,10 +177,11 @@ public class TipherethTrackers {
 				|| src instanceof ShockingTrap || src instanceof StormTrap;
 	}
 
-	//the HQ sephirah gets her prisma scroll of mirror image as soon as she takes the subclass
+	//the HQ sephirah gets a scroll of prismatic image as soon as she takes the subclass
 	public static void onSubclassChosen( Hero hero ){
 		if (hero.subClass == HeroSubClass.HQ_SEPHIRAH){
-			PrismaMirrorScroll scroll = new PrismaMirrorScroll();
+			ScrollOfPrismaticImage scroll = new ScrollOfPrismaticImage();
+			scroll.identify();
 			if (!scroll.collect()) Dungeon.level.drop(scroll, hero.pos).sprite.drop();
 		}
 	}
