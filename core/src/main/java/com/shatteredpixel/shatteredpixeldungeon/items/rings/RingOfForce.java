@@ -90,10 +90,10 @@ public class RingOfForce extends Ring {
 		if (hero.buff(MonkEnergy.MonkAbility.UnarmedAbilityTracker.class) != null){
 			usingForce = false;
 		}
-		//the worn ribbon: its level, on top of a ring of force if there is one
+		//the worn ribbon punches like a ring of force of its level, a worn ring of force doesn't stack, the higher counts
 		TipherethRibbon ribbon = TipherethRibbon.worn(hero);
 		if (ribbon != null && hero.buff(MonkEnergy.MonkAbility.UnarmedAbilityTracker.class) == null){
-			int level = Math.max(0, ribbon.buffedLvl()) + (usingForce ? getBuffedBonus(hero, Force.class) : 0);
+			int level = Math.max(Math.max(0, ribbon.buffedLvl()), usingForce ? getBuffedBonus(hero, Force.class) : 0);
 			float tier = tier(hero.STR());
 			return Hero.heroDamageIntRange(min(level, tier), max(level, tier));
 		}

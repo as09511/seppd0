@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
@@ -51,12 +52,14 @@ import com.watabou.utils.PathFinder;
 import com.watabou.utils.PointF;
 import com.watabou.utils.Random;
 
-//Tiphereth's second armor ability: a golden circle opens in front of her and in front of the chosen enemy,
-//she steps through it to the enemy's side, strikes for 5-15 RED damage and gains 5 stacks of the golden road
+//Tiphereth's second armor ability: she opens the golden road (a golden circle in front of her and of the chosen enemy),
+//steps through it to the enemy's side, strikes for 5-15 RED damage and gains 5 stacks of the golden road for 5 turns
 public class GoldRushDash extends ArmorAbility {
 
 	public static final int BASE_RANGE = 4;
 	public static final int STACKS = 5;
+	public static final int ROAD_TURNS = 5;
+	public static final float CHAIN_TURNS = 3f;
 
 	{
 		baseChargeUse = 25f;
@@ -72,14 +75,31 @@ public class GoldRushDash extends ArmorAbility {
 		return BASE_RANGE + hero.pointsInTalent(Talent.GOLDEN_DASH);
 	}
 
-	//golden strike: +25% damage per point
 	public static int damageRoll( Hero hero ){
-		return Math.round(Random.NormalIntRange(5, 15) * (1f + 0.25f*hero.pointsInTalent(Talent.GOLDEN_STRIKE)));
+		return Random.NormalIntRange(5, 15);
+	}
+
+	//golden chain: used again within 3 turns, it costs 20/30/40/50% less charge
+	@Override
+	public float chargeUse( Hero hero ) {
+		float use = super.chargeUse(hero);
+		int pts = hero.pointsInTalent(Talent.GOLDEN_STRIKE);
+		if (pts > 0 && hero.buff(Chain.class) != null){
+			use *= 1f - (0.1f + 0.1f*pts);
+		}
+		return use;
 	}
 
 	//endless road: the golden road lasts 1 more turn per point
 	public static int roadTurns( Hero hero ){
-		return GoldRush.GoldenRoad.DURATION + hero.pointsInTalent(Talent.ENDLESS_ROAD);
+		return ROAD_TURNS + hero.pointsInTalent(Talent.ENDLESS_ROAD);
+	}
+
+	//the window in which golden chain makes the next gold rush cheaper
+	public static class Chain extends FlavourBuff {
+		{
+			type = buffType.POSITIVE;
+		}
 	}
 
 	@Override
@@ -119,6 +139,9 @@ public class GoldRushDash extends ArmorAbility {
 
 		armor.charge -= chargeUse(hero);
 		Item.updateQuickslot();
+		if (hero.hasTalent(Talent.GOLDEN_STRIKE)){
+			Buff.prolong(hero, Chain.class, CHAIN_TURNS);
+		}
 
 		//golden circles in front of Tiphereth and in front of the enemy
 		circle(hero.pos, target);

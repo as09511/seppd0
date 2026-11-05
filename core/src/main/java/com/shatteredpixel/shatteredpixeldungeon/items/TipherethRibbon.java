@@ -47,13 +47,13 @@ import java.util.ArrayList;
 //carries up to 1 upgrade between weapons and gives the weapon it is tied to +1 melee damage.
 //With the maintenance talent it carries the weapon's enchantment too.
 //The natural science floor librarian can wear it as her weapon instead: her attacks count as unarmed and deal RED damage
-//rolled like a ring of force of the ribbon's level, and it raises strength like a ring of might (the two don't stack).
+//rolled like a ring of force of the ribbon's level (a worn ring of force doesn't stack, the higher counts).
+//Its strength requirement starts at 10 and goes down with upgrades like any weapon's.
 public class TipherethRibbon extends MeleeWeapon {
 
 	public static final String AC_AFFIX = "AFFIX";
 
 	public static final int DAMAGE_BONUS = 1;
-	public static final int STR_REQ = 10;
 
 	{
 		image = ItemSpriteSheet.TIPHERETH_RIBBON;
@@ -94,21 +94,16 @@ public class TipherethRibbon extends MeleeWeapon {
 		return hero == null ? 0 : hero.pointsInTalent(Talent.PROOF_OF_COMPETENCE);
 	}
 
-	//the ribbon's level as a worn weapon, the same as a ring of might of that level
-	public static int mightBonus( Char ch ){
-		TipherethRibbon r = worn(ch);
-		return r == null ? 0 : Math.max(0, r.buffedLvl());
-	}
-
 	@Override
 	public int buffedLvl() {
 		//the ribbon's own level only counts while it is worn, its bonus on a tied weapon is applied there
 		return super.buffedLvl() + (isEquipped(Dungeon.hero) ? competence(Dungeon.hero) : 0);
 	}
 
+	//10 at tier 1, lowered by upgrades and the potion of mastery like any weapon, raised by proof of competence
 	@Override
 	public int STRReq( int lvl ) {
-		return STR_REQ + competence(Dungeon.hero);
+		return super.STRReq(lvl) + competence(Dungeon.hero);
 	}
 
 	//the punches are rolled like a ring of force of the ribbon's level
@@ -133,20 +128,7 @@ public class TipherethRibbon extends MeleeWeapon {
 	@Override
 	public boolean doEquip( Hero hero ) {
 		if (!wearable(hero)) return false;
-		if (super.doEquip(hero)){
-			hero.updateHT(false);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean doUnequip( Hero hero, boolean collect, boolean single ) {
-		if (super.doUnequip(hero, collect, single)){
-			hero.updateHT(false);
-			return true;
-		}
-		return false;
+		return super.doEquip(hero);
 	}
 
 	//maintenance: the ribbon carries the weapon's enchantment when it is moved

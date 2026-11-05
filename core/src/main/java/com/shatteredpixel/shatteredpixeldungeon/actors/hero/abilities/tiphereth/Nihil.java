@@ -24,6 +24,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vulnerable;
@@ -49,29 +50,23 @@ import com.watabou.utils.Random;
 
 import java.util.ArrayList;
 
-//Tiphereth's third armor ability: the area around her goes dark for a moment, every enemy in it takes 6-16 damage,
-//and if her weapon needs 10 strength or less they are also weakened, made vulnerable, rooted and paralysed for 4 turns
+//Tiphereth's third armor ability: the 7x7 area around her goes dark for a moment, every enemy in it takes 6-16 damage,
+//and if her weapon needs 10 strength or less they are also weakened, made vulnerable, rooted and paralysed for 4 turns.
+//Deep void gives it a 25% chance per point to strike again by itself 4 turns later
 public class Nihil extends ArmorAbility {
 
 	//a 7x7 square to begin with
 	public static final int BASE_RANGE = 3;
 	public static final int DEBUFF_TURNS = 4;
 	public static final int LIGHT_WEAPON_STR = 10;
+	public static final float ECHO_DELAY = 4f;
 
 	{
 		baseChargeUse = 30f;
 	}
 
-	//deep void: every 2 points widen the square by a tile on each side (9x9, 11x11),
-	//an odd point already reaches the next ring, all but its corners
 	public static boolean inArea( Hero hero, int cell ){
-		int pts = hero.pointsInTalent(Talent.DEEP_VOID);
-		int range = BASE_RANGE + pts/2;
-		int w = Dungeon.level.width();
-		int dx = Math.abs(cell % w - hero.pos % w);
-		int dy = Math.abs(cell / w - hero.pos / w);
-		if (dx <= range && dy <= range) return true;
-		return pts % 2 == 1 && dx <= range+1 && dy <= range+1 && !(dx == range+1 && dy == range+1);
+		return Dungeon.level.distance(hero.pos, cell) <= BASE_RANGE;
 	}
 
 	//deception: +50% damage per point
@@ -96,6 +91,19 @@ public class Nihil extends ArmorAbility {
 		armor.charge -= chargeUse(hero);
 		Item.updateQuickslot();
 
+		blast(hero);
+
+		//deep void: 25% per point to strike again 4 turns later
+		if (Random.Float() < 0.25f*hero.pointsInTalent(Talent.DEEP_VOID)){
+			Buff.append(hero, Echo.class, ECHO_DELAY);
+		}
+
+		hero.sprite.operate(hero.pos);
+		hero.spendAndNext(1f);
+	}
+
+	//the blackout and its blow, around wherever Tiphereth stands
+	public static void blast( Hero hero ){
 		boolean light = lightWeapon(hero);
 
 		//the area blacks out for a moment
@@ -134,9 +142,23 @@ public class Nihil extends ArmorAbility {
 				Buff.prolong(ch, Paralysis.class, turns);
 			}
 		}
+	}
 
-		hero.sprite.operate(hero.pos);
-		hero.spendAndNext(1f);
+	//deep void's second blow, it comes by itself and doesn't take Tiphereth's turn
+	public static class Echo extends FlavourBuff {
+
+		{
+			type = buffType.POSITIVE;
+		}
+
+		@Override
+		public boolean act() {
+			if (target instanceof Hero && target.isAlive()){
+				blast((Hero) target);
+			}
+			detach();
+			return true;
+		}
 	}
 
 	@Override

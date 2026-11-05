@@ -108,7 +108,7 @@ public class GoldRush extends EgoWeapon {
 
 		public void hit(){
 			stacks = Math.min(MAX_STACKS, stacks + 1);
-			left = DURATION;
+			left = Math.max(left, DURATION);
 			BuffIndicator.refreshHero();
 		}
 
@@ -127,8 +127,17 @@ public class GoldRush extends EgoWeapon {
 			return ARMOR*stacks;
 		}
 
+		//a new road acts on the turn it was gained, it only starts counting down from the next turn,
+		//so it lasts as many turns as it says
+		private boolean fresh = true;
+
 		@Override
 		public boolean act() {
+			if (fresh){
+				fresh = false;
+				spend(TICK);
+				return true;
+			}
 			left--;
 			if (left <= 0){
 				detach();
@@ -176,6 +185,7 @@ public class GoldRush extends EgoWeapon {
 		@Override
 		public void restoreFromBundle(Bundle bundle) {
 			super.restoreFromBundle(bundle);
+			fresh = false;
 			stacks = bundle.getInt(STACKS);
 			left = bundle.getInt(LEFT);
 		}
