@@ -142,15 +142,13 @@ public enum HeroClass {
 	//Tiphereth, the Central Command Team's sephirah
 	TIPHERETH( HeroSubClass.HQ_SEPHIRAH, HeroSubClass.SCIENCE_LIBRARIAN ),
 
-	//testing class, uses the warrior's sprite, talents and subclasses
-	TESTER( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
-
-	//testing class: starts the run as a level 30 Netzach with Tengu's mask and the dwarf king's crown
-	TEST_NETZACH( HeroSubClass.SAFETY_SEPHIRAH, HeroSubClass.ART_LIBRARIAN );
+	//testing classes: start the run at level 30 with Tengu's mask, the dwarf king's crown and the testing tools
+	TEST_NETZACH( HeroSubClass.SAFETY_SEPHIRAH, HeroSubClass.ART_LIBRARIAN ),
+	TEST_TIPHERETH( HeroSubClass.HQ_SEPHIRAH, HeroSubClass.SCIENCE_LIBRARIAN );
 
 	//debugging tools: only debug builds can show or start them
 	public boolean isDebugOnly(){
-		return this == TESTER || this == TEST_NETZACH;
+		return this == TEST_NETZACH || this == TEST_TIPHERETH;
 	}
 
 	//Shattered's original six heroes can no longer be started. Their code and data stay, so old saves, rankings,
@@ -171,7 +169,11 @@ public enum HeroClass {
 
 	//the class the hero actually plays as
 	public HeroClass playedClass(){
-		return this == TEST_NETZACH ? NETZACH : this;
+		switch (this){
+			case TEST_NETZACH:   return NETZACH;
+			case TEST_TIPHERETH: return TIPHERETH;
+			default:             return this;
+		}
 	}
 
 	private HeroSubClass[] subClasses;
@@ -246,15 +248,16 @@ public enum HeroClass {
 
 			case TEST_NETZACH:
 				initNetzach( hero );
-				initTestNetzach( hero );
+				initTestHero( hero );
 				break;
 
 			case TIPHERETH:
 				initTiphereth( hero );
 				break;
 
-			case TESTER:
-				initTester( hero );
+			case TEST_TIPHERETH:
+				initTiphereth( hero );
+				initTestHero( hero );
 				break;
 		}
 
@@ -344,17 +347,15 @@ public enum HeroClass {
 		new PotionOfLevitation().identify();
 	}
 
-	//level 30 right away, with both the subclass and the armor ability items ready to use
-	private static void initTestNetzach( Hero hero ) {
+	//level 30 right away, with both the subclass and the armor ability items ready to use, and the testing tools
+	private static void initTestHero( Hero hero ) {
 		hero.lvl = 30;
 		hero.exp = 0;
 		hero.updateHT(true);
 		hero.HP = hero.HT;
 		new TengusMask().collect();
 		new KingsCrown().collect();
-	}
 
-	private static void initTester( Hero hero ) {
 		new ScrollHolder().collect();
 		Dungeon.LimitedDrops.SCROLL_HOLDER.drop();
 		new PotionBandolier().collect();
@@ -371,20 +372,21 @@ public enum HeroClass {
 		toolkit.upgrade(10);
 		toolkit.identify().collect();
 		Dungeon.energy += 100;
-		new ScrollOfUpgrade().quantity(10).identify().collect();
+		new ScrollOfUpgrade().quantity(15).identify().collect();
 		new Dart().quantity(1).identify().collect();
 
+		//the class's own starting item keeps the first quickslot
 		EgoExtractor extractor = new EgoExtractor();
 		extractor.collect();
-		Dungeon.quickslot.setSlot(0, extractor);
+		Dungeon.quickslot.setSlot(1, extractor);
 
 		DummySummoner summoner = new DummySummoner();
 		summoner.collect();
-		Dungeon.quickslot.setSlot(1, summoner);
+		Dungeon.quickslot.setSlot(2, summoner);
 
 		LCorpHQGate gate = new LCorpHQGate();
 		gate.collect();
-		Dungeon.quickslot.setSlot(2, gate);
+		Dungeon.quickslot.setSlot(3, gate);
 	}
 
 	public Badges.Badge masteryBadge() {
@@ -534,7 +536,7 @@ public enum HeroClass {
 	}
 
 	public String spritesheet() {
-		switch (this) {
+		switch (playedClass()) {
 			case WARRIOR: default:
 				return Assets.Sprites.WARRIOR;
 			case MAGE:
@@ -554,7 +556,6 @@ public enum HeroClass {
 			case HOD:
 				return Assets.Sprites.HOD;
 			case NETZACH:
-			case TEST_NETZACH:
 				return Assets.Sprites.NETZACH;
 			case TIPHERETH:
 				return Assets.Sprites.TIPHERETH;
@@ -562,7 +563,7 @@ public enum HeroClass {
 	}
 
 	public String splashArt(){
-		switch (this) {
+		switch (playedClass()) {
 			case WARRIOR: default:
 				return Assets.Splashes.WARRIOR;
 			case MAGE:
@@ -582,7 +583,6 @@ public enum HeroClass {
 			case HOD:
 				return Assets.Splashes.HOD;
 			case NETZACH:
-			case TEST_NETZACH:
 				return Assets.Splashes.NETZACH;
 			case TIPHERETH:
 				return Assets.Splashes.TIPHERETH;
@@ -606,8 +606,8 @@ public enum HeroClass {
 				return Badges.isUnlocked(Badges.Badge.UNLOCK_DUELIST);
 			case CLERIC:
 				return Badges.isUnlocked(Badges.Badge.UNLOCK_CLERIC);
-			case TESTER:
 			case TEST_NETZACH:
+			case TEST_TIPHERETH:
 				//testing classes are debugging tools, only debug builds can use them
 				return false;
 		}

@@ -25,7 +25,6 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.InterlevelScene;
@@ -40,7 +39,6 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.shatteredpixel.shatteredpixeldungeon.utils.DungeonSeed;
 import com.watabou.noosa.Game;
 
-import com.watabou.utils.DeviceCompat;
 
 import java.util.Locale;
 
@@ -155,10 +153,6 @@ public class WndGameInProgress extends Window {
 		cont.icon(Icons.get(Icons.ENTER));
 		cont.setRect(0, pos, WIDTH/2 -1, 20);
 		add(cont);
-		//the tester is a debugging tool: release builds can only erase its runs
-		if (info.heroClass == HeroClass.TESTER && !DeviceCompat.isDebug()){
-			cont.enable(false);
-		}
 
 		erase.icon(Icons.get(Icons.CLOSE));
 		erase.setRect(WIDTH/2 + 1, pos, WIDTH/2 - 1, 20);

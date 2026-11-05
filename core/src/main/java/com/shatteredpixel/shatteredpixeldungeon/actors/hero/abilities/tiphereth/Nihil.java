@@ -53,8 +53,8 @@ import java.util.ArrayList;
 //and if her weapon needs 10 strength or less they are also weakened, made vulnerable, rooted and paralysed for 4 turns
 public class Nihil extends ArmorAbility {
 
-	//a 5x5 square to begin with, measured as a circle so every point of deep void widens it
-	public static final float BASE_RADIUS = 2.9f;
+	//a 7x7 square to begin with
+	public static final int BASE_RANGE = 3;
 	public static final int DEBUFF_TURNS = 4;
 	public static final int LIGHT_WEAPON_STR = 10;
 
@@ -62,9 +62,16 @@ public class Nihil extends ArmorAbility {
 		baseChargeUse = 30f;
 	}
 
-	//deep void: +0.5 radius per point
-	public static float radius( Hero hero ){
-		return BASE_RADIUS + 0.5f*hero.pointsInTalent(Talent.DEEP_VOID);
+	//deep void: every 2 points widen the square by a tile on each side (9x9, 11x11),
+	//an odd point already reaches the next ring, all but its corners
+	public static boolean inArea( Hero hero, int cell ){
+		int pts = hero.pointsInTalent(Talent.DEEP_VOID);
+		int range = BASE_RANGE + pts/2;
+		int w = Dungeon.level.width();
+		int dx = Math.abs(cell % w - hero.pos % w);
+		int dy = Math.abs(cell / w - hero.pos / w);
+		if (dx <= range && dy <= range) return true;
+		return pts % 2 == 1 && dx <= range+1 && dy <= range+1 && !(dx == range+1 && dy == range+1);
 	}
 
 	//deception: +50% damage per point
@@ -77,7 +84,8 @@ public class Nihil extends ArmorAbility {
 		return DEBUFF_TURNS + hero.pointsInTalent(Talent.VOID_ECHO);
 	}
 
-	//her weapon needs 10 strength or less (fists and the worn ribbon count by their own requirement)
+	//her weapon finally needs 10 strength or less, after upgrades, the potion of mastery and proof of competence
+	//(fists and the worn ribbon count by their own requirement)
 	public static boolean lightWeapon( Hero hero ){
 		KindOfWeapon w = hero.belongings.weapon();
 		return w == null || (w instanceof Weapon && ((Weapon) w).STRReq() <= LIGHT_WEAPON_STR);
@@ -88,12 +96,11 @@ public class Nihil extends ArmorAbility {
 		armor.charge -= chargeUse(hero);
 		Item.updateQuickslot();
 
-		float r = radius(hero);
 		boolean light = lightWeapon(hero);
 
 		//the area blacks out for a moment
 		for (int cell = 0; cell < Dungeon.level.length(); cell++){
-			if (Dungeon.level.trueDistance(hero.pos, cell) <= r && Dungeon.level.heroFOV[cell]){
+			if (inArea(hero, cell) && Dungeon.level.heroFOV[cell]){
 				ColorBlock dark = new ColorBlock(DungeonTilemap.SIZE, DungeonTilemap.SIZE, 0xFF000000);
 				PointF p = DungeonTilemap.tileToWorld(cell);
 				dark.x = p.x;
@@ -113,7 +120,7 @@ public class Nihil extends ArmorAbility {
 
 		ArrayList<Char> targets = new ArrayList<>();
 		for (Mob m : Dungeon.level.mobs.toArray(new Mob[0])){
-			if (m.alignment == Char.Alignment.ENEMY && m.isAlive() && Dungeon.level.trueDistance(hero.pos, m.pos) <= r){
+			if (m.alignment == Char.Alignment.ENEMY && m.isAlive() && inArea(hero, m.pos)){
 				targets.add(m);
 			}
 		}

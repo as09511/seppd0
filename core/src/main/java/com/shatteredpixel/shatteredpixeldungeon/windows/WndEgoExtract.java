@@ -40,7 +40,7 @@ import com.watabou.utils.Reflection;
 
 import java.util.ArrayList;
 
-//E.G.O extraction, for Angela (every E.G.O but combined ones, priced in enkephalin boxes) or the tester's
+//E.G.O extraction, for Angela (every E.G.O but combined ones, priced in enkephalin boxes) or the testing
 //extractor (every E.G.O, free), grouped by risk level.
 //A risk level is chosen first, then its E.G.O are listed PAGE_SIZE to a page.
 //Picking one asks for confirmation before anything is spent.
@@ -53,7 +53,7 @@ public class WndEgoExtract extends Window {
 
 	private ScrollingListPane list;
 
-	//what the list is for: Angela's paid extraction, or the tester's free extractor
+	//what the list is for: Angela's paid extraction, or the testing heroes' free extractor
 	public interface Picker {
 		boolean includes( Item item );
 		String title();

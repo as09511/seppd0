@@ -378,7 +378,7 @@ public class Dungeon {
 					level = new DeadEndLevel();
 			}
 		} else if (branch == 2) {
-			//L Corp headquarters, only reachable with the tester's tool for now
+			//L Corp headquarters, only reachable with the testing tools for now
 			level = new LCorpHQLevel();
 		} else {
 			level = new DeadEndLevel();

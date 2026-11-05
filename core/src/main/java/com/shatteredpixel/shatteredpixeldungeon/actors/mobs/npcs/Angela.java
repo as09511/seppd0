@@ -87,7 +87,7 @@ public class Angela extends NPC {
 	}
 
 	//the ordeal she offers: the Dawn on floor 6, the Noon on floor 11, none on floor 16.
-	//One summoned by the Tester offers whichever of the two comes next.
+	//One summoned with the testing tools offers whichever of the two comes next.
 	public static final int NONE = 0;
 	public static final int DAWN = 1;
 	public static final int NOON = 2;
@@ -133,7 +133,7 @@ public class Angela extends NPC {
 			return super.interact(c);
 		}
 
-		//an Angela summoned by the Tester (or from an older save) picks her ordeal on the spot
+		//an Angela summoned with the testing tools (or from an older save) picks her ordeal on the spot
 		if (tier() == DAWN && Quest.type == 0){
 			Quest.spawned = true;
 			Quest.type = Random.Int(4) + 1;

@@ -240,7 +240,7 @@ public class ScrollOfMetamorphosis extends ExoticScroll {
 
 			for (HeroClass cls : HeroClass.values()){
 
-				//Sefirot: only the sephirot's talents are offered, not the retired heroes' or the testers'
+				//Sefirot: only the sephirot's talents are offered, not the retired heroes' or the testing classes'
 				if (cls.isRetired() || cls.isDebugOnly()) continue;
 
 				ArrayList<LinkedHashMap<Talent, Integer>> clsTalents = new ArrayList<>();

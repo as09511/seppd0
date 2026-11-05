@@ -461,7 +461,7 @@ public enum Icons {
 	}
 	
 	public static Image get( HeroClass cl ) {
-		switch (cl) {
+		switch (cl.playedClass()) {
 			case WARRIOR:
 				return new ItemSprite(ItemSpriteSheet.SEAL);
 			case MAGE:
@@ -486,12 +486,9 @@ public enum Icons {
 			case HOD:
 				return new ItemSprite(ItemSpriteSheet.HOD_MANUAL);
 			case NETZACH:
-			case TEST_NETZACH:
 				return new ItemSprite(ItemSpriteSheet.CONCENTRATED_ENKEPHALIN);
 			case TIPHERETH:
 				return new ItemSprite(ItemSpriteSheet.TIPHERETH_RIBBON);
-			case TESTER:
-				return new ItemSprite(ItemSpriteSheet.CRYSTAL_CHEST);
 			default:
 				return null;
 		}
