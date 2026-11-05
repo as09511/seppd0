@@ -48,7 +48,7 @@ import com.watabou.utils.Random;
 import java.util.ArrayList;
 
 //Noon of Violet: a monolith of glowing runes that falls from above. The whole room is marked for 5 turns,
-//then it lands, striking everything left in the room. It never moves, and its tentacles reach 2 tiles.
+//then it lands, striking everything left in the room (armor applies). It never moves, and its tentacles reach 2 tiles.
 public class GrantUsLove extends OrdealMob {
 
 	public static final int FALL_TURNS  = 5;
@@ -179,7 +179,8 @@ public class GrantUsLove extends OrdealMob {
 			//everyone still in the room is crushed
 			for (Char ch : Actor.chars().toArray(new Char[0])){
 				if (!ch.isAlive() || !area.contains(ch.pos)) continue;
-				int dmg = DamageType.apply(ch, DamageType.RED, FALL_DAMAGE);
+				//armor blocks part of the blow first, then the RED multiplier applies, like an attack
+				int dmg = DamageType.apply(ch, DamageType.RED, Math.max(0, FALL_DAMAGE - ch.drRoll()));
 				ch.damage(dmg, love);
 				if (ch == Dungeon.hero && !ch.isAlive()){
 					Dungeon.fail(love);
