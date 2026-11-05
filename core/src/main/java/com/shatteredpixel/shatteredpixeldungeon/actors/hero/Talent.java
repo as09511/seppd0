@@ -288,6 +288,12 @@ public enum Talent {
 	EROSION_SHIELD(191, 3), PRECIOUS_ONE(192, 3), VALUE_DISPOSAL(193, 3),
 	//Natural Science Floor Librarian T3
 	WARD(194, 3), INTEMPERANCE(195, 3), EMPTINESS(196, 3),
+	//Shield Barrage T4
+	LASTING_SHIELD(206, 4), SHIELD_OUTPUT(207, 4), SHIELD_SPREAD(208, 4),
+	//Gold Rush T4
+	GOLDEN_DASH(209, 4), GOLDEN_STRIKE(210, 4), ENDLESS_ROAD(211, 4),
+	//Nihil T4
+	DEEP_VOID(212, 4), DECEPTION(213, 4), VOID_ECHO(214, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one

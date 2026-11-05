@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.tiphereth.Nihil;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.tiphereth.GoldRushDash;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.tiphereth.ShieldBarrage;
 import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLevitation;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
@@ -525,6 +528,8 @@ public enum HeroClass {
 				return new ArmorAbility[]{new ManagerCall(), new BloodyDesire(), new RedEye()};
 			case NETZACH:
 				return new ArmorAbility[]{new NeutralizingGas(), new OurGalaxy(), new DaCapoMovement()};
+			case TIPHERETH:
+				return new ArmorAbility[]{new ShieldBarrage(), new GoldRushDash(), new Nihil()};
 		}
 	}
 

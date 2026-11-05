@@ -23,7 +23,8 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
@@ -44,28 +45,38 @@ import com.watabou.utils.Random;
 import java.util.ArrayList;
 
 //Tiphereth B: the HQ sephirah's scroll of prismatic image calls her instead of a prismatic image.
-//She is a prismatic image with 1.5x Tiphereth's max health that doesn't hide away between fights: she takes part of the
-//health damage Tiphereth takes, slowly recovers like a prismatic guard, comes back to Tiphereth's side from
-//3 or more tiles away and follows her between floors. Like a prismatic image she fades for a few turns when she
-//falls, and another scroll of prismatic image brings her back to full health.
+//She is a prismatic image with 1.5x Tiphereth's max health: she takes part of the health damage Tiphereth takes,
+//comes back to Tiphereth's side from more than 3 tiles away and follows her between floors. Like a prismatic image
+//she waits out of sight when no enemy is around (see TipherethGuard), fades for a few turns when she falls,
+//and another scroll of prismatic image brings her back to full health.
 public class TipherethB extends PrismaticImage {
 
 	public static final float BASE_HEALTH = 1.5f;
 	public static final int RETURN_DISTANCE = 3;
-	//the same pace a prismatic guard heals at
-	public static final float REGEN = 0.1f;
 
 	{
 		spriteClass = TipherethBSprite.class;
-		//she stays out instead of hiding away when no enemy is in sight
-		WANDERING = new Stay();
+		WANDERING = new Wait();
 	}
 
-	//plain wandering, without the prismatic image's return into the guard
-	private class Stay extends Mob.Wandering {}
+	//like a prismatic image, she steps back out of sight when no enemy is in view
+	private class Wait extends Mob.Wandering {
+		@Override
+		public boolean act( boolean enemyInFOV, boolean justAlerted ) {
+			Hero hero = owner();
+			if (!enemyInFOV && hero != null){
+				Buff.affect(hero, TipherethGuard.class).set(HP);
+				destroy();
+				CellEmitter.get(pos).start(Speck.factory(Speck.LIGHT), 0.2f, 3);
+				sprite.die();
+				Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
+				return true;
+			}
+			return super.act(enemyInFOV, justAlerted);
+		}
+	}
 
 	private int ownerID = -1;
-	private float partialRegen = 0;
 
 	public Hero owner(){
 		Actor a = Actor.findById(ownerID);
@@ -99,7 +110,8 @@ public class TipherethB extends PrismaticImage {
 		return 0.5f + 0.1f*hero.pointsInTalent(Talent.VALUE_DISPOSAL);
 	}
 
-	//the HQ sephirah reading a scroll of prismatic image: Tiphereth B comes to her side, or is healed if she is here
+	//the HQ sephirah reading a scroll of prismatic image, the same as the prismatic image: Tiphereth B is healed
+	//to full if she is here, otherwise she waits out of sight at full health until an enemy comes close
 	public static void call( Hero hero ){
 		TipherethB b = find();
 		if (b != null){
@@ -107,21 +119,7 @@ public class TipherethB extends PrismaticImage {
 			b.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(b.HT), FloatingText.HEALING);
 			return;
 		}
-		ArrayList<Integer> cells = new ArrayList<>();
-		for (int n : PathFinder.NEIGHBOURS8){
-			int c = hero.pos + n;
-			if (Dungeon.level.passable[c] && Actor.findChar(c) == null) cells.add(c);
-		}
-		if (cells.isEmpty()){
-			GLog.w(Messages.get(TipherethB.class, "no_space"));
-			return;
-		}
-		b = new TipherethB();
-		int max = maxHealth(hero);
-		b.duplicate(hero, max);
-		GameScene.add(b);
-		ScrollOfTeleportation.appear(b, Random.element(cells));
-		b.sprite.emitter().burst(Speck.factory(Speck.LIGHT), 8);
+		Buff.affect(hero, TipherethGuard.class).heal();
 		GLog.p(Messages.get(TipherethB.class, "called"));
 	}
 
@@ -143,15 +141,8 @@ public class TipherethB extends PrismaticImage {
 				HP = Math.max(1, Math.round(HP * newHT / (float) HT));
 				HT = newHT;
 			}
-			if (HP < HT && Regeneration.regenOn()){
-				partialRegen += REGEN;
-				if (partialRegen >= 1){
-					HP = Math.min(HT, HP + 1);
-					partialRegen -= 1;
-				}
-			}
 			armTier = hero.tier();
-			if (Dungeon.level.distance(pos, hero.pos) >= RETURN_DISTANCE) returnTo(hero);
+			if (Dungeon.level.distance(pos, hero.pos) > RETURN_DISTANCE) returnTo(hero);
 		}
 		return super.act();
 	}
@@ -180,19 +171,16 @@ public class TipherethB extends PrismaticImage {
 	}
 
 	private static final String OWNER = "owner";
-	private static final String PARTIAL = "partial_regen";
 
 	@Override
 	public void storeInBundle( Bundle bundle ) {
 		super.storeInBundle(bundle);
 		bundle.put(OWNER, ownerID);
-		bundle.put(PARTIAL, partialRegen);
 	}
 
 	@Override
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle(bundle);
 		ownerID = bundle.getInt(OWNER);
-		partialRegen = bundle.getFloat(PARTIAL);
 	}
 }

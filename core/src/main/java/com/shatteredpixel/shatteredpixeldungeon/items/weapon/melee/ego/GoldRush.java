@@ -112,6 +112,13 @@ public class GoldRush extends EgoWeapon {
 			BuffIndicator.refreshHero();
 		}
 
+		//Tiphereth's gold rush: several stacks at once, for at least the given number of turns
+		public void surge( int amount, int turns ){
+			stacks = Math.min(MAX_STACKS, stacks + amount);
+			left = Math.max(left, turns);
+			BuffIndicator.refreshHero();
+		}
+
 		public int damageBonus(){
 			return DAMAGE*stacks;
 		}
@@ -143,7 +150,7 @@ public class GoldRush extends EgoWeapon {
 
 		@Override
 		public float iconFadePercent() {
-			return Math.max(0, (DURATION - left) / (float)DURATION);
+			return Math.max(0, (DURATION - left) / (float)Math.max(DURATION, left));
 		}
 
 		@Override
