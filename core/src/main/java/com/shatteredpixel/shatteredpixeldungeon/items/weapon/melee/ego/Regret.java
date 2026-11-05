@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -68,7 +69,7 @@ public class Regret extends EgoWeapon {
 				}
 			}
 			for (Char ch : targets){
-				int splash = Math.max(0, attacker.damageRoll() - ch.drRoll());
+				int splash = Math.max(0, HodTrackers.boostDirectDamage(attacker, ch, attacker.damageRoll()) - ch.drRoll());
 				splash = DamageType.apply(ch, damageType, splash) / 2;
 				if (splash > 0) {
 					ch.damage(splash, attacker);

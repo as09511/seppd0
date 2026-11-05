@@ -22,6 +22,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -125,7 +126,7 @@ public class RedEyesPenitence extends EgoWeapon implements CombinedEgo {
 		float ratio = smashing ? SMASH_RATIO : RATIO;
 
 		//the Penitence half: a separate WHITE hit, rolled with its own damage, armor and multiplier like Solemn Lament
-		int white = Math.round(damageRoll(attacker) * (smashing ? SMASH_DAMAGE : 1f));
+		int white = Math.round(HodTrackers.boostDirectDamage(attacker, defender, damageRoll(attacker)) * (smashing ? SMASH_DAMAGE : 1f));
 		white = Math.max(0, white - defender.drRoll());
 		white = DamageType.apply(defender, DamageType.WHITE, white);
 		if (white > 0 && defender.isAlive()){

@@ -75,9 +75,16 @@ public class HodTrackers {
 
 	//training results: +0.5/1/1.5% melee damage per stack
 	//literature floor librarian: +20% damage against rooted enemies
+	//weapon damage dealt straight to a target without an attack (splash, extra hits, beams):
+	// Hod's attack bonuses apply to it the same way, once
+	public static int boostDirectDamage( Char attacker, Char target, int dmg ){
+		if (!(attacker instanceof Hero) || ((Hero) attacker).heroClass != HeroClass.HOD || dmg <= 0) return dmg;
+		return Math.round(dmg * attackMultiplier((Hero) attacker, target));
+	}
+
 	public static float attackMultiplier( Hero hero, Char enemy ){
 		float mult = 1f;
-		if (hero.hasTalent(Talent.TRAINING_RESULT) && !(hero.belongings.attackingWeapon() instanceof MissileWeapon)){
+		if (hero.hasTalent(Talent.TRAINING_RESULT)){
 			mult *= 1f + HodManual.stacks(hero) * 0.005f * hero.pointsInTalent(Talent.TRAINING_RESULT);
 		}
 		if (hero.subClass == HeroSubClass.LITERATURE_LIBRARIAN && enemy != null && enemy.buff(Roots.class) != null){

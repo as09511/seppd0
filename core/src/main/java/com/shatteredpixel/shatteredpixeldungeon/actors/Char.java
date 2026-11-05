@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Prediction;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Analyzed;
@@ -447,7 +448,10 @@ public abstract class Char extends Actor {
 					Buff.affect(Dungeon.hero, Talent.BountyHunterTracker.class, 0.0f);
 				}
 			} else {
+				//Tiphereth's expectation counts real attacks only, so splash rolls don't advance it
+				Hero.maxDamageRoll = this instanceof Hero && TipherethTrackers.expectationHit((Hero) this);
 				dmg = damageRoll();
+				Hero.maxDamageRoll = false;
 			}
 
 			dmg = dmg*dmgMulti;

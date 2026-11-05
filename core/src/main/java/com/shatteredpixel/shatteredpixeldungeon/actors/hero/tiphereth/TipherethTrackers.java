@@ -20,6 +20,10 @@
  */
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth;
 
+import java.util.Collections;
+import java.util.HashSet;
+import com.watabou.utils.Bundle;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Electricity;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Fire;
@@ -57,11 +61,11 @@ public class TipherethTrackers {
 		return hero.pointsInTalent(Talent.PRIDE);
 	}
 
-	//preemptive defense: 3/5 shielding the first time each enemy lands a hit
+	//preemptive defense: 3/5 shielding the first time each kind of enemy lands a hit,
+	// tracked per kind for the whole run like Yesod's new enemy info
 	public static void onHitBy( Hero hero, Char enemy ){
 		if (!hero.hasTalent(Talent.PREEMPTIVE_DEFENSE) || !(enemy instanceof Mob)) return;
-		if (enemy.buff(PreemptiveMark.class) != null) return;
-		Buff.affect(enemy, PreemptiveMark.class);
+		if (!Buff.affect(hero, PreemptiveTypes.class).types.add(enemy.getClass().getName())) return;
 		int shield = 1 + 2*hero.pointsInTalent(Talent.PREEMPTIVE_DEFENSE);
 		Buff.affect(hero, Barrier.class).incShield(shield);
 		if (hero.sprite != null){
@@ -69,10 +73,27 @@ public class TipherethTrackers {
 		}
 	}
 
-	//marks an enemy that has already set off preemptive defense
-	public static class PreemptiveMark extends Buff {
+	//the kinds of enemy that have already set off preemptive defense
+	public static class PreemptiveTypes extends Buff {
 		{
 			revivePersists = true;
+		}
+
+		public final HashSet<String> types = new HashSet<>();
+
+		private static final String TYPES = "types";
+
+		@Override
+		public void storeInBundle( Bundle bundle ) {
+			super.storeInBundle(bundle);
+			bundle.put(TYPES, types.toArray(new String[0]));
+		}
+
+		@Override
+		public void restoreFromBundle( Bundle bundle ) {
+			super.restoreFromBundle(bundle);
+			types.clear();
+			if (bundle.contains(TYPES)) Collections.addAll(types, bundle.getStringArray(TYPES));
 		}
 	}
 
@@ -110,7 +131,7 @@ public class TipherethTrackers {
 		return com.watabou.utils.Random.NormalIntRange(0, 2*hero.pointsInTalent(Talent.PHYSICAL_SHIELD));
 	}
 
-	//trauma prevention shield: elemental damage is reduced by 15/25% of a roll of the armor
+	//trauma prevention shield: magic damage is reduced by 15/25% of a roll of the armor
 	public static int traumaShield( Char ch, int dmg, Object src ){
 		Hero hero = owner(ch);
 		if (hero == null || !hero.hasTalent(Talent.TRAUMA_SHIELD) || !elemental(src) || dmg <= 0) return dmg;
@@ -125,8 +146,12 @@ public class TipherethTrackers {
 		return null;
 	}
 
-	//fire, frost and lightning, whatever they come from
+	//any magic damage: whatever the anti-magic glyph resists, plus fire, frost and lightning from any source
 	public static boolean elemental( Object src ){
+		if (src == null) return false;
+		for (Class<?> c : AntiMagic.RESISTS){
+			if (c.isAssignableFrom(src.getClass())) return true;
+		}
 		return src instanceof Burning || src instanceof Fire || src instanceof Inferno
 				|| src instanceof Frost || src instanceof Freezing || src instanceof Blizzard
 				|| src instanceof Electricity

@@ -727,8 +727,6 @@ public class Hero extends Char {
 		KindOfWeapon wep = belongings.attackingWeapon();
 		int dmg;
 
-		//Tiphereth's expectation: every 5th/4th attack rolls its maximum damage
-		maxDamageRoll = TipherethTrackers.expectationHit(this);
 		if (!RingOfForce.fightingUnarmed(this)) {
 			dmg = wep.damageRoll( this );
 
@@ -739,7 +737,6 @@ public class Hero extends Char {
 				dmg = ((Weapon)belongings.attackingWeapon()).augment.damageFactor(dmg);
 			}
 		}
-		maxDamageRoll = false;
 
 		//Tiphereth's pride: +1/+2 melee damage while two or more enemies are in sight
 		if (!(wep instanceof MissileWeapon)){
@@ -785,8 +782,8 @@ public class Hero extends Char {
 	}
 
 	//damage rolls that come from the hero can have their RNG influenced by clover
-	//set while a roll should land on its maximum, for Tiphereth's expectation
-	private static boolean maxDamageRoll = false;
+	//set by Char.attack while a roll should land on its maximum, for Tiphereth's expectation
+	public static boolean maxDamageRoll = false;
 
 	public static int heroDamageIntRange(int min, int max ){
 		if (maxDamageRoll){
