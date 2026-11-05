@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.rings;
 
 
+import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -107,12 +108,13 @@ public class RingOfMight extends Ring {
 		return new Might();
 	}
 	
+	//Tiphereth's worn ribbon works like a ring of might of its level, the higher of the two counts
 	public static int strengthBonus( Char target ){
-		return getBonus( target, Might.class );
+		return Math.max(getBonus( target, Might.class ), TipherethRibbon.mightBonus(target));
 	}
 	
 	public static float HTMultiplier( Char target ){
-		return (float)Math.pow(1.035, getBuffedBonus(target, Might.class));
+		return (float)Math.pow(1.035, Math.max(getBuffedBonus(target, Might.class), TipherethRibbon.mightBonus(target)));
 	}
 
 	public class Might extends RingBuff {

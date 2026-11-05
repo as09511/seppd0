@@ -20,6 +20,7 @@
  */
 package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Viscosity;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -51,6 +52,10 @@ public class HeroDamageBonus {
 		//Netzach's finale: more damage against enemies with two or more debuffs
 		if (hero.heroClass == HeroClass.NETZACH){
 			dmg *= NetzachTrackers.attackMultiplier(hero, target);
+		}
+		//Tiphereth's emptiness: more damage for each empty artifact or ring slot
+		if (hero.heroClass == HeroClass.TIPHERETH){
+			dmg *= TipherethTrackers.emptinessDealt(hero);
 		}
 		return dmg;
 	}

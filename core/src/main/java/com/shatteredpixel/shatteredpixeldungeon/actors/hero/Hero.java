@@ -613,6 +613,8 @@ public class Hero extends Char {
 		
 		evasion *= RingOfEvasion.evasionMultiplier( this );
 		evasion *= HodManual.evasionMultiplier( this );
+		//Tiphereth's not a kid!: +10/15/20% evasion
+		evasion *= TipherethTrackers.evasionFactor( this );
 
 		//mobile command: +10/20/30% evasion while hasted
 		if (hasTalent(Talent.MOBILE_COMMAND) && buff(Haste.class) != null){
@@ -1805,6 +1807,10 @@ public class Hero extends Char {
 		//Hod's field guidance: less damage taken next to her manager
 		damage *= ManagerCall.guidanceFactor(this, this);
 
+		//Tiphereth's emptiness and ward
+		damage *= TipherethTrackers.emptinessTaken(this);
+		if (!(src instanceof Hunger) && damage > 0) damage *= TipherethTrackers.wardFactor(this);
+
 		Endure.EndureTracker endure = buff(Endure.EndureTracker.class);
 		if (!(src instanceof Char)){
 			//reduce damage here if it isn't coming from a character (if it is we already reduced it)
@@ -1836,6 +1842,9 @@ public class Hero extends Char {
 
 		//we ceil this one to avoid letting the player easily take 0 dmg from tenacity early
 		dmg = (int)Math.ceil(dmg * RingOfTenacity.damageMultiplier( this ));
+
+		//Tiphereth B takes her share of the health damage
+		dmg = TipherethTrackers.shareWithB(this, dmg, src);
 
 		int preHP = HP + shielding();
 		if (src instanceof Hunger) preHP -= shielding();

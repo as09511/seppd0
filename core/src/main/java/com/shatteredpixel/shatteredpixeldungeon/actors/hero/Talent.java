@@ -282,6 +282,12 @@ public enum Talent {
 	PRIDE(5), PRECISE_INSPECTION(1), PREEMPTIVE_DEFENSE(35), SNEAKY(66),
 	//Tiphereth T2
 	SHARED_MEAL(4), EXPECTATION(137), MAINTENANCE(98), PHYSICAL_SHIELD(99), TRAUMA_SHIELD(102),
+	//Tiphereth T3
+	NOT_A_KID(10, 3), PROOF_OF_COMPETENCE(11, 3),
+	//HQ Sephirah T3
+	EROSION_SHIELD(191, 3), PRECIOUS_ONE(192, 3), VALUE_DISPOSAL(193, 3),
+	//Natural Science Floor Librarian T3
+	WARD(194, 3), INTEMPERANCE(195, 3), EMPTINESS(196, 3),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -625,6 +631,15 @@ public enum Talent {
 				known++;
 			}
 			if (known > 0) GLog.p(Messages.get(Talent.class, "efficient_potions", known));
+		}
+		//Tiphereth's ward starts ready
+		if (talent == WARD){
+			Buff.affect(hero, TipherethTrackers.Ward.class);
+		}
+		//proof of competence changes the worn ribbon's level, and with it her strength and health
+		if (talent == PROOF_OF_COMPETENCE){
+			hero.updateHT(false);
+			Item.updateQuickslot();
 		}
 		//Tiphereth's precise inspection +2: the wielded weapon right away
 		if (talent == PRECISE_INSPECTION && hero.pointsInTalent(PRECISE_INSPECTION) == 2){
@@ -1346,6 +1361,9 @@ public enum Talent {
 			case NETZACH:
 				Collections.addAll(tierTalents, ADDITIONAL_DOSE, RECOVERY_EFFICIENCY);
 				break;
+			case TIPHERETH:
+				Collections.addAll(tierTalents, NOT_A_KID, PROOF_OF_COMPETENCE);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1433,6 +1451,12 @@ public enum Talent {
 				break;
 			case ART_LIBRARIAN:
 				Collections.addAll(tierTalents, INCOMPREHENSIBLE, FERVENT_EMOTION, FINALE);
+				break;
+			case HQ_SEPHIRAH:
+				Collections.addAll(tierTalents, EROSION_SHIELD, PRECIOUS_ONE, VALUE_DISPOSAL);
+				break;
+			case SCIENCE_LIBRARIAN:
+				Collections.addAll(tierTalents, WARD, INTEMPERANCE, EMPTINESS);
 				break;
 		}
 		for (Talent talent : tierTalents){

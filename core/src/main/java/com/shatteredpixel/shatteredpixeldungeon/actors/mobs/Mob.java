@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethB;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Commission;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -1786,7 +1787,7 @@ public abstract class Mob extends Char {
 		heldAllies.clear();
 		for (Mob mob : level.mobs.toArray( new Mob[0] )) {
 			//preserve directable allies or empowered intelligent allies no matter where they are
-			if (mob instanceof DirectableAlly
+			if (mob instanceof DirectableAlly || mob instanceof TipherethB
 				|| (mob.intelligentAlly && PowerOfMany.getPoweredAlly() == mob)) {
 				if (mob instanceof DirectableAlly) {
 					((DirectableAlly) mob).clearDefensingPos();

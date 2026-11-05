@@ -24,7 +24,10 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Belongings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfForce;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
@@ -43,15 +46,19 @@ import java.util.ArrayList;
 //Tiphereth's starting item, the weapon counterpart of the warrior's broken seal: it is tied to a melee weapon,
 //carries up to 1 upgrade between weapons and gives the weapon it is tied to +1 melee damage.
 //With the maintenance talent it carries the weapon's enchantment too.
-public class TipherethRibbon extends Item {
+//The natural science floor librarian can wear it as her weapon instead: her attacks count as unarmed and deal RED damage
+//rolled like a ring of force of the ribbon's level, and it raises strength like a ring of might (the two don't stack).
+public class TipherethRibbon extends MeleeWeapon {
 
 	public static final String AC_AFFIX = "AFFIX";
 
 	public static final int DAMAGE_BONUS = 1;
+	public static final int STR_REQ = 10;
 
 	{
 		image = ItemSpriteSheet.TIPHERETH_RIBBON;
 
+		tier = 1;
 		cursedKnown = levelKnown = true;
 		unique = true;
 		bones = false;
@@ -59,19 +66,92 @@ public class TipherethRibbon extends Item {
 		defaultAction = AC_AFFIX;
 	}
 
-	private Weapon.Enchantment enchantment;
+	//the enchantment the ribbon carries between weapons
+	private Weapon.Enchantment carried;
 
 	public Weapon.Enchantment getEnchantment(){
-		return enchantment;
+		return carried;
 	}
 
 	public void setEnchantment( Weapon.Enchantment ench ){
-		this.enchantment = ench;
+		this.carried = ench;
+	}
+
+	//only the natural science floor librarian wears the ribbon
+	public static boolean wearable( Hero hero ){
+		return hero != null && hero.subClass == HeroSubClass.SCIENCE_LIBRARIAN;
+	}
+
+	public static TipherethRibbon worn( Char ch ){
+		if (ch instanceof Hero && ((Hero) ch).belongings.weapon() instanceof TipherethRibbon){
+			return (TipherethRibbon) ((Hero) ch).belongings.weapon();
+		}
+		return null;
+	}
+
+	//proof of competence: +1/2/3 to the ribbon's level and strength requirement
+	public static int competence( Hero hero ){
+		return hero == null ? 0 : hero.pointsInTalent(Talent.PROOF_OF_COMPETENCE);
+	}
+
+	//the ribbon's level as a worn weapon, the same as a ring of might of that level
+	public static int mightBonus( Char ch ){
+		TipherethRibbon r = worn(ch);
+		return r == null ? 0 : Math.max(0, r.buffedLvl());
+	}
+
+	@Override
+	public int buffedLvl() {
+		//the ribbon's own level only counts while it is worn, its bonus on a tied weapon is applied there
+		return super.buffedLvl() + (isEquipped(Dungeon.hero) ? competence(Dungeon.hero) : 0);
+	}
+
+	@Override
+	public int STRReq( int lvl ) {
+		return STR_REQ + competence(Dungeon.hero);
+	}
+
+	//the punches are rolled like a ring of force of the ribbon's level
+	@Override
+	public int min( int lvl ) {
+		return RingOfForce.unarmedMin(lvl, Dungeon.hero == null ? 10 : Dungeon.hero.STR());
+	}
+
+	@Override
+	public int max( int lvl ) {
+		return RingOfForce.unarmedMax(lvl, Dungeon.hero == null ? 10 : Dungeon.hero.STR());
+	}
+
+	@Override
+	public String defaultAction() {
+		if (Dungeon.hero != null && wearable(Dungeon.hero)){
+			return isEquipped(Dungeon.hero) ? AC_UNEQUIP : AC_EQUIP;
+		}
+		return AC_AFFIX;
+	}
+
+	@Override
+	public boolean doEquip( Hero hero ) {
+		if (!wearable(hero)) return false;
+		if (super.doEquip(hero)){
+			hero.updateHT(false);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean doUnequip( Hero hero, boolean collect, boolean single ) {
+		if (super.doUnequip(hero, collect, single)){
+			hero.updateHT(false);
+			return true;
+		}
+		return false;
 	}
 
 	//maintenance: the ribbon carries the weapon's enchantment when it is moved
 	public boolean canTransferEnchantment(){
-		return enchantment != null && Dungeon.hero != null && Dungeon.hero.hasTalent(Talent.MAINTENANCE);
+		return carried != null && Dungeon.hero != null && Dungeon.hero.hasTalent(Talent.MAINTENANCE);
 	}
 
 	//maintenance +2: the enchantment of the weapon the ribbon is tied to is never lost to upgrades
@@ -81,13 +161,19 @@ public class TipherethRibbon extends Item {
 
 	@Override
 	public ItemSprite.Glowing glowing() {
-		return enchantment != null ? enchantment.glowing() : null;
+		return carried != null ? carried.glowing() : null;
 	}
 
 	@Override
 	public ArrayList<String> actions( Hero hero ) {
 		ArrayList<String> actions = super.actions(hero);
-		actions.add(AC_AFFIX);
+		actions.remove(AC_ABILITY);
+		if (!wearable(hero)){
+			actions.remove(AC_EQUIP);
+		}
+		if (!isEquipped(hero)){
+			actions.add(AC_AFFIX);
+		}
 		return actions;
 	}
 
@@ -107,19 +193,19 @@ public class TipherethRibbon extends Item {
 			GLog.w(Messages.get(TipherethRibbon.class, "unknown_weapon"));
 			return;
 		}
-		if (weapon.cursed && (enchantment == null || !enchantment.curse())){
+		if (weapon.cursed && (carried == null || !carried.curse())){
 			GLog.w(Messages.get(TipherethRibbon.class, "cursed_weapon"));
 			return;
 		}
-		if (weapon.enchantment != null && enchantment != null
+		if (weapon.enchantment != null && carried != null
 				&& (canTransferEnchantment() || outgoing == this)
-				&& weapon.enchantment.getClass() != enchantment.getClass()){
+				&& weapon.enchantment.getClass() != carried.getClass()){
 			//both have an enchantment, the hero picks which one stays
 			GameScene.show(new WndOptions(new ItemSprite(ItemSpriteSheet.TIPHERETH_RIBBON),
 					Messages.get(TipherethRibbon.class, "choose_title"),
-					Messages.get(TipherethRibbon.class, "choose_desc", weapon.enchantment.name(), enchantment.name()),
+					Messages.get(TipherethRibbon.class, "choose_desc", weapon.enchantment.name(), carried.name()),
 					weapon.enchantment.name(),
-					enchantment.name()){
+					carried.name()){
 				@Override
 				protected void onSelect( int index ) {
 					if (index == -1) return;
@@ -152,28 +238,39 @@ public class TipherethRibbon extends Item {
 
 	@Override
 	public String name() {
-		return enchantment != null ? enchantment.name(super.name()) : super.name();
+		return carried != null ? carried.name(trueName()) : trueName();
 	}
 
 	@Override
 	public String info() {
-		String info = super.info();
-		if (enchantment != null){
-			info += "\n\n" + Messages.get(this, "enchanted", enchantment.name());
-			info += " " + enchantment.desc();
+		String info = desc();
+		if (Dungeon.hero != null && wearable(Dungeon.hero)){
+			int lvl = buffedLvl();
+			info += "\n\n" + Messages.get(this, "worn_stats", min(lvl), max(lvl), STRReq(), Math.max(0, lvl));
+		}
+		if (carried != null){
+			info += "\n\n" + Messages.get(this, "enchanted", carried.name());
+			info += " " + carried.desc();
 		}
 		return info;
 	}
 
-	//a scroll of upgrade works on the ribbon itself once, the same as upgrading the weapon it is tied to
+	//a scroll of upgrade works on the ribbon itself once, the same as upgrading the weapon it is tied to.
+	//The librarian wears it as her weapon, so she can upgrade it like one
 	@Override
 	public boolean isUpgradable() {
-		return level() == 0;
+		return level() == 0 || (Dungeon.hero != null && wearable(Dungeon.hero));
 	}
 
 	@Override
 	public boolean isIdentified() {
 		return true;
+	}
+
+	@Override
+	public Item identify( boolean byHero ) {
+		levelKnown = cursedKnown = true;
+		return this;
 	}
 
 	@Override
@@ -195,7 +292,7 @@ public class TipherethRibbon extends Item {
 
 		@Override
 		public boolean itemSelectable( Item item ) {
-			return item instanceof MeleeWeapon && ((MeleeWeapon) item).checkRibbon() == null;
+			return item instanceof MeleeWeapon && !(item instanceof TipherethRibbon) && ((MeleeWeapon) item).checkRibbon() == null;
 		}
 
 		@Override
@@ -207,17 +304,22 @@ public class TipherethRibbon extends Item {
 		}
 	};
 
-	private static final String ENCHANTMENT = "enchantment";
+	private static final String CARRIED = "carried_enchantment";
 
 	@Override
 	public void storeInBundle( Bundle bundle ) {
 		super.storeInBundle(bundle);
-		bundle.put(ENCHANTMENT, enchantment);
+		bundle.put(CARRIED, carried);
 	}
 
 	@Override
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle(bundle);
-		enchantment = (Weapon.Enchantment) bundle.get(ENCHANTMENT);
+		carried = (Weapon.Enchantment) bundle.get(CARRIED);
+		//ribbons from the first build kept their enchantment under the weapon's own key
+		if (carried == null && enchantment != null){
+			carried = enchantment;
+			enchantment = null;
+		}
 	}
 }

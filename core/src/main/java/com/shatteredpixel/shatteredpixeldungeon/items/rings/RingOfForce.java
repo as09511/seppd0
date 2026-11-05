@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.rings;
 
+import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -89,6 +90,13 @@ public class RingOfForce extends Ring {
 		if (hero.buff(MonkEnergy.MonkAbility.UnarmedAbilityTracker.class) != null){
 			usingForce = false;
 		}
+		//the worn ribbon: its level, on top of a ring of force if there is one
+		TipherethRibbon ribbon = TipherethRibbon.worn(hero);
+		if (ribbon != null && hero.buff(MonkEnergy.MonkAbility.UnarmedAbilityTracker.class) == null){
+			int level = Math.max(0, ribbon.buffedLvl()) + (usingForce ? getBuffedBonus(hero, Force.class) : 0);
+			float tier = tier(hero.STR());
+			return Hero.heroDamageIntRange(min(level, tier), max(level, tier));
+		}
 		if (usingForce) {
 			int level = getBuffedBonus(hero, Force.class);
 			float tier = tier(hero.STR());
@@ -104,6 +112,15 @@ public class RingOfForce extends Ring {
 			//attack without any ring of force influence
 			return Hero.heroDamageIntRange(1, Math.max(hero.STR()-8, 1));
 		}
+	}
+
+	//Tiphereth's ribbon worn by the natural science floor librarian punches like a ring of force of its level
+	public static int unarmedMin( int lvl, int str ){
+		return min(lvl, tier(str));
+	}
+
+	public static int unarmedMax( int lvl, int str ){
+		return max(lvl, tier(str));
 	}
 
 	//same as equivalent tier weapon
@@ -261,6 +278,10 @@ public class RingOfForce extends Ring {
 		}
 		if (hero.belongings.thrownWeapon != null || hero.belongings.abilityWeapon != null){
 			return false;
+		}
+		//attacks with Tiphereth's worn ribbon count as unarmed
+		if (hero.belongings.attackingWeapon() instanceof TipherethRibbon){
+			return true;
 		}
 		BrawlersStance stance = hero.buff(BrawlersStance.class);
 		if (stance != null && stance.active){

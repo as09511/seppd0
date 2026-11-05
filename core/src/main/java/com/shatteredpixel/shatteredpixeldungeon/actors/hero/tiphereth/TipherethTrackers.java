@@ -20,6 +20,16 @@
  */
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth;
 
+import com.watabou.utils.Random;
+import com.watabou.noosa.Image;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfForce;
+import com.shatteredpixel.shatteredpixeldungeon.items.PrismaMirrorScroll;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Hunger;
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import java.util.Collections;
 import java.util.HashSet;
 import com.watabou.utils.Bundle;
@@ -99,6 +109,7 @@ public class TipherethTrackers {
 
 	//sneaky: like the rogue's sucker punch, only the first surprise attack on each enemy cripples it for 2/3 turns
 	public static void onAttack( Hero hero, Char enemy ){
+		onUnarmedHit(hero, enemy);
 		if (!hero.hasTalent(Talent.SNEAKY) || !(enemy instanceof Mob) || !enemy.isAlive()) return;
 		if (((Mob) enemy).surprisedBy(hero) && enemy.buff(SneakyTracker.class) == null){
 			Buff.prolong(enemy, Cripple.class, 1 + hero.pointsInTalent(Talent.SNEAKY));
@@ -144,9 +155,10 @@ public class TipherethTrackers {
 		return Math.max(0, dmg - reduce);
 	}
 
-	//the hero these talents belong to: Tiphereth herself (Tiphereth B joins in with stage 2)
+	//the hero these talents belong to: Tiphereth herself, or the Tiphereth she called as Tiphereth B
 	private static Hero owner( Char ch ){
 		if (ch instanceof Hero && ((Hero) ch).heroClass == HeroClass.TIPHERETH) return (Hero) ch;
+		if (ch instanceof TipherethB) return ((TipherethB) ch).owner();
 		return null;
 	}
 
@@ -163,5 +175,143 @@ public class TipherethTrackers {
 				|| src instanceof Blazing || src instanceof Shocking
 				|| src instanceof BurningTrap || src instanceof BlazingTrap
 				|| src instanceof ShockingTrap || src instanceof StormTrap;
+	}
+
+	//the HQ sephirah gets her prisma scroll of mirror image as soon as she takes the subclass
+	public static void onSubclassChosen( Hero hero ){
+		if (hero.subClass == HeroSubClass.HQ_SEPHIRAH){
+			PrismaMirrorScroll scroll = new PrismaMirrorScroll();
+			if (!scroll.collect()) Dungeon.level.drop(scroll, hero.pos).sprite.drop();
+		}
+	}
+
+	//not a kid!: +10/15/20% evasion
+	public static float evasionFactor( Hero hero ){
+		if (!hero.hasTalent(Talent.NOT_A_KID)) return 1f;
+		return 1.05f + 0.05f*hero.pointsInTalent(Talent.NOT_A_KID);
+	}
+
+	//erosion neutralizing shield: debuffs on Tiphereth and Tiphereth B last 20/30/40% shorter
+	public static float debuffDuration( Char target, Buff buff ){
+		if (buff == null || buff.type != Buff.buffType.NEGATIVE) return 1f;
+		Hero hero = target instanceof TipherethB ? ((TipherethB) target).owner() : owner(target);
+		if (hero == null || !hero.hasTalent(Talent.EROSION_SHIELD)) return 1f;
+		return 0.9f - 0.1f*hero.pointsInTalent(Talent.EROSION_SHIELD);
+	}
+
+	//Tiphereth B takes part of the health damage Tiphereth takes, shielding is used up first and isn't shared.
+	//Returns the damage Tiphereth still takes herself.
+	public static int shareWithB( Hero hero, int dmg, Object src ){
+		if (hero.heroClass != HeroClass.TIPHERETH || dmg <= 0 || src instanceof Hunger) return dmg;
+		TipherethB b = TipherethB.get();
+		if (b == null || b.owner() != hero) return dmg;
+		int toHealth = Math.max(0, dmg - hero.shielding());
+		int share = Math.min(Math.round(toHealth * TipherethB.shareRatio(hero)), b.HP);
+		if (share <= 0) return dmg;
+		b.damage(share, src);
+		return dmg - share;
+	}
+
+	//ward: the next damage taken is halved, ready again 10/7/5 turns after it is used
+	public static float wardFactor( Hero hero ){
+		if (!hero.hasTalent(Talent.WARD)) return 1f;
+		Ward w = Buff.affect(hero, Ward.class);
+		if (w.cooldown > 0) return 1f;
+		w.cooldown = WARD_COOLDOWN[Math.min(3, hero.pointsInTalent(Talent.WARD))];
+		BuffIndicator.refreshHero();
+		return 0.5f;
+	}
+
+	private static final int[] WARD_COOLDOWN = {0, 10, 7, 5};
+
+	public static class Ward extends Buff {
+
+		{
+			type = buffType.POSITIVE;
+			revivePersists = true;
+		}
+
+		public int cooldown = 0;
+
+		@Override
+		public boolean act() {
+			if (!(target instanceof Hero) || !((Hero) target).hasTalent(Talent.WARD)){
+				detach();
+				return true;
+			}
+			if (cooldown > 0){
+				cooldown--;
+				if (cooldown == 0) BuffIndicator.refreshHero();
+			}
+			spend(TICK);
+			return true;
+		}
+
+		@Override
+		public int icon() {
+			return BuffIndicator.ARMOR;
+		}
+
+		@Override
+		public void tintIcon( Image icon ) {
+			icon.hardlight(1f, 0.85f, 0.3f);
+		}
+
+		@Override
+		public float iconFadePercent() {
+			Hero hero = (Hero) target;
+			int max = WARD_COOLDOWN[Math.min(3, hero.pointsInTalent(Talent.WARD))];
+			return max <= 0 ? 0 : cooldown / (float) max;
+		}
+
+		@Override
+		public String iconTextDisplay() {
+			return cooldown > 0 ? Integer.toString(cooldown) : "";
+		}
+
+		@Override
+		public String desc() {
+			return cooldown > 0 ? Messages.get(this, "desc_cooldown", cooldown) : Messages.get(this, "desc_ready");
+		}
+
+		private static final String COOLDOWN = "cooldown";
+
+		@Override
+		public void storeInBundle( Bundle bundle ) {
+			super.storeInBundle(bundle);
+			bundle.put(COOLDOWN, cooldown);
+		}
+
+		@Override
+		public void restoreFromBundle( Bundle bundle ) {
+			super.restoreFromBundle(bundle);
+			cooldown = bundle.getInt(COOLDOWN);
+		}
+	}
+
+	//intemperance: unarmed attacks paralyse for 1 turn 15/20/25% of the time
+	public static void onUnarmedHit( Hero hero, Char enemy ){
+		if (!hero.hasTalent(Talent.INTEMPERANCE) || !enemy.isAlive() || !RingOfForce.fightingUnarmed(hero)) return;
+		if (Random.Float() < 0.1f + 0.05f*hero.pointsInTalent(Talent.INTEMPERANCE)){
+			Buff.prolong(enemy, Paralysis.class, 1f);
+		}
+	}
+
+	//emptiness: each empty artifact or ring slot, 10/17.5/25% more damage dealt and 5/10/15% less taken
+	public static int emptySlots( Hero hero ){
+		if (!hero.hasTalent(Talent.EMPTINESS)) return 0;
+		int n = 0;
+		if (hero.belongings.artifact() == null) n++;
+		if (hero.belongings.misc() == null) n++;
+		if (hero.belongings.ring() == null) n++;
+		return n;
+	}
+
+	public static float emptinessDealt( Hero hero ){
+		return 1f + emptySlots(hero) * (0.025f + 0.075f*hero.pointsInTalent(Talent.EMPTINESS));
+	}
+
+	public static float emptinessTaken( Hero hero ){
+		return Math.max(0f, 1f - emptySlots(hero) * 0.05f*hero.pointsInTalent(Talent.EMPTINESS));
 	}
 }

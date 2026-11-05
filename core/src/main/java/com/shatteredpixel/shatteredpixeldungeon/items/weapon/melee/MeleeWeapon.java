@@ -137,7 +137,7 @@ public class MeleeWeapon extends Weapon {
 	public boolean doEquip( Hero hero ) {
 		KindOfWeapon old = hero.belongings.weapon;
 		boolean equipped = super.doEquip(hero);
-		if (equipped && hero.belongings.weapon == this && ribbon == null && hero.heroClass == HeroClass.TIPHERETH
+		if (equipped && hero.belongings.weapon == this && ribbon == null && !(this instanceof TipherethRibbon) && hero.heroClass == HeroClass.TIPHERETH
 				&& old instanceof MeleeWeapon && old != this && ((MeleeWeapon) old).ribbon != null){
 			TipherethRibbon r = ((MeleeWeapon) old).ribbon;
 			if (cursedKnown && (!cursed || (r.getEnchantment() != null && r.getEnchantment().curse()))){
@@ -383,12 +383,23 @@ public class MeleeWeapon extends Weapon {
 		if (masteryPotionBonus){
 			req -= 2;
 		}
+		//Tiphereth's proof of competence: a weapon with her ribbon needs 1/2/3 more strength
+		if (ribbon != null){
+			req += TipherethRibbon.competence(Dungeon.hero);
+		}
 		return req;
 	}
 
 	private static boolean evaluatingTwinUpgrades = false;
+	//Tiphereth's proof of competence: a weapon with her ribbon gains 1/2/3 levels
 	@Override
 	public int buffedLvl() {
+		int lvl = buffedLvlBase();
+		if (ribbon != null) lvl += TipherethRibbon.competence(Dungeon.hero);
+		return lvl;
+	}
+
+	private int buffedLvlBase() {
 		if (!evaluatingTwinUpgrades && Dungeon.hero != null && isEquipped(Dungeon.hero) && Dungeon.hero.hasTalent(Talent.TWIN_UPGRADES)){
 			KindOfWeapon other = null;
 			if (Dungeon.hero.belongings.weapon() != this) other = Dungeon.hero.belongings.weapon();
