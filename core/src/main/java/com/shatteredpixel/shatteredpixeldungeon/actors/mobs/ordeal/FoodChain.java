@@ -343,6 +343,16 @@ public class FoodChain extends OrdealMob {
 	//one step along the corridor, its own kind in the way swaps places with it
 	private boolean crawl(){
 		int[] ahead = front(pos);
+
+		//another Food Chain right in front: the two of them trade places whole, and each goes on its way
+		FoodChain other = chainAt(ahead[0]);
+		if (other != null && other != this && other.isAlive() && other.pos == pos + 2*step()){
+			int mine = pos;
+			placeBody(other.pos, true);
+			other.placeBody(mine, true);
+			return true;
+		}
+
 		Char[] inWay = new Char[2];
 		for (int i = 0; i < 2; i++){
 			int c = ahead[i];
@@ -366,6 +376,15 @@ public class FoodChain extends OrdealMob {
 			}
 		}
 		return true;
+	}
+
+	//the Food Chain whose body covers a cell, if any
+	private static FoodChain chainAt( int cell ){
+		if (!inside(cell)) return null;
+		Char ch = Actor.findChar(cell);
+		if (ch instanceof FoodChain) return (FoodChain) ch;
+		if (ch instanceof Body) return ((Body) ch).owner();
+		return null;
 	}
 
 	//the two cells of the body at its rear, one per lane, which a step forward leaves empty
