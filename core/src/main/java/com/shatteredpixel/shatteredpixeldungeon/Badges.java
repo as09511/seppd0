@@ -171,6 +171,7 @@ public class Badges {
 		REASON_TO_DISCERN           ( 89 ), //victory as Yesod
 		HOPE_TO_BE_BETTER           ( 90 ), //victory as Hod
 		COURAGE_TO_LIVE_ON          ( 91 ), //victory as Netzach
+		EXPECTATION_OF_MEANING      ( 92 ), //victory as Tiphereth
 
 		//platinum
 		MANY_BUFFS                  ( 96 ),
@@ -833,6 +834,7 @@ public class Badges {
 		victoryClassBadges.put(HeroClass.YESOD, Badge.REASON_TO_DISCERN);
 		victoryClassBadges.put(HeroClass.HOD, Badge.HOPE_TO_BE_BETTER);
 		victoryClassBadges.put(HeroClass.NETZACH, Badge.COURAGE_TO_LIVE_ON);
+		victoryClassBadges.put(HeroClass.TIPHERETH, Badge.EXPECTATION_OF_MEANING);
 	}
 
 	private static LinkedHashMap<HeroSubClass, Badge> thirdBossSubclassBadges = new LinkedHashMap<>();
@@ -1022,7 +1024,7 @@ public class Badges {
 		}
 
 		//the seed of light badge of the sephirah: 똑바로 설 수 있는 의지, 분별할 수 있는 이성,
-		// 더 나은 존재가 될 수 있다는 희망, 삶을 이어나갈 것이라는 용기
+		// 더 나은 존재가 될 수 있다는 희망, 삶을 이어나갈 것이라는 용기, 존재의 의미에 대한 기대
 		badge = victoryClassBadges.get(Dungeon.hero.heroClass);
 		if (badge == null) return;
 		local.add( badge );

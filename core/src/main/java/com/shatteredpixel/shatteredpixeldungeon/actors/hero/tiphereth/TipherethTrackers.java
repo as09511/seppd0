@@ -21,7 +21,6 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth;
 
 import com.watabou.utils.Random;
-import com.watabou.noosa.Image;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfForce;
@@ -250,12 +249,7 @@ public class TipherethTrackers {
 
 		@Override
 		public int icon() {
-			return BuffIndicator.ARMOR;
-		}
-
-		@Override
-		public void tintIcon( Image icon ) {
-			icon.hardlight(1f, 0.85f, 0.3f);
+			return BuffIndicator.WARD;
 		}
 
 		@Override
