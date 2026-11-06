@@ -22,6 +22,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
@@ -34,7 +35,10 @@ import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ClimaxThroesSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
+import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
+
+import java.util.ArrayList;
 
 //Dusk of Crimson: a stitched heap of flesh swinging a cleaver and an axe. It runs twice as fast as anyone,
 //but squeezing through a doorway takes it 2 turns. When it dies it splits into two Harmonies of Skin,
@@ -83,6 +87,22 @@ public class ClimaxThroes extends OrdealMob {
 		if (squeeze) spend(DOOR_TIME - 1f/speed());
 	}
 
+	//the Harmonies come out right where the Throes falls, not somewhere else on the floor
+	private int splitCell(){
+		PathFinder.buildDistanceMap(pos, Dungeon.level.passable, 3);
+		for (int range = 1; range <= 3; range++){
+			ArrayList<Integer> cells = new ArrayList<>();
+			for (int cell = 0; cell < Dungeon.level.length(); cell++){
+				if (PathFinder.distance[cell] == range && !Dungeon.level.solid[cell] && !Dungeon.level.pit[cell]
+						&& Actor.findChar(cell) == null){
+					cells.add(cell);
+				}
+			}
+			if (!cells.isEmpty()) return Random.element(cells);
+		}
+		return Dungeon.level.randomRespawnCell(this);
+	}
+
 	@Override
 	public void die( Object cause ) {
 		//the Harmonies are on the floor before the ordeal checks whether anything is left
@@ -90,7 +110,7 @@ public class ClimaxThroes extends OrdealMob {
 		for (int i = 0; i < SPLIT; i++){
 			HarmonyOfSkin harmony = new HarmonyOfSkin();
 			harmony.tier(tier);
-			Angela.Quest.place(harmony, Dungeon.level.randomRespawnCell(harmony));
+			Angela.Quest.place(harmony, splitCell());
 			if (harmony.sprite != null){
 				CellEmitter.get(harmony.pos).start(Speck.factory(Speck.LIGHT), 0.2f, 3);
 			}
