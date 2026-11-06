@@ -39,20 +39,17 @@ import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportat
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.GoldRush;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
-import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
-import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTilemap;
 import com.shatteredpixel.shatteredpixeldungeon.ui.HeroIcon;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Callback;
 import com.watabou.utils.PathFinder;
-import com.watabou.utils.PointF;
 import com.watabou.utils.Random;
 
-//Tiphereth's second armor ability: she opens the golden road (a golden circle in front of her and of the chosen enemy),
+//Tiphereth's second armor ability: she opens the golden road (a golden circle on her as she leaves and arrives),
 //steps through it to the enemy's side, strikes for 5-15 RED damage and gains 5 stacks of the golden road for 2 turns
 public class GoldRushDash extends ArmorAbility {
 
@@ -142,9 +139,8 @@ public class GoldRushDash extends ArmorAbility {
 			Buff.prolong(hero, Chain.class, CHAIN_TURNS);
 		}
 
-		//golden circles in front of Tiphereth and in front of the enemy
-		circle(hero.pos, target);
-		circle(target, hero.pos);
+		//a golden circle opens on Tiphereth as she leaves
+		circle(hero);
 		Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
 
 		hero.busy();
@@ -154,6 +150,8 @@ public class GoldRushDash extends ArmorAbility {
 			protected void onComplete() {
 				if (to != hero.pos){
 					ScrollOfTeleportation.appear(hero, to);
+					//and again where she comes out
+					circle(hero);
 					Dungeon.level.occupyCell(hero);
 					Dungeon.observe();
 					GameScene.updateFog();
@@ -170,11 +168,8 @@ public class GoldRushDash extends ArmorAbility {
 		});
 	}
 
-	private static void circle( int from, int toward ){
-		Ballistica line = new Ballistica(from, toward, Ballistica.STOP_TARGET);
-		int cell = line.dist >= 1 ? line.path.get(1) : from;
-		PointF p = DungeonTilemap.tileCenterToWorld(cell);
-		new Flare(8, 20).color(0xFFD040, true).show(Dungeon.hero.sprite.parent, p, 1f);
+	private static void circle( Char ch ){
+		new Flare(8, 20).color(0xFFD040, true).show(ch.sprite, 1f);
 	}
 
 	private void strike( Hero hero, Char enemy ){
