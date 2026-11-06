@@ -1388,6 +1388,11 @@ public abstract class Char extends Actor {
 
 		stealth += Obfuscation.stealthBoost(this, glyphLevel(Obfuscation.class));
 
+		//Tiphereth's sneaky: enemies notice her as if she were 1/2 tiles further away
+		if (this instanceof Hero){
+			stealth += ((Hero) this).pointsInTalent(Talent.SNEAKY);
+		}
+
 		return stealth;
 	}
 

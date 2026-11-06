@@ -1129,7 +1129,7 @@ public enum Talent {
 		//Hod's practical evaluation
 		dmg = HodManual.onAttackProc(hero, enemy, dmg);
 
-		//Tiphereth's sneaky: surprise attacks cripple
+		//Tiphereth's natural science librarian: the worn ribbon's unarmed hits
 		TipherethTrackers.onAttack(hero, enemy);
 
 		//spore: 10/20/30% of the damage as bleeding on burning enemies

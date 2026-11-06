@@ -43,7 +43,6 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Burning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Cripple;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Frost;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
@@ -106,18 +105,9 @@ public class TipherethTrackers {
 		}
 	}
 
-	//sneaky: like the rogue's sucker punch, only the first surprise attack on each enemy cripples it for 2/3 turns
 	public static void onAttack( Hero hero, Char enemy ){
 		onUnarmedHit(hero, enemy);
-		if (!hero.hasTalent(Talent.SNEAKY) || !(enemy instanceof Mob) || !enemy.isAlive()) return;
-		if (((Mob) enemy).surprisedBy(hero) && enemy.buff(SneakyTracker.class) == null){
-			Buff.prolong(enemy, Cripple.class, 1 + hero.pointsInTalent(Talent.SNEAKY));
-			Buff.affect(enemy, SneakyTracker.class);
-		}
 	}
-
-	//marks an enemy that has already been crippled by sneaky
-	public static class SneakyTracker extends Buff {}
 
 	//expectation: every 5th/4th attack deals its maximum damage. Counts the attack and says whether this one does.
 	public static boolean expectationHit( Hero hero ){

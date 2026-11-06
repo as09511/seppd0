@@ -1792,8 +1792,8 @@ public class Hero extends Char {
 			damage *= 1.5f;
 		}
 
-		//Netzach's resignation: 10/20% less damage taken at 30% health or less
-		if (hasTalent(Talent.RESIGNATION) && HP <= HT*0.3f){
+		//Netzach's resignation: 10/20% less damage taken at 50% health or less
+		if (hasTalent(Talent.RESIGNATION) && HP <= HT*0.5f){
 			damage *= 1f - 0.1f*pointsInTalent(Talent.RESIGNATION);
 		}
 		//Netzach's safety secured: less damage taken while paying back deferred damage
