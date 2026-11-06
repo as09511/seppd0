@@ -33,6 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.tiles.CustomTilemap;
 import com.watabou.noosa.Tilemap;
 import com.watabou.noosa.audio.Music;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 //L Corp headquarters (L사 본사), a boss arena modelled on the qliphoth tree: a 3x3 grid of 6x6 rooms joined by 2 wide, 8 long corridors,
@@ -127,16 +128,12 @@ public class LCorpHQLevel extends Level {
 		}
 
 		//corridors, centred on the sides of the rooms they join
-		int offset = (ROOM - CORRIDOR_WIDTH)/2;
-		carve(roomX(1) + offset, roomY(-1) + ROOM, CORRIDOR_WIDTH, CORRIDOR);
-		for (int row = 0; row < 3; row++){
-			for (int col = 0; col < 3; col++){
-				if (col < 2) carve(roomX(col) + ROOM, roomY(row) + offset, CORRIDOR, CORRIDOR_WIDTH);
-				if (row < 2) carve(roomX(col) + offset, roomY(row) + ROOM, CORRIDOR_WIDTH, CORRIDOR);
-			}
+		for (int[] c : corridors()){
+			carve(c[0], c[1], c[2], c[3]);
 		}
 
 		//the hero arrives at the top of Malkuth's room
+		int offset = (ROOM - CORRIDOR_WIDTH)/2;
 		int entrance = roomX(1) + offset + roomY(-1)*width();
 		map[entrance] = Terrain.ENTRANCE;
 		transitions.add(new LevelTransition(this,
@@ -151,6 +148,24 @@ public class LCorpHQLevel extends Level {
 		customTiles.add(floor);
 
 		return true;
+	}
+
+	private static ArrayList<int[]> corridors;
+
+	//every corridor as {x, y, width, height} of its floor: the one below Malkuth's room, then those of the grid
+	public static ArrayList<int[]> corridors(){
+		if (corridors == null){
+			corridors = new ArrayList<>();
+			int offset = (ROOM - CORRIDOR_WIDTH)/2;
+			corridors.add(new int[]{roomX(1) + offset, roomY(-1) + ROOM, CORRIDOR_WIDTH, CORRIDOR});
+			for (int row = 0; row < 3; row++){
+				for (int col = 0; col < 3; col++){
+					if (col < 2) corridors.add(new int[]{roomX(col) + ROOM, roomY(row) + offset, CORRIDOR, CORRIDOR_WIDTH});
+					if (row < 2) corridors.add(new int[]{roomX(col) + offset, roomY(row) + ROOM, CORRIDOR_WIDTH, CORRIDOR});
+				}
+			}
+		}
+		return corridors;
 	}
 
 	private void carve(int x, int y, int w, int h){

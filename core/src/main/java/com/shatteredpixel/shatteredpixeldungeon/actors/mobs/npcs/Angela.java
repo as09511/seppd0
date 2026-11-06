@@ -45,6 +45,14 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.CheersForTheBeginning;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.ClimaxThroes;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.FoodChain;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.WhereWeMustReach;
+import com.shatteredpixel.shatteredpixeldungeon.levels.LCorpHQLevel;
+import com.shatteredpixel.shatteredpixeldungeon.levels.features.LevelTransition;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ClimaxThroesSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.FoodChainSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.WhereWeMustReachSprite;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.Doubt;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.FruitOfUnderstanding;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.GrantUsLove;
@@ -81,7 +89,8 @@ import com.watabou.utils.Random;
 import java.util.ArrayList;
 
 //Angela, the AI secretary of L Corp. She waits by the stairs of floors 6, 11, 16 and 21, can't be harmed,
-//and offers the hero one of four Dawn ordeals on floor 6 and, once that is overcome, one of four Noon ordeals on floor 11.
+//and offers the hero one of four Dawn ordeals on floor 6, once that is overcome one of four Noon ordeals on floor 11,
+//and once that is overcome too one of three Dusk ordeals on floor 16.
 //In exchange for enkephalin boxes from the warehouse she also extracts or refines E.G.O, once each per game,
 //and for a beacon of returning her elevator takes the hero to her on another floor already reached.
 public class Angela extends NPC {
@@ -92,17 +101,18 @@ public class Angela extends NPC {
 		properties.add(Property.IMMOVABLE);
 	}
 
-	//the ordeal she offers: the Dawn on floor 6, the Noon on floor 11, none on floor 16.
-	//One summoned with the testing tools offers whichever of the two comes next.
+	//the ordeal she offers: the Dawn on floor 6, the Noon on floor 11, the Dusk on floor 16, none on floor 21.
+	//One summoned with the testing tools offers whichever comes next.
 	public static final int NONE = 0;
 	public static final int DAWN = 1;
 	public static final int NOON = 2;
+	public static final int DUSK = 3;
 	private static final int NEXT = -1;
 
 	private int ordealTier = NEXT;
 
 	private int tier(){
-		if (ordealTier == NEXT) return Quest.completed ? NOON : DAWN;
+		if (ordealTier == NEXT) return Quest.noonCompleted ? DUSK : Quest.completed ? NOON : DAWN;
 		return ordealTier;
 	}
 
@@ -146,6 +156,9 @@ public class Angela extends NPC {
 		}
 		if (tier() == NOON && Quest.noonType == 0){
 			Quest.noonType = Random.Int(4) + 1;
+		}
+		if (tier() == DUSK && Quest.duskType == 0){
+			Quest.duskType = Random.Int(3) + 1;
 		}
 
 		//the very first talk with Angela on this profile: her welcome, the badge and the gift
@@ -198,7 +211,8 @@ public class Angela extends NPC {
 		int tier = tier();
 		if (tier != NONE){
 			entries.add(MENU_ORDEAL);
-			labels.add(Messages.get(Angela.class, Quest.unlocked(tier) ? "menu_ordeal" : "menu_ordeal_locked", Quest.ordealName(tier)));
+			labels.add(Messages.get(Angela.class, Quest.unlocked(tier) ? "menu_ordeal"
+					: tier == DUSK ? "menu_ordeal_locked_dusk" : "menu_ordeal_locked", Quest.ordealName(tier)));
 		}
 		entries.add(MENU_EXTRACT);
 		labels.add(Messages.get(Angela.class, Quest.extracted ? "menu_extract_used" : "menu_extract"));
@@ -354,6 +368,8 @@ public class Angela extends NPC {
 		super.restoreFromBundle(bundle);
 		if (bundle.contains(ORDEAL_TIER)){
 			ordealTier = bundle.getInt(ORDEAL_TIER);
+			//the trader of floor 16 from before the Dusk ordeals now offers them
+			if (ordealTier == NONE && Dungeon.depth == 16 && Dungeon.branch == 0) ordealTier = DUSK;
 		} else if (!bundle.contains(OFFERS_ORDEAL) || bundle.getBoolean(OFFERS_ORDEAL)){
 			ordealTier = DAWN;
 		} else {
@@ -367,10 +383,13 @@ public class Angela extends NPC {
 			yell(Messages.get(Angela.class, "in_progress", Quest.ordealName(tier)));
 			return;
 		}
+		//the Amber Dusk is fought at L Corp headquarters
+		String offer = Messages.get(Angela.class, tier == DUSK && Quest.duskType == Quest.DUSK_AMBER ? "offer_hq" : "offer",
+				Quest.ordealName(tier), Quest.reward(tier));
 		GameScene.show(new WndOptions(
 				sprite(),
 				Messages.titleCase(name()),
-				Messages.get(Angela.class, "offer", Quest.ordealName(tier), Quest.reward(tier)),
+				offer,
 				Messages.get(Angela.class, "accept"),
 				Messages.get(Angela.class, "decline")){
 			@Override
@@ -474,9 +493,17 @@ public class Angela extends NPC {
 		public static final int NOON_INDIGO  = 3; //Sweepers x3, as a pack
 		public static final int NOON_CRIMSON = 4; //Harmony of Skin, splitting into two Cheers for the Beginning
 
-		//enkephalin boxes given for overcoming a Dawn or a Noon ordeal
+		//the Dusk ordeals of floor 16
+		public static final int DUSK_GREEN   = 1; //Where We Must Reach, calling up Doubts and Processes of Understanding
+		public static final int DUSK_CRIMSON = 2; //Throes of Climax, splitting into two Harmonies of Skin
+		public static final int DUSK_AMBER   = 3; //Food Chains x2, in the corridors of L Corp headquarters
+
+		public static final int FOOD_CHAINS = 2;
+
+		//enkephalin boxes given for overcoming a Dawn, a Noon or a Dusk ordeal
 		public static final int ORDEAL_REWARD = 10;
 		public static final int NOON_REWARD   = 20;
+		public static final int DUSK_REWARD   = 30;
 
 		private static boolean spawned;
 		private static int type;
@@ -485,6 +512,11 @@ public class Angela extends NPC {
 		private static int noonType;
 		private static boolean noonGiven;
 		private static boolean noonCompleted;
+		private static int duskType;
+		private static boolean duskGiven;
+		private static boolean duskCompleted;
+		//the Amber Dusk takes the hero to L Corp headquarters, the Food Chains come out once they arrive
+		private static boolean duskPending;
 		//each of Angela's services can be used once per game
 		private static boolean extracted;
 		private static boolean refined;
@@ -497,6 +529,10 @@ public class Angela extends NPC {
 			noonType = 0;
 			noonGiven = false;
 			noonCompleted = false;
+			duskType = 0;
+			duskGiven = false;
+			duskCompleted = false;
+			duskPending = false;
 			extracted = false;
 			refined = false;
 		}
@@ -511,6 +547,10 @@ public class Angela extends NPC {
 		private static final String NOON_TYPE      = "noon_type";
 		private static final String NOON_GIVEN     = "noon_given";
 		private static final String NOON_COMPLETED = "noon_completed";
+		private static final String DUSK_TYPE      = "dusk_type";
+		private static final String DUSK_GIVEN     = "dusk_given";
+		private static final String DUSK_COMPLETED = "dusk_completed";
+		private static final String DUSK_PENDING   = "dusk_pending";
 
 		public static void storeInBundle( Bundle bundle ){
 			Bundle node = new Bundle();
@@ -523,6 +563,10 @@ public class Angela extends NPC {
 			node.put(NOON_TYPE, noonType);
 			node.put(NOON_GIVEN, noonGiven);
 			node.put(NOON_COMPLETED, noonCompleted);
+			node.put(DUSK_TYPE, duskType);
+			node.put(DUSK_GIVEN, duskGiven);
+			node.put(DUSK_COMPLETED, duskCompleted);
+			node.put(DUSK_PENDING, duskPending);
 			bundle.put(NODE, node);
 		}
 
@@ -541,6 +585,10 @@ public class Angela extends NPC {
 			noonType = node.getInt(NOON_TYPE);
 			noonGiven = node.getBoolean(NOON_GIVEN);
 			noonCompleted = node.getBoolean(NOON_COMPLETED);
+			duskType = node.getInt(DUSK_TYPE);
+			duskGiven = node.getBoolean(DUSK_GIVEN);
+			duskCompleted = node.getBoolean(DUSK_COMPLETED);
+			duskPending = node.getBoolean(DUSK_PENDING);
 		}
 
 		public static boolean extracted(){
@@ -556,24 +604,29 @@ public class Angela extends NPC {
 		}
 
 		public static String ordealName( int tier ){
+			if (tier == DUSK) return Messages.get(Angela.class, "dusk_" + duskType);
 			if (tier == NOON) return Messages.get(Angela.class, "noon_" + noonType);
 			return Messages.get(Angela.class, "ordeal_" + type);
 		}
 
-		//the Noon ordeal waits until the Dawn one has been overcome
+		//the Noon ordeal waits until the Dawn one has been overcome, the Dusk one until the Noon one has
 		public static boolean unlocked( int tier ){
+			if (tier == DUSK) return noonCompleted;
 			return tier != NOON || completed;
 		}
 
 		public static boolean given( int tier ){
+			if (tier == DUSK) return duskGiven;
 			return tier == NOON ? noonGiven : given;
 		}
 
 		public static boolean completed( int tier ){
+			if (tier == DUSK) return duskCompleted;
 			return tier == NOON ? noonCompleted : completed;
 		}
 
 		public static int reward( int tier ){
+			if (tier == DUSK) return DUSK_REWARD;
 			return tier == NOON ? NOON_REWARD : ORDEAL_REWARD;
 		}
 
@@ -596,7 +649,16 @@ public class Angela extends NPC {
 			noonCompleted = false;
 		}
 
-		//places an Angela without an ordeal near the entrance stairs of floor 16
+		//places an Angela with the Dusk ordeal near the entrance stairs of floor 16
+		public static void spawnDusk( Level level, Room entranceRoom ){
+			if (placeNearEntrance(level, entranceRoom, DUSK) == null) return;
+			duskType = Random.Int(3) + 1;
+			duskGiven = false;
+			duskCompleted = false;
+			duskPending = false;
+		}
+
+		//places an Angela without an ordeal near the entrance stairs of floor 21
 		public static void spawnTrader( Level level, Room entranceRoom ){
 			placeNearEntrance(level, entranceRoom, NONE);
 		}
@@ -677,6 +739,10 @@ public class Angela extends NPC {
 		}
 
 		public static void start( int tier ){
+			if (tier == DUSK){
+				startDusk();
+				return;
+			}
 			if (tier == NOON){
 				startNoon();
 				return;
@@ -753,6 +819,83 @@ public class Angela extends NPC {
 			showOrdealText(NOON, "noon_start_" + noonType);
 		}
 
+		private static void startDusk(){
+			duskGiven = true;
+
+			Level level = Dungeon.level;
+			switch (duskType){
+				case DUSK_GREEN: default:
+					WhereWeMustReach tower = new WhereWeMustReach();
+					place(tower, farCell(level, tower));
+					break;
+				case DUSK_CRIMSON:
+					ClimaxThroes throes = new ClimaxThroes();
+					place(throes, level.randomRespawnCell(throes));
+					break;
+				case DUSK_AMBER:
+					//off to L Corp headquarters, where the Food Chains wait in the corridors
+					duskPending = true;
+					Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
+					Level.beforeTransition();
+					Invisibility.dispel();
+					InterlevelScene.curTransition = new LevelTransition(level, Dungeon.hero.pos,
+							LevelTransition.Type.BRANCH_EXIT, Dungeon.depth, 2, LevelTransition.Type.BRANCH_ENTRANCE);
+					InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
+					Game.switchScene(InterlevelScene.class);
+					return;
+			}
+
+			GLog.n(ordealName(DUSK));
+			showOrdealText(DUSK, "dusk_start_" + duskType);
+		}
+
+		//a free cell some way from the hero, for an ordeal that is meant to be found
+		private static int farCell( Level level, Mob mob ){
+			for (int i = 0; i < 50; i++){
+				int cell = level.randomRespawnCell(mob);
+				if (cell != -1 && level.distance(cell, Dungeon.hero.pos) >= 8) return cell;
+			}
+			return level.randomRespawnCell(mob);
+		}
+
+		//the Food Chains come out once the hero has arrived at L Corp headquarters, which stays sealed until they fall.
+		// Called while the floor is being switched to, before its actors start
+		public static void beforeArrival( Level level ){
+			if (!duskPending || !(level instanceof LCorpHQLevel)) return;
+			duskPending = false;
+			ArrayList<Integer> corridors = new ArrayList<>();
+			for (int i = 0; i < LCorpHQLevel.corridors().size(); i++) corridors.add(i);
+			Random.shuffle(corridors);
+			int placed = 0;
+			for (int c : corridors){
+				if (placed >= FOOD_CHAINS) break;
+				if (FoodChain.spawn((LCorpHQLevel) level, c, Dungeon.hero.pos)) placed++;
+			}
+			level.locked = true;
+			arrivalText = true;
+		}
+
+		private static boolean arrivalText = false;
+
+		//once the floor's actors are running, the Amber Dusk's words are shown
+		public static void afterArrival(){
+			if (!arrivalText) return;
+			arrivalText = false;
+			Actor.add(new Actor(){
+				{
+					actPriority = VFX_PRIO;
+				}
+
+				@Override
+				protected boolean act() {
+					Actor.remove(this);
+					GLog.n(ordealName(DUSK));
+					showOrdealText(DUSK, "dusk_start_" + duskType);
+					return true;
+				}
+			});
+		}
+
 		//corridor cells free for a larva, optionally only those out of the hero's sight
 		private static ArrayList<Integer> corridorCells( Level level, boolean hidden ){
 			ArrayList<Integer> result = new ArrayList<>();
@@ -792,20 +935,29 @@ public class Angela extends NPC {
 				}
 			}
 			int reward = reward(tier);
-			if (tier == NOON) noonCompleted = true;
+			if (tier == DUSK) duskCompleted = true;
+			else if (tier == NOON) noonCompleted = true;
 			else completed = true;
+			//L Corp headquarters opens again once the Food Chains have fallen
+			if (tier == DUSK && Dungeon.level instanceof LCorpHQLevel) Dungeon.level.locked = false;
 			Warehouse.addEnkephalin(reward);
 			GLog.p(Messages.get(Angela.class, "reward", reward, Warehouse.enkephalin()));
-			showOrdealText(tier, tier == NOON ? "noon_end_" + noonType : "end_" + type);
+			showOrdealText(tier, tier == DUSK ? "dusk_end_" + duskType : tier == NOON ? "noon_end_" + noonType : "end_" + type);
 		}
 
 		private static void showOrdealText( int tier, String key ){
 			String title = ordealName(tier);
 			String text = Messages.get(Angela.class, key);
-			int t = tier == NOON ? noonType : type;
+			int t = tier == DUSK ? duskType : tier == NOON ? noonType : type;
 			Game.runOnRenderThread(() -> {
 				CharSprite icon;
-				if (tier == NOON){
+				if (tier == DUSK){
+					switch (t){
+						case DUSK_GREEN: default: icon = new WhereWeMustReachSprite(); break;
+						case DUSK_CRIMSON: icon = new ClimaxThroesSprite(); break;
+						case DUSK_AMBER: icon = new FoodChainSprite(); break;
+					}
+				} else if (tier == NOON){
 					switch (t){
 						case NOON_GREEN: default: icon = new ProcessOfUnderstandingSprite(); break;
 						case NOON_VIOLET: icon = new GrantUsLoveSprite(); break;

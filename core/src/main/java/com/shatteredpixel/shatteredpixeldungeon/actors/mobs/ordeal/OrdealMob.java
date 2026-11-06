@@ -42,22 +42,34 @@ public abstract class OrdealMob extends Mob {
 	protected DamageType attackType = DamageType.RED;
 	protected RiskLevel risk = RiskLevel.TETH;
 
-	//which of Angela's ordeals this monster belongs to: Angela.DAWN or Angela.NOON
+	//which of Angela's ordeals this monster belongs to: Angela.DAWN, Angela.NOON or Angela.DUSK
 	protected int tier = Angela.DAWN;
 
 	public int tier(){
 		return tier;
 	}
 
-	//a Dawn monster called up by a Noon one (the Harmony of Skin's Cheers) counts toward the Noon ordeal
-	public OrdealMob noon(){
-		tier = Angela.NOON;
-		maxLvl = NOON_MAX_LVL;
+	//a monster called up by one of a later ordeal (the Harmony of Skin's Cheers, the Doubts of Where We Must Reach...)
+	// counts toward that ordeal instead
+	public OrdealMob tier( int tier ){
+		this.tier = tier;
+		maxLvl = maxLvl(tier, maxLvl);
 		return this;
 	}
 
-	//Noon monsters still give experience to a hero a few levels further down
+	public OrdealMob noon(){
+		return tier(Angela.NOON);
+	}
+
+	//Noon and Dusk monsters still give experience to a hero a few levels further down
 	public static final int NOON_MAX_LVL = 20;
+	public static final int DUSK_MAX_LVL = 26;
+
+	private static int maxLvl( int tier, int fallback ){
+		if (tier == Angela.DUSK) return DUSK_MAX_LVL;
+		if (tier == Angela.NOON) return NOON_MAX_LVL;
+		return fallback;
+	}
 
 	@Override
 	public String info() {
@@ -88,6 +100,6 @@ public abstract class OrdealMob extends Mob {
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle(bundle);
 		if (bundle.contains(TIER)) tier = bundle.getInt(TIER);
-		if (tier == Angela.NOON) maxLvl = NOON_MAX_LVL;
+		maxLvl = maxLvl(tier, maxLvl);
 	}
 }

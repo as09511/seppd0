@@ -303,6 +303,9 @@ public class Assets {
 		public static final String GRANT_US_LOVE = "sprites/grant_us_love.png";
 		public static final String SWEEPER  = "sprites/sweeper.png";
 		public static final String HARMONY_OF_SKIN = "sprites/harmony_of_skin.png";
+		public static final String WHERE_WE_MUST_REACH = "sprites/where_we_must_reach.png";
+		public static final String CLIMAX_THROES = "sprites/climax_throes.png";
+		public static final String FOOD_CHAIN = "sprites/food_chain.png";
 		public static final String AVATARS  = "sprites/avatars.png";
 		public static final String PET      = "sprites/pet.png";
 		public static final String AMULET   = "sprites/amulet.png";

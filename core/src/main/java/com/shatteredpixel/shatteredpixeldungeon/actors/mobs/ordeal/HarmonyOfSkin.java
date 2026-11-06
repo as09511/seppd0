@@ -73,7 +73,7 @@ public class HarmonyOfSkin extends OrdealMob {
 		boolean seen = Dungeon.level.heroFOV[pos];
 		for (int i = 0; i < SPLIT; i++){
 			CheersForTheBeginning cheers = new CheersForTheBeginning();
-			cheers.noon();
+			cheers.tier(tier);
 			Angela.Quest.place(cheers, Dungeon.level.randomRespawnCell(cheers));
 			if (cheers.sprite != null){
 				CellEmitter.get(cheers.pos).start(Speck.factory(Speck.LIGHT), 0.2f, 3);

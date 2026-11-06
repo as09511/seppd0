@@ -194,10 +194,10 @@ public class CityLevel extends RegularLevel {
 		return Imp.Quest.spawn(super.initRooms());
 	}
 
-	//Angela waits by the stairs of floor 16 to trade E.G.O for enkephalin
+	//Angela waits by the stairs of floor 16 with the Dusk ordeal
 	@Override
 	protected void createMobs() {
-		if (Dungeon.depth == 16) Angela.Quest.spawnTrader(this, roomEntrance);
+		if (Dungeon.depth == 16) Angela.Quest.spawnDusk(this, roomEntrance);
 		super.createMobs();
 	}
 	

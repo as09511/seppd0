@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.FoodChain;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.AnomalyManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
@@ -1916,7 +1917,8 @@ public class Hero extends Char {
 				Notes.add(m.landmark());
 			}
 
-			if (fieldOfView[ m.pos ] && m.alignment == Alignment.ENEMY) {
+			//the other cells of a Food Chain are the same enemy, only the Food Chain itself is counted
+			if (fieldOfView[ m.pos ] && m.alignment == Alignment.ENEMY && !(m instanceof FoodChain.Body)) {
 				visible.add(m);
 				if (!visibleEnemies.contains( m )) {
 					newMob = true;
@@ -2142,7 +2144,8 @@ public class Hero extends Char {
 			if (((Mob) ch).heroShouldInteract()) {
 				curAction = new HeroAction.Interact( ch );
 			} else {
-				curAction = new HeroAction.Attack( ch );
+				//a Food Chain is struck at whichever of its cells is next to the hero
+				curAction = new HeroAction.Attack( FoodChain.nearestCell( ch, this ) );
 			}
 
 		//TODO perhaps only trigger this if hero is already adjacent? reducing mistaps

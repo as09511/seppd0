@@ -501,7 +501,12 @@ public class Dungeon {
 
 		Mob.restoreAllies( level, pos );
 
+		//the Amber Dusk's Food Chains come out in L Corp headquarters
+		Angela.Quest.beforeArrival( level );
+
 		Actor.init();
+
+		Angela.Quest.afterArrival();
 
 		level.addRespawner();
 		
