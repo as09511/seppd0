@@ -1061,8 +1061,9 @@ public abstract class Mob extends Char {
 			Dungeon.hero.belongings.getItem(MalkuthNotebook.class).directCharge(0.1f*Dungeon.hero.pointsInTalent(Talent.WORKER_BEE));
 		}
 
-		//speed war: kills while hasted extend the haste by 1/2 turns
-		if (cause == Dungeon.hero && alignment == Alignment.ENEMY && Dungeon.hero.hasTalent(Talent.SPEED_WAR)
+		//speed war: kills by her or any ally while she is hasted extend the haste by 1/2 turns
+		if (cause instanceof Char && ((Char) cause).alignment == Alignment.ALLY
+				&& alignment == Alignment.ENEMY && Dungeon.hero.hasTalent(Talent.SPEED_WAR)
 				&& Dungeon.hero.buff(Haste.class) != null){
 			Dungeon.hero.buff(Haste.class).extend(Dungeon.hero.pointsInTalent(Talent.SPEED_WAR));
 		}

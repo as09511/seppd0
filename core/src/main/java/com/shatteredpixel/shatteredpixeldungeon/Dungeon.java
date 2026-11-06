@@ -473,6 +473,11 @@ public class Dungeon {
 	
 	public static void switchLevel( final Level level, int pos ) {
 
+		//Position of -3 means beside Angela, for her elevator
+		if (pos == Angela.Quest.BESIDE_ANGELA){
+			pos = Angela.Quest.besideAngela(level);
+		}
+
 		//Position of -2 specifically means trying to place the hero the exit
 		if (pos == -2){
 			LevelTransition t = level.getTransition(LevelTransition.Type.REGULAR_EXIT);

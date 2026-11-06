@@ -26,7 +26,11 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.spells.BeaconOfReturning;
+import com.shatteredpixel.shatteredpixeldungeon.journal.Notes;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.InterlevelScene;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.Warehouse;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
@@ -75,9 +79,10 @@ import com.watabou.utils.Random;
 
 import java.util.ArrayList;
 
-//Angela, the AI secretary of L Corp. She waits by the stairs of floors 6, 11 and 16, can't be harmed,
+//Angela, the AI secretary of L Corp. She waits by the stairs of floors 6, 11, 16 and 21, can't be harmed,
 //and offers the hero one of four Dawn ordeals on floor 6 and, once that is overcome, one of four Noon ordeals on floor 11.
-//In exchange for enkephalin boxes from the warehouse she also extracts or refines E.G.O, once each per game.
+//In exchange for enkephalin boxes from the warehouse she also extracts or refines E.G.O, once each per game,
+//and for a beacon of returning her elevator takes the hero to her on another floor already reached.
 public class Angela extends NPC {
 
 	{
@@ -183,6 +188,7 @@ public class Angela extends NPC {
 	private static final int MENU_REFINE  = 2;
 	private static final int MENU_LEAVE   = 3;
 	private static final int MENU_ASIDE   = 4;
+	private static final int MENU_ELEVATOR = 5;
 
 	//Angela's services: the ordeal (floor 6 only), E.G.O extraction and E.G.O refining, paid for with enkephalin boxes
 	private void showMenu(){
@@ -197,6 +203,8 @@ public class Angela extends NPC {
 		labels.add(Messages.get(Angela.class, Quest.extracted ? "menu_extract_used" : "menu_extract"));
 		entries.add(MENU_REFINE);
 		labels.add(Messages.get(Angela.class, Quest.refined ? "menu_refine_used" : "menu_refine"));
+		entries.add(MENU_ELEVATOR);
+		labels.add(Messages.get(Angela.class, "menu_elevator"));
 		entries.add(MENU_ASIDE);
 		labels.add(Messages.get(Angela.class, "menu_aside"));
 		entries.add(MENU_LEAVE);
@@ -224,9 +232,82 @@ public class Angela extends NPC {
 					case MENU_EXTRACT: WndEgoExtract.open(Angela.this); break;
 					case MENU_REFINE:  refine(); break;
 					case MENU_ASIDE:   stepAside(); break;
+					case MENU_ELEVATOR: elevator(); break;
 				}
 			}
 		});
+	}
+
+	//the floors where Angela waits by the stairs
+	public static final int[] FLOORS = {6, 11, 16, 21};
+	public static final int ELEVATOR_COST = 1;
+
+	private static boolean canRideTo( int depth ){
+		return depth != Dungeon.depth && Dungeon.levelHasBeenGenerated(depth, 0);
+	}
+
+	//her elevator: for a beacon of returning she sends the hero to her on another floor already reached
+	private void elevator(){
+		BeaconOfReturning beacon = Dungeon.hero.belongings.getItem(BeaconOfReturning.class);
+		int beacons = beacon == null ? 0 : beacon.quantity();
+		String text = Messages.get(Angela.class, "elevator", ELEVATOR_COST, beacons);
+		if (beacons < ELEVATOR_COST) text += "\n\n" + Messages.get(Angela.class, "elevator_no_beacon");
+
+		ArrayList<Integer> floors = new ArrayList<>();
+		ArrayList<String> labels = new ArrayList<>();
+		for (int d : FLOORS){
+			if (d == Dungeon.depth) continue;
+			floors.add(d);
+			labels.add(Messages.get(Angela.class, canRideTo(d) ? "elevator_floor" : "elevator_floor_locked", d));
+		}
+		labels.add(Messages.get(Angela.class, "cancel"));
+
+		GameScene.show(new WndOptions(
+				sprite(),
+				Messages.titleCase(name()),
+				text,
+				labels.toArray(new String[0])){
+			@Override
+			protected boolean enabled( int index ) {
+				return index >= floors.size() || (beacons >= ELEVATOR_COST && canRideTo(floors.get(index)));
+			}
+
+			@Override
+			protected void onSelect( int index ) {
+				if (index < floors.size()) ride(floors.get(index));
+			}
+		});
+	}
+
+	private void ride( int depth ){
+		Hero hero = Dungeon.hero;
+		BeaconOfReturning beacon = hero.belongings.getItem(BeaconOfReturning.class);
+		if (beacon == null || beacon.quantity() < ELEVATOR_COST || !canRideTo(depth) || !hero.isAlive()) return;
+		if (!Dungeon.interfloorTeleportAllowed()){
+			yell(Messages.get(Angela.class, "elevator_blocked"));
+			return;
+		}
+
+		//the last beacon goes with its return point, the same as when it is used up by itself
+		if (beacon.quantity() == 1){
+			BeaconOfReturning.BeaconTracker tracker = hero.buff(BeaconOfReturning.BeaconTracker.class);
+			if (tracker != null){
+				Notes.remove(Notes.Landmark.BEACON_LOCATION, tracker.returnDepth);
+				tracker.detach();
+			}
+		}
+		beacon.detach(hero.belongings.backpack);
+		Item.updateQuickslot();
+		GLog.i(Messages.get(Angela.class, "elevator_ride", depth));
+		Sample.INSTANCE.play(Assets.Sounds.BEACON);
+
+		Level.beforeTransition();
+		Invisibility.dispel();
+		InterlevelScene.mode = InterlevelScene.Mode.RETURN;
+		InterlevelScene.returnDepth = depth;
+		InterlevelScene.returnBranch = 0;
+		InterlevelScene.returnPos = Quest.BESIDE_ANGELA;
+		Game.switchScene(InterlevelScene.class);
 	}
 
 	//Angela never walks around, so she swaps places with the hero when asked, in case she stands in the way
@@ -550,6 +631,26 @@ public class Angela extends NPC {
 			angela.pos = Random.element(near.isEmpty() ? inRoom : near);
 			level.mobs.add(angela);
 			return angela;
+		}
+
+		//the hero's position when arriving by her elevator, Dungeon.switchLevel turns it into a cell beside her
+		public static final int BESIDE_ANGELA = -3;
+
+		//a free cell next to the Angela on this level, or -1 (the entrance) if she isn't here
+		public static int besideAngela( Level level ){
+			for (Mob m : level.mobs){
+				if (!(m instanceof Angela)) continue;
+				ArrayList<Integer> cells = new ArrayList<>();
+				for (int n : PathFinder.NEIGHBOURS8){
+					int c = m.pos + n;
+					if (c >= 0 && c < level.length() && level.passable[c] && !level.solid[c]
+							&& level.findMob(c) == null && !level.invalidHeroPos(c)){
+						cells.add(c);
+					}
+				}
+				if (!cells.isEmpty()) return Random.element(cells);
+			}
+			return -1;
 		}
 
 		//how many cells can be walked to from the entrance, with one cell taken by someone who never moves

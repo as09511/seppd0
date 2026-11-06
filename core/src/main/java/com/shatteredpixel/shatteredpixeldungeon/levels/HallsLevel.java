@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.levels;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.items.Torch;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.HallsPainter;
@@ -91,6 +92,13 @@ public class HallsLevel extends RegularLevel {
 		rooms.add(new DemonSpawnerRoom());
 
 		return rooms;
+	}
+
+	//Angela waits by the stairs of floor 21 too, with her services and her elevator
+	@Override
+	protected void createMobs() {
+		if (Dungeon.depth == 21) Angela.Quest.spawnTrader(this, roomEntrance);
+		super.createMobs();
 	}
 
 	@Override
