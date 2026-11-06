@@ -103,7 +103,6 @@ import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap.Type;
 import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
-import com.shatteredpixel.shatteredpixeldungeon.items.RelocationRadio;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.netzach.NetzachTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.netzach.DaCapoMovement;
 import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
@@ -377,11 +376,6 @@ public class Hero extends Char {
 			AbilityCrown crown = new AbilityCrown();
 			crown.charge = belongings.armor instanceof ClassArmor ? ((ClassArmor) belongings.armor).charge : 50;
 			belongings.backpack.items.add(crown);
-		}
-
-		//saves from before the emergency relocation radio
-		if (hasTalent(Talent.EMERGENCY_RELOCATION) && belongings.getItem(RelocationRadio.class) == null){
-			belongings.backpack.items.add(new RelocationRadio());
 		}
 	}
 	

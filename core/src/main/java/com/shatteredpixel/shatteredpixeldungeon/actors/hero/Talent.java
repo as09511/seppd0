@@ -66,7 +66,6 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.SpellSprite;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.LeafParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
-import com.shatteredpixel.shatteredpixeldungeon.items.RelocationRadio;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ego.Suit;
@@ -610,11 +609,6 @@ public enum Talent {
 	}
 
 	public static void onTalentUpgraded( Hero hero, Talent talent ){
-		//Hod's emergency relocation comes with a radio that can sit in a quickslot
-		if (talent == EMERGENCY_RELOCATION){
-			RelocationRadio.sync(hero, true);
-		}
-
 		//Hod's basic fitness raises max HP right away
 		if (talent == BASIC_FITNESS){
 			hero.updateHT(false);
@@ -784,7 +778,6 @@ public enum Talent {
 		//effects that were applied when the talents were taken
 		hero.updateHT(false);
 		ConcentratedEnkephalin.clampCharges(hero);
-		RelocationRadio.sync(hero, false);
 		Dungeon.observe();
 		BuffIndicator.refreshHero();
 		Item.updateQuickslot();

@@ -30,7 +30,10 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbili
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.cleric.Trinity;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.utils.Bundle;
 
@@ -82,21 +85,49 @@ public class AbilityCrown extends Item {
 		super.execute( hero, action );
 
 		if (action.equals(AC_ABILITY)){
-			if (hero.armorAbility == null){
+			//with emergency relocation and a manager around, Hod picks between calling a new manager and the swap,
+			//so the swap can be used from a quickslot too
+			if (hero.armorAbility instanceof ManagerCall && ManagerCall.canRelocate(hero)){
 				usesTargeting = false;
-				GLog.w( Messages.get(this, "no_ability") );
-			} else if (charge < hero.armorAbility.chargeUse(hero)) {
-				usesTargeting = false;
-				GLog.w( Messages.get(this, "low_charge") );
-			} else {
-				usesTargeting = hero.armorAbility.useTargeting();
-				hero.armorAbility.use(this, hero);
+				chooseManagerAction(hero);
+				return;
 			}
+			useAbility(hero);
 		} else if (action.equals(AC_RELOCATE)){
 			usesTargeting = false;
 			if (ManagerCall.canRelocate(hero)){
 				ManagerCall.relocate(this, hero);
 			}
+		}
+	}
+
+	private void chooseManagerAction( Hero hero ){
+		GameScene.show(new WndOptions(new ItemSprite(this),
+				Messages.get(this, "choose_title"),
+				Messages.get(this, "choose_msg"),
+				Messages.get(this, "choose_ability", hero.armorAbility.name(), Math.round(hero.armorAbility.chargeUse(hero))),
+				Messages.get(this, "ac_relocate", Math.round(ManagerCall.relocateCost(hero)))){
+			@Override
+			protected void onSelect(int index) {
+				if (index == 0){
+					useAbility(hero);
+				} else if (index == 1 && ManagerCall.canRelocate(hero)){
+					ManagerCall.relocate(AbilityCrown.this, hero);
+				}
+			}
+		});
+	}
+
+	private void useAbility( Hero hero ){
+		if (hero.armorAbility == null){
+			usesTargeting = false;
+			GLog.w( Messages.get(this, "no_ability") );
+		} else if (charge < hero.armorAbility.chargeUse(hero)) {
+			usesTargeting = false;
+			GLog.w( Messages.get(this, "low_charge") );
+		} else {
+			usesTargeting = hero.armorAbility.useTargeting();
+			hero.armorAbility.use(this, hero);
 		}
 	}
 

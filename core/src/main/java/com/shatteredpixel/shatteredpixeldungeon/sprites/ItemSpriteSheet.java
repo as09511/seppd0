@@ -949,12 +949,6 @@ public class ItemSpriteSheet {
 		assignItemRect(TIPHERETH_RIBBON, 16, 16);
 	}
 
-	//Hod's emergency relocation radio, next to Tiphereth's ribbon
-	public static final int RELOCATION_RADIO = xy(9, 32);
-	static{
-		assignItemRect(RELOCATION_RADIO, 16, 16);
-	}
-
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots
 	public static final int GUIDE_PAGE  = DOCUMENTS+0;
 	public static final int ALCH_PAGE   = DOCUMENTS+1;
