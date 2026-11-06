@@ -29,7 +29,6 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Charm;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Corruption;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
@@ -51,9 +50,9 @@ import java.util.Collections;
 
 //Dusk of Amber: a great burrowing thing that fills a whole corridor of L Corp headquarters (2x2 cells).
 //It crawls from one end of its corridor to the other at half speed and only strikes what is right in front of it,
-//knocking it back and stunning it for a turn. Its own kind in the way swap places with it. At the far end it
+//knocking it back. Its own kind in the way swap places with it. At the far end it
 //sinks away and comes up at the end of another corridor. In each corridor, as room opens up behind it,
-//it leaves Perfect Food in the corridor behind it, never more than 4 of its own at once.
+//it leaves Perfect Food in the corridor behind it, up to 4 in each corridor.
 //The cell it stands on is its bottom left, three Body parts take up the rest and pass on what they are dealt.
 public class FoodChain extends OrdealMob {
 
@@ -88,8 +87,6 @@ public class FoodChain extends OrdealMob {
 	private int dir = 1;
 	//how much Perfect Food it has left in this corridor
 	private int fedHere = 0;
-	//the Perfect Food it has left, by actor id
-	private ArrayList<Integer> food = new ArrayList<>();
 
 	@Override
 	public int damageRoll() {
@@ -322,7 +319,7 @@ public class FoodChain extends OrdealMob {
 		next();
 	}
 
-	//everything in front of it is struck, knocked back along the corridor and stunned for a turn
+	//everything in front of it is struck and knocked back along the corridor
 	private void strike(){
 		int push = step();
 		for (Char t : new ArrayList<>(targets)){
@@ -334,7 +331,6 @@ public class FoodChain extends OrdealMob {
 					WandOfBlastWave.throwChar(t, new Ballistica(t.pos, t.pos + push, Ballistica.MAGIC_BOLT),
 							1, false, false, this);
 				}
-				Buff.prolong(t, Paralysis.class, 1f);
 			}
 		}
 		targets.clear();
@@ -401,16 +397,12 @@ public class FoodChain extends OrdealMob {
 		return x >= c[0] && x < c[0] + c[2] && y >= c[1] && y < c[1] + c[3];
 	}
 
-	//as it crawls on, it leaves Perfect Food in the corridor cells it frees behind it,
-	//up to 4 in each corridor, and never more than 4 of its own at once
+	//as it crawls on, it leaves Perfect Food in the corridor cells it frees behind it, up to 4 in each corridor
+	// (what it left in other corridors doesn't count)
 	private void leaveFood(){
-		for (int i = food.size() - 1; i >= 0; i--){
-			Actor a = Actor.findById(food.get(i));
-			if (!(a instanceof PerfectFood) || !((PerfectFood) a).isAlive()) food.remove(i);
-		}
 		boolean seen = false;
 		for (int c : behind(pos)){
-			if (fedHere >= MAX_FOOD || food.size() >= MAX_FOOD) break;
+			if (fedHere >= MAX_FOOD) break;
 			if (!inside(c) || !inCorridor(c) || !Dungeon.level.passable[c] || Dungeon.level.solid[c]
 					|| Actor.findChar(c) != null){
 				continue;
@@ -419,7 +411,6 @@ public class FoodChain extends OrdealMob {
 			f.tier(tier);
 			Angela.Quest.place(f, c);
 			if (f.pos == c){
-				food.add(f.id());
 				fedHere++;
 				if (Dungeon.level.heroFOV[c]){
 					CellEmitter.get(c).burst(Speck.factory(Speck.ROCK), 3);
@@ -516,7 +507,6 @@ public class FoodChain extends OrdealMob {
 	private static final String CORRIDOR = "corridor";
 	private static final String DIR      = "dir";
 	private static final String FED      = "fed_here";
-	private static final String FOOD     = "food";
 
 	@Override
 	public void storeInBundle( Bundle bundle ) {
@@ -524,9 +514,6 @@ public class FoodChain extends OrdealMob {
 		bundle.put(CORRIDOR, corridor);
 		bundle.put(DIR, dir);
 		bundle.put(FED, fedHere);
-		int[] ids = new int[food.size()];
-		for (int i = 0; i < ids.length; i++) ids[i] = food.get(i);
-		bundle.put(FOOD, ids);
 	}
 
 	@Override
@@ -536,8 +523,6 @@ public class FoodChain extends OrdealMob {
 		dir = bundle.getInt(DIR);
 		if (dir == 0) dir = 1;
 		fedHere = bundle.getInt(FED);
-		food.clear();
-		if (bundle.contains(FOOD)) for (int id : bundle.getIntArray(FOOD)) food.add(id);
 	}
 
 	//the other three cells of a Food Chain's body: it can't be told apart from the Food Chain,
