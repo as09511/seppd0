@@ -25,6 +25,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.levels.LCorpHQLevel;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.RegularLevel;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
@@ -55,7 +56,7 @@ public class PerfectFood extends OrdealMob {
 
 	@Override
 	public int damageRoll() {
-		return Random.NormalIntRange(1, 8);
+		return Random.NormalIntRange(2, 8);
 	}
 
 	@Override
@@ -66,6 +67,18 @@ public class PerfectFood extends OrdealMob {
 	//the passable cells of the level's corridors (connection rooms, doors included).
 	//A level without corridors returns null, and the larvae can then go anywhere.
 	public static boolean[] corridors( Level level ){
+		//L Corp headquarters has its corridors between the rooms of the sephirot
+		if (level instanceof LCorpHQLevel){
+			boolean[] result = new boolean[level.length()];
+			for (int[] c : LCorpHQLevel.corridors()){
+				for (int x = c[0]; x < c[0] + c[2]; x++){
+					for (int y = c[1]; y < c[1] + c[3]; y++){
+						result[x + y*level.width()] = true;
+					}
+				}
+			}
+			return result;
+		}
 		if (!(level instanceof RegularLevel)) return null;
 		boolean[] result = new boolean[level.length()];
 		boolean any = false;

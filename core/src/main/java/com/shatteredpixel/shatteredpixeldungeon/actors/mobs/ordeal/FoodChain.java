@@ -52,8 +52,8 @@ import java.util.Collections;
 //Dusk of Amber: a great burrowing thing that fills a whole corridor of L Corp headquarters (2x2 cells).
 //It crawls from one end of its corridor to the other at half speed and only strikes what is right in front of it,
 //knocking it back and stunning it for a turn. Its own kind in the way swap places with it. At the far end it
-//sinks away and comes up at the end of another corridor. Once in each corridor, while there is room behind it,
-//it leaves Perfect Food behind, never more than 4 of its own at once.
+//sinks away and comes up at the end of another corridor. In each corridor, as room opens up behind it,
+//it leaves Perfect Food in the corridor behind it, never more than 4 of its own at once.
 //The cell it stands on is its bottom left, three Body parts take up the rest and pass on what they are dealt.
 public class FoodChain extends OrdealMob {
 
@@ -86,8 +86,8 @@ public class FoodChain extends OrdealMob {
 	//which corridor of L Corp headquarters it is crawling through, and which way along it (+1 right/down, -1 left/up)
 	private int corridor = 0;
 	private int dir = 1;
-	//whether it has left its food in this corridor yet
-	private boolean fed = false;
+	//how much Perfect Food it has left in this corridor
+	private int fedHere = 0;
 	//the Perfect Food it has left, by actor id
 	private ArrayList<Integer> food = new ArrayList<>();
 
@@ -298,7 +298,7 @@ public class FoodChain extends OrdealMob {
 			return true;
 		}
 
-		if (!fed) leaveFood();
+		leaveFood();
 
 		if (atEnd()){
 			burrow();
@@ -375,40 +375,40 @@ public class FoodChain extends OrdealMob {
 		return new int[]{b[0] + s, b[1] + s};
 	}
 
-	//it fills the room behind it with Perfect Food, once in each corridor
+	//whether a cell lies in the corridor it is crawling through
+	private boolean inCorridor( int cell ){
+		int[] c = corridorRect();
+		int x = cell % W(), y = cell / W();
+		return x >= c[0] && x < c[0] + c[2] && y >= c[1] && y < c[1] + c[3];
+	}
+
+	//as it crawls on, it leaves Perfect Food in the corridor cells it frees behind it,
+	//up to 4 in each corridor, and never more than 4 of its own at once
 	private void leaveFood(){
 		for (int i = food.size() - 1; i >= 0; i--){
 			Actor a = Actor.findById(food.get(i));
 			if (!(a instanceof PerfectFood) || !((PerfectFood) a).isAlive()) food.remove(i);
 		}
-		if (food.size() >= MAX_FOOD){
-			return;
-		}
-		int[] b1 = behind(pos);
-		int back = -step();
-		ArrayList<Integer> cells = new ArrayList<>();
-		for (int c : new int[]{b1[0], b1[1], b1[0] + back, b1[1] + back}){
-			if (inside(c) && Dungeon.level.passable[c] && !Dungeon.level.solid[c] && Actor.findChar(c) == null){
-				cells.add(c);
-			}
-		}
-		if (cells.isEmpty()) return;
-		fed = true;
 		boolean seen = false;
-		for (int c : cells){
-			if (food.size() >= MAX_FOOD) break;
+		for (int c : behind(pos)){
+			if (fedHere >= MAX_FOOD || food.size() >= MAX_FOOD) break;
+			if (!inside(c) || !inCorridor(c) || !Dungeon.level.passable[c] || Dungeon.level.solid[c]
+					|| Actor.findChar(c) != null){
+				continue;
+			}
 			PerfectFood f = new PerfectFood();
 			f.tier(tier);
 			Angela.Quest.place(f, c);
 			if (f.pos == c){
 				food.add(f.id());
+				fedHere++;
 				if (Dungeon.level.heroFOV[c]){
 					CellEmitter.get(c).burst(Speck.factory(Speck.ROCK), 3);
 					seen = true;
 				}
 			}
 		}
-		if (seen) sprite.showStatus(0xFFB040, Messages.get(this, "food"));
+		if (seen && sprite != null) sprite.showStatus(0xFFB040, Messages.get(this, "food"));
 	}
 
 	//at the end of its corridor it sinks away and comes up at the end of another
@@ -433,7 +433,7 @@ public class FoodChain extends OrdealMob {
 				if (seenBefore) CellEmitter.get(pos).burst(Speck.factory(Speck.ROCK), 8);
 				corridor = c;
 				dir = d;
-				fed = false;
+				fedHere = 0;
 				placeBody(anchor, false);
 				if (sprite != null) ((FoodChainSprite) sprite).face(horizontal(corridorRect()) ? dir : 0);
 				if (Dungeon.level.heroFOV[pos]){
@@ -496,7 +496,7 @@ public class FoodChain extends OrdealMob {
 
 	private static final String CORRIDOR = "corridor";
 	private static final String DIR      = "dir";
-	private static final String FED      = "fed";
+	private static final String FED      = "fed_here";
 	private static final String FOOD     = "food";
 
 	@Override
@@ -504,7 +504,7 @@ public class FoodChain extends OrdealMob {
 		super.storeInBundle(bundle);
 		bundle.put(CORRIDOR, corridor);
 		bundle.put(DIR, dir);
-		bundle.put(FED, fed);
+		bundle.put(FED, fedHere);
 		int[] ids = new int[food.size()];
 		for (int i = 0; i < ids.length; i++) ids[i] = food.get(i);
 		bundle.put(FOOD, ids);
@@ -516,7 +516,7 @@ public class FoodChain extends OrdealMob {
 		corridor = bundle.getInt(CORRIDOR);
 		dir = bundle.getInt(DIR);
 		if (dir == 0) dir = 1;
-		fed = bundle.getBoolean(FED);
+		fedHere = bundle.getInt(FED);
 		food.clear();
 		if (bundle.contains(FOOD)) for (int id : bundle.getIntArray(FOOD)) food.add(id);
 	}
