@@ -53,12 +53,11 @@ import com.watabou.utils.PointF;
 import com.watabou.utils.Random;
 
 //Tiphereth's second armor ability: she opens the golden road (a golden circle in front of her and of the chosen enemy),
-//steps through it to the enemy's side, strikes for 5-15 RED damage and gains 5 stacks of the golden road for 5 turns
+//steps through it to the enemy's side, strikes for 5-15 RED damage and gains 5 stacks of the golden road for 2 turns
 public class GoldRushDash extends ArmorAbility {
 
 	public static final int BASE_RANGE = 4;
 	public static final int STACKS = 5;
-	public static final int ROAD_TURNS = 5;
 	public static final float CHAIN_TURNS = 3f;
 
 	{
@@ -92,7 +91,7 @@ public class GoldRushDash extends ArmorAbility {
 
 	//endless road: the golden road lasts 1 more turn per point
 	public static int roadTurns( Hero hero ){
-		return ROAD_TURNS + hero.pointsInTalent(Talent.ENDLESS_ROAD);
+		return GoldRush.GoldenRoad.DURATION + hero.pointsInTalent(Talent.ENDLESS_ROAD);
 	}
 
 	//the window in which golden chain makes the next gold rush cheaper
@@ -196,7 +195,7 @@ public class GoldRushDash extends ArmorAbility {
 
 	@Override
 	public int icon() {
-		return HeroIcon.HEROIC_LEAP;
+		return HeroIcon.GOLD_RUSH;
 	}
 
 	@Override

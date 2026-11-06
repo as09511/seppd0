@@ -163,7 +163,7 @@ public class Nihil extends ArmorAbility {
 
 	@Override
 	public int icon() {
-		return HeroIcon.SHOCKWAVE;
+		return HeroIcon.NIHIL;
 	}
 
 	@Override

@@ -83,6 +83,12 @@ public class HeroIcon extends Image {
 	public static final int NEUTRALIZING_GAS = 39;
 	public static final int OUR_GALAXY      = 67;
 	public static final int DA_CAPO         = 68;
+	//Tiphereth
+	public static final int SHIELD_BARRAGE  = 69;
+	public static final int GOLD_RUSH       = 70;
+	public static final int NIHIL           = 71;
+	public static final int HQ_SEPHIRAH       = 111;
+	public static final int SCIENCE_LIBRARIAN = 119;
 
 	//cleric spells
 	public static final int GUIDING_LIGHT   = 40;

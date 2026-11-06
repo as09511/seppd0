@@ -165,7 +165,7 @@ public class ShieldBarrage extends ArmorAbility {
 
 	@Override
 	public int icon() {
-		return HeroIcon.ENDURE;
+		return HeroIcon.SHIELD_BARRAGE;
 	}
 
 	@Override
