@@ -25,6 +25,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
+import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -248,6 +249,11 @@ public class Angela extends NPC {
 
 	//her elevator: for a beacon of returning she sends the hero to her on another floor already reached
 	private void elevator(){
+		//closed for the whole ascent once the amulet has been taken, even if it is put down again
+		if (Statistics.amuletObtained){
+			yell(Messages.get(Angela.class, "elevator_ascent"));
+			return;
+		}
 		BeaconOfReturning beacon = Dungeon.hero.belongings.getItem(BeaconOfReturning.class);
 		int beacons = beacon == null ? 0 : beacon.quantity();
 		String text = Messages.get(Angela.class, "elevator", ELEVATOR_COST, beacons);
@@ -283,7 +289,7 @@ public class Angela extends NPC {
 		Hero hero = Dungeon.hero;
 		BeaconOfReturning beacon = hero.belongings.getItem(BeaconOfReturning.class);
 		if (beacon == null || beacon.quantity() < ELEVATOR_COST || !canRideTo(depth) || !hero.isAlive()) return;
-		if (!Dungeon.interfloorTeleportAllowed()){
+		if (Statistics.amuletObtained || !Dungeon.interfloorTeleportAllowed()){
 			yell(Messages.get(Angela.class, "elevator_blocked"));
 			return;
 		}
