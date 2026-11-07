@@ -38,6 +38,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Sleep;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Terror;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vertigo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.OrdealMob;
 import com.shatteredpixel.shatteredpixeldungeon.levels.LCorpHQLevel;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
@@ -240,6 +241,7 @@ public class BlueStar extends Mob {
 		//L Corp headquarters opens again, the stairs in Malkuth's room lead back up
 		Dungeon.level.locked = false;
 		GLog.p(Messages.get(this, "suppressed"));
+		Angela.Quest.onBossSuppressed(Angela.BLUE_STAR);
 		Badges.validateBlueStar();
 	}
 

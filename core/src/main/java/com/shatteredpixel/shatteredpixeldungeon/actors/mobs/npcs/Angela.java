@@ -567,6 +567,8 @@ public class Angela extends NPC {
 		public static final int ORDEAL_REWARD = 10;
 		public static final int NOON_REWARD   = 20;
 		public static final int DUSK_REWARD   = 30;
+		//enkephalin boxes given for suppressing the Blue Star, only the first time in a game
+		public static final int BLUE_STAR_REWARD = 40;
 
 		private static boolean spawned;
 		private static int type;
@@ -582,6 +584,8 @@ public class Angela extends NPC {
 		private static boolean duskPending;
 		//the boss fight the hero is on the way to, it comes out once they arrive at L Corp headquarters
 		private static String bossPending = null;
+		//the boss fights already won in this game, each one pays its reward only once
+		private static ArrayList<String> bossesSuppressed = new ArrayList<>();
 		//each of Angela's services can be used once per game
 		private static boolean extracted;
 		private static boolean refined;
@@ -599,6 +603,7 @@ public class Angela extends NPC {
 			duskCompleted = false;
 			duskPending = false;
 			bossPending = null;
+			bossesSuppressed = new ArrayList<>();
 			extracted = false;
 			refined = false;
 		}
@@ -618,6 +623,7 @@ public class Angela extends NPC {
 		private static final String DUSK_COMPLETED = "dusk_completed";
 		private static final String DUSK_PENDING   = "dusk_pending";
 		private static final String BOSS_PENDING   = "boss_pending";
+		private static final String BOSSES_SUPPRESSED = "bosses_suppressed";
 
 		public static void storeInBundle( Bundle bundle ){
 			Bundle node = new Bundle();
@@ -635,6 +641,7 @@ public class Angela extends NPC {
 			node.put(DUSK_COMPLETED, duskCompleted);
 			node.put(DUSK_PENDING, duskPending);
 			if (bossPending != null) node.put(BOSS_PENDING, bossPending);
+			node.put(BOSSES_SUPPRESSED, bossesSuppressed.toArray(new String[0]));
 			bundle.put(NODE, node);
 		}
 
@@ -658,6 +665,25 @@ public class Angela extends NPC {
 			duskCompleted = node.getBoolean(DUSK_COMPLETED);
 			duskPending = node.getBoolean(DUSK_PENDING);
 			bossPending = node.contains(BOSS_PENDING) ? node.getString(BOSS_PENDING) : null;
+			bossesSuppressed = new ArrayList<>();
+			if (node.contains(BOSSES_SUPPRESSED)){
+				for (String b : node.getStringArray(BOSSES_SUPPRESSED)) bossesSuppressed.add(b);
+			}
+		}
+
+		public static int bossReward( String boss ){
+			if (BLUE_STAR.equals(boss)) return BLUE_STAR_REWARD;
+			return 0;
+		}
+
+		//called when a boss of the floor 26 Angela falls, its enkephalin boxes are given the first time in a game
+		public static void onBossSuppressed( String boss ){
+			if (bossesSuppressed.contains(boss)) return;
+			bossesSuppressed.add(boss);
+			int reward = bossReward(boss);
+			if (reward <= 0) return;
+			Warehouse.addEnkephalin(reward);
+			GLog.p(Messages.get(Angela.class, "boss_reward", reward, Warehouse.enkephalin()));
 		}
 
 		public static boolean extracted(){
