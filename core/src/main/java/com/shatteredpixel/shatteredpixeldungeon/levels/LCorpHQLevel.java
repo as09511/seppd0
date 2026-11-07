@@ -96,6 +96,11 @@ public class LCorpHQLevel extends Level {
 		return 1 + (row+1)*STEP;
 	}
 
+	//the bottom left cell of the 2x2 middle of the Central Command lobby (Tiphereth's room), where the Blue Star stands
+	public int lobbyCentre(){
+		return roomX(1) + ROOM/2 - 1 + (roomY(1) + ROOM/2)*width();
+	}
+
 	//which sephira's room a cell belongs to, or -1 for corridors and walls
 	public int roomAt(int cell){
 		int x = cell % width(), y = cell / width();

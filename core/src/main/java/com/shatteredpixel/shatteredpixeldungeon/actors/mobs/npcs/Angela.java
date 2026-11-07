@@ -44,6 +44,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.boss.BlueStar;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.BlueStarSprite;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BossHealthBar;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.CheersForTheBeginning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.ClimaxThroes;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.FoodChain;
@@ -261,8 +264,10 @@ public class Angela extends NPC {
 		});
 	}
 
-	//the boss fights the Angela of floor 26 can send the hero to, by message key. None are ready yet
-	private static final String[] BOSS_FIGHTS = {};
+	//the boss fights the Angela of floor 26 can send the hero to, by message key.
+	// Each one is fought at L Corp headquarters, which stays sealed until the boss falls
+	public static final String BLUE_STAR = "blue_star";
+	private static final String[] BOSS_FIGHTS = {BLUE_STAR};
 
 	private void showBossMenu(){
 		ArrayList<String> labels = new ArrayList<>();
@@ -290,8 +295,25 @@ public class Angela extends NPC {
 		});
 	}
 
-	//takes the hero to the chosen boss fight, filled in once there are any
 	private void enterBossFight( String boss ){
+		GameScene.show(new WndOptions(
+				sprite(),
+				Messages.titleCase(name()),
+				Messages.get(Angela.class, "boss_confirm", Messages.get(Angela.class, "boss_" + boss)),
+				Messages.get(Angela.class, "boss_accept"),
+				Messages.get(Angela.class, "cancel")){
+			@Override
+			protected void onSelect( int index ) {
+				if (index == 0) Quest.startBossFight(boss);
+			}
+		});
+	}
+
+	//Angela of floor 26, as summoned with the testing tools
+	public static class BossGate extends Angela {
+		{
+			((Angela) this).ordealTier = BOSS_GATE;
+		}
 	}
 
 	//the floors where Angela waits by the stairs
@@ -558,6 +580,8 @@ public class Angela extends NPC {
 		private static boolean duskCompleted;
 		//the Amber Dusk takes the hero to L Corp headquarters, the Food Chains come out once they arrive
 		private static boolean duskPending;
+		//the boss fight the hero is on the way to, it comes out once they arrive at L Corp headquarters
+		private static String bossPending = null;
 		//each of Angela's services can be used once per game
 		private static boolean extracted;
 		private static boolean refined;
@@ -574,6 +598,7 @@ public class Angela extends NPC {
 			duskGiven = false;
 			duskCompleted = false;
 			duskPending = false;
+			bossPending = null;
 			extracted = false;
 			refined = false;
 		}
@@ -592,6 +617,7 @@ public class Angela extends NPC {
 		private static final String DUSK_GIVEN     = "dusk_given";
 		private static final String DUSK_COMPLETED = "dusk_completed";
 		private static final String DUSK_PENDING   = "dusk_pending";
+		private static final String BOSS_PENDING   = "boss_pending";
 
 		public static void storeInBundle( Bundle bundle ){
 			Bundle node = new Bundle();
@@ -608,6 +634,7 @@ public class Angela extends NPC {
 			node.put(DUSK_GIVEN, duskGiven);
 			node.put(DUSK_COMPLETED, duskCompleted);
 			node.put(DUSK_PENDING, duskPending);
+			if (bossPending != null) node.put(BOSS_PENDING, bossPending);
 			bundle.put(NODE, node);
 		}
 
@@ -630,6 +657,7 @@ public class Angela extends NPC {
 			duskGiven = node.getBoolean(DUSK_GIVEN);
 			duskCompleted = node.getBoolean(DUSK_COMPLETED);
 			duskPending = node.getBoolean(DUSK_PENDING);
+			bossPending = node.contains(BOSS_PENDING) ? node.getString(BOSS_PENDING) : null;
 		}
 
 		public static boolean extracted(){
@@ -926,6 +954,12 @@ public class Angela extends NPC {
 		//the Food Chains come out once the hero has arrived at L Corp headquarters, which stays sealed until they fall.
 		// Called while the floor is being switched to, before its actors start
 		public static void beforeArrival( Level level ){
+			if (bossPending != null && level instanceof LCorpHQLevel){
+				if (bossPending.equals(BLUE_STAR)) BlueStar.spawn((LCorpHQLevel) level);
+				bossArrival = bossPending;
+				bossPending = null;
+				return;
+			}
 			if (!duskPending || !(level instanceof LCorpHQLevel)) return;
 			duskPending = false;
 			ArrayList<Integer> corridors = new ArrayList<>();
@@ -941,9 +975,45 @@ public class Angela extends NPC {
 		}
 
 		private static boolean arrivalText = false;
+		private static String bossArrival = null;
 
-		//once the floor's actors are running, the Amber Dusk's words are shown
+		//off to L Corp headquarters for one of the boss fights of floor 26
+		public static void startBossFight( String boss ){
+			Level level = Dungeon.level;
+			if (level.locked || !Dungeon.hero.isAlive()) return;
+			bossPending = boss;
+			Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
+			Level.beforeTransition();
+			Invisibility.dispel();
+			InterlevelScene.curTransition = new LevelTransition(level, Dungeon.hero.pos,
+					LevelTransition.Type.BRANCH_EXIT, Dungeon.depth, 2, LevelTransition.Type.BRANCH_ENTRANCE);
+			InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
+			Game.switchScene(InterlevelScene.class);
+		}
+
+		//once the floor's actors are running, the Amber Dusk's words (or the boss fight's) are shown
 		public static void afterArrival(){
+			if (bossArrival != null){
+				String boss = bossArrival;
+				bossArrival = null;
+				Actor.add(new Actor(){
+					{
+						actPriority = VFX_PRIO;
+					}
+
+					@Override
+					protected boolean act() {
+						Actor.remove(this);
+						for (Mob m : Dungeon.level.mobs){
+							if (m instanceof BlueStar) BossHealthBar.assignBoss(m);
+						}
+						Game.runOnRenderThread(() -> GameScene.show(new WndTitledMessage(new BlueStarSprite(),
+								Messages.get(Angela.class, "boss_" + boss), Messages.get(Angela.class, "boss_start_" + boss))));
+						return true;
+					}
+				});
+				return;
+			}
 			if (!arrivalText) return;
 			arrivalText = false;
 			Actor.add(new Actor(){

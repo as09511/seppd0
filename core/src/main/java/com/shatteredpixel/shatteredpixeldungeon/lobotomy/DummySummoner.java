@@ -52,7 +52,8 @@ public class DummySummoner extends Item {
 			TrainingDummy.Weak.class,
 			TrainingDummy.PaleWeak.class,
 			TrainingDummy.Ally.class,
-			Angela.class
+			Angela.class,
+			Angela.BossGate.class
 	};
 
 	{
@@ -77,7 +78,8 @@ public class DummySummoner extends Item {
 		if (action.equals(AC_SUMMON)){
 			String[] names = new String[DUMMIES.length];
 			for (int i = 0; i < DUMMIES.length; i++){
-				names[i] = Messages.titleCase(Reflection.newInstance(DUMMIES[i]).name());
+				names[i] = DUMMIES[i] == Angela.BossGate.class ? Messages.get(this, "boss_gate")
+						: Messages.titleCase(Reflection.newInstance(DUMMIES[i]).name());
 			}
 
 			GameScene.show(new WndOptions(new ItemSprite(this), Messages.titleCase(name()), Messages.get(this, "choose"), names){
