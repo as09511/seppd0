@@ -118,6 +118,9 @@ import com.shatteredpixel.shatteredpixeldungeon.lobotomy.EgoExtractor;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.watabou.utils.DeviceCompat;
 
+//A new playable class also needs its ending portrait: a 24x32 frame in sprites/avatars.png at the
+// class's ordinal, shown by SurfaceScene when the hero climbs out of floor 1 with the amulet.
+// Testing classes reuse the portrait of the class they copy (see SurfaceScene.Avatar).
 public enum HeroClass {
 
 	WARRIOR( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
