@@ -74,14 +74,19 @@ public class BlueStarSprite extends MobSprite {
 		//it faces every way at once
 	}
 
-	//the heart flares and a blue shockwave sweeps out over the whole floor
+	private StarShockwave wave;
+
+	//the heart flares and a blue shockwave sweeps out over the whole floor.
+	// Only one ring is out at a time, so turns that pass quickly don't pile them up
 	public void shockwave(){
+		if (wave != null && wave.alive && wave.parent != null) return;
 		play( attack );
 		//out to the farthest corner of the floor
 		PointF c = center();
 		float w = Dungeon.level.width() * DungeonTilemap.SIZE, h = Dungeon.level.height() * DungeonTilemap.SIZE;
 		float reach = (float)Math.hypot(Math.max(c.x, w - c.x), Math.max(c.y, h - c.y));
-		GameScene.effect( new StarShockwave( c, reach, reach / 600f, WAVE_COLOR ) );
+		wave = new StarShockwave( c, reach, reach / 600f, WAVE_COLOR );
+		GameScene.effect( wave );
 	}
 
 	@Override

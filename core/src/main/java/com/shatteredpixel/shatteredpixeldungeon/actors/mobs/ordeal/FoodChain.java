@@ -490,6 +490,12 @@ public class FoodChain extends OrdealMob {
 		super.die(cause);
 	}
 
+	//it is always aware of the hero, so only an invisible hero catches it off guard
+	@Override
+	public boolean surprisedBy( Char enemy, boolean attacking ){
+		return enemy == Dungeon.hero && enemy.invisible > 0 && (!attacking || enemy.canSurpriseAttack());
+	}
+
 	@Override
 	protected boolean getCloser( int target ) {
 		return false;
@@ -609,6 +615,12 @@ public class FoodChain extends OrdealMob {
 		public String info() {
 			FoodChain o = owner();
 			return o != null ? o.info() : Messages.get(FoodChain.class, "desc");
+		}
+
+		@Override
+		public boolean surprisedBy( Char enemy, boolean attacking ){
+			FoodChain o = owner();
+			return o != null ? o.surprisedBy(enemy, attacking) : super.surprisedBy(enemy, attacking);
 		}
 
 		@Override

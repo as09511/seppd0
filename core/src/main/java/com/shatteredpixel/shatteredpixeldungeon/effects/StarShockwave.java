@@ -85,7 +85,7 @@ public class StarShockwave extends Image {
 		}
 		float p = time / duration;
 		place(4 + (maxRadius - 4) * p);
-		alpha(1f - p*p);
+		alpha(0.6f * (1f - p*p));
 	}
 
 	@Override

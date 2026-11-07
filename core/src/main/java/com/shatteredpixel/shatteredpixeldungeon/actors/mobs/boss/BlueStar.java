@@ -240,6 +240,12 @@ public class BlueStar extends Mob {
 		GLog.p(Messages.get(this, "suppressed"));
 	}
 
+	//it is always aware of the hero, so only an invisible hero catches it off guard
+	@Override
+	public boolean surprisedBy( Char enemy, boolean attacking ){
+		return enemy == Dungeon.hero && enemy.invisible > 0 && (!attacking || enemy.canSurpriseAttack());
+	}
+
 	@Override
 	protected boolean getCloser( int target ) {
 		return false;
@@ -350,6 +356,12 @@ public class BlueStar extends Mob {
 		public String info() {
 			BlueStar o = owner();
 			return o != null ? o.info() : Messages.get(BlueStar.class, "desc");
+		}
+
+		@Override
+		public boolean surprisedBy( Char enemy, boolean attacking ){
+			BlueStar o = owner();
+			return o != null ? o.surprisedBy(enemy, attacking) : super.surprisedBy(enemy, attacking);
 		}
 
 		@Override
