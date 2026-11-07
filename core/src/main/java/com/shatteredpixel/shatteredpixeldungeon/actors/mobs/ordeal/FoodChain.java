@@ -36,6 +36,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfBlastWave;
 import com.shatteredpixel.shatteredpixeldungeon.levels.LCorpHQLevel;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.MultiCellHits;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -457,15 +458,18 @@ public class FoodChain extends OrdealMob {
 		}
 	}
 
-	//a blast or a cloud that covers several of its cells at once only harms it once
-	private Object lastSource = null;
-	private float lastSourceTime = -1;
+	//a blast or a cloud that covers several of its cells at once only harms it once,
+	// several strikes on the same cell all go through
+	private final MultiCellHits hits = new MultiCellHits();
 
 	@Override
 	public void damage( int dmg, Object src ) {
-		if (src != null && src == lastSource && Actor.now() == lastSourceTime) return;
-		lastSource = src;
-		lastSourceTime = Actor.now();
+		damage(dmg, src, 3);
+	}
+
+	//cell: 0-2 for the parts, 3 for its own cell
+	private void damage( int dmg, Object src, int cell ){
+		if (!hits.allow(src, cell)) return;
 		super.damage(dmg, src);
 		for (Body b : parts()){
 			if (b != null){
@@ -565,7 +569,12 @@ public class FoodChain extends OrdealMob {
 		@Override
 		public void damage( int dmg, Object src ) {
 			FoodChain o = owner();
-			if (o != null) o.damage(dmg, src);
+			if (o == null) return;
+			//the damage type of the attack goes along, so it shows as it should
+			DamageType type = o.incomingDamageType;
+			o.incomingDamageType = incomingDamageType;
+			o.damage(dmg, src, index);
+			o.incomingDamageType = type;
 		}
 
 		@Override
