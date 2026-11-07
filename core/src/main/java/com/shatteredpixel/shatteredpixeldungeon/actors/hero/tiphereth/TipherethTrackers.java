@@ -198,7 +198,8 @@ public class TipherethTrackers {
 		int toHealth = Math.max(0, dmg - hero.shielding());
 		int share = Math.min(Math.round(toHealth * TipherethB.shareRatio(hero)), b.HP);
 		if (share <= 0) return dmg;
-		b.damage(share, src);
+		//her share was already reduced on Tiphereth's side, so the trauma prevention shield isn't applied twice
+		b.takeShare(share, src);
 		return dmg - share;
 	}
 

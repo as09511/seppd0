@@ -165,6 +165,11 @@ public class TipherethB extends PrismaticImage {
 		super.damage(TipherethTrackers.traumaShield(this, dmg, src), src);
 	}
 
+	//the part of Tiphereth's damage she takes for her, already reduced on Tiphereth's side
+	public void takeShare( int dmg, Object src ) {
+		super.damage(dmg, src);
+	}
+
 	@Override
 	public CharSprite sprite() {
 		return new TipherethBSprite();
