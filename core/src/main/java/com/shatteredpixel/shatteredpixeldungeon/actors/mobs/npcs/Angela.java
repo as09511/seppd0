@@ -272,7 +272,10 @@ public class Angela extends NPC {
 	private void showBossMenu(){
 		ArrayList<String> labels = new ArrayList<>();
 		for (String boss : BOSS_FIGHTS){
-			labels.add(Messages.get(Angela.class, "boss_" + boss));
+			String label = Messages.get(Angela.class, "boss_" + boss);
+			//each boss fight can be taken on once per game
+			if (Quest.bossChallenged(boss)) label = Messages.get(Angela.class, "boss_done", label);
+			labels.add(label);
 		}
 		boolean none = labels.isEmpty();
 		if (none) labels.add(Messages.get(Angela.class, "boss_preparing"));
@@ -285,7 +288,8 @@ public class Angela extends NPC {
 				labels.toArray(new String[0])){
 			@Override
 			protected boolean enabled( int index ) {
-				return !none || index != 0;
+				if (none) return index != 0;
+				return index >= BOSS_FIGHTS.length || !Quest.bossChallenged(BOSS_FIGHTS[index]);
 			}
 
 			@Override
@@ -584,8 +588,8 @@ public class Angela extends NPC {
 		private static boolean duskPending;
 		//the boss fight the hero is on the way to, it comes out once they arrive at L Corp headquarters
 		private static String bossPending = null;
-		//the boss fights already won in this game, each one pays its reward only once
-		private static ArrayList<String> bossesSuppressed = new ArrayList<>();
+		//the boss fights already taken on in this game, each one can be challenged only once
+		private static ArrayList<String> bossesChallenged = new ArrayList<>();
 		//each of Angela's services can be used once per game
 		private static boolean extracted;
 		private static boolean refined;
@@ -603,7 +607,7 @@ public class Angela extends NPC {
 			duskCompleted = false;
 			duskPending = false;
 			bossPending = null;
-			bossesSuppressed = new ArrayList<>();
+			bossesChallenged = new ArrayList<>();
 			extracted = false;
 			refined = false;
 		}
@@ -623,7 +627,7 @@ public class Angela extends NPC {
 		private static final String DUSK_COMPLETED = "dusk_completed";
 		private static final String DUSK_PENDING   = "dusk_pending";
 		private static final String BOSS_PENDING   = "boss_pending";
-		private static final String BOSSES_SUPPRESSED = "bosses_suppressed";
+		private static final String BOSSES_CHALLENGED = "bosses_challenged";
 
 		public static void storeInBundle( Bundle bundle ){
 			Bundle node = new Bundle();
@@ -641,7 +645,7 @@ public class Angela extends NPC {
 			node.put(DUSK_COMPLETED, duskCompleted);
 			node.put(DUSK_PENDING, duskPending);
 			if (bossPending != null) node.put(BOSS_PENDING, bossPending);
-			node.put(BOSSES_SUPPRESSED, bossesSuppressed.toArray(new String[0]));
+			node.put(BOSSES_CHALLENGED, bossesChallenged.toArray(new String[0]));
 			bundle.put(NODE, node);
 		}
 
@@ -665,10 +669,12 @@ public class Angela extends NPC {
 			duskCompleted = node.getBoolean(DUSK_COMPLETED);
 			duskPending = node.getBoolean(DUSK_PENDING);
 			bossPending = node.contains(BOSS_PENDING) ? node.getString(BOSS_PENDING) : null;
-			bossesSuppressed = new ArrayList<>();
-			if (node.contains(BOSSES_SUPPRESSED)){
-				for (String b : node.getStringArray(BOSSES_SUPPRESSED)) bossesSuppressed.add(b);
+			bossesChallenged = new ArrayList<>();
+			if (node.contains(BOSSES_CHALLENGED)){
+				for (String b : node.getStringArray(BOSSES_CHALLENGED)) bossesChallenged.add(b);
 			}
+			//a boss fight already under way in an older save counts as taken on
+			if (bossPending != null && !bossesChallenged.contains(bossPending)) bossesChallenged.add(bossPending);
 		}
 
 		public static int bossReward( String boss ){
@@ -676,10 +682,13 @@ public class Angela extends NPC {
 			return 0;
 		}
 
-		//called when a boss of the floor 26 Angela falls, its enkephalin boxes are given the first time in a game
+		public static boolean bossChallenged( String boss ){
+			return bossesChallenged.contains(boss);
+		}
+
+		//called when a boss of the floor 26 Angela falls, giving its enkephalin boxes
 		public static void onBossSuppressed( String boss ){
-			if (bossesSuppressed.contains(boss)) return;
-			bossesSuppressed.add(boss);
+			if (!bossesChallenged.contains(boss)) bossesChallenged.add(boss);
 			int reward = bossReward(boss);
 			if (reward <= 0) return;
 			Warehouse.addEnkephalin(reward);
@@ -1006,8 +1015,9 @@ public class Angela extends NPC {
 		//off to L Corp headquarters for one of the boss fights of floor 26
 		public static void startBossFight( String boss ){
 			Level level = Dungeon.level;
-			if (level.locked || !Dungeon.hero.isAlive()) return;
+			if (level.locked || !Dungeon.hero.isAlive() || bossChallenged(boss)) return;
 			bossPending = boss;
+			bossesChallenged.add(boss);
 			Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
 			Level.beforeTransition();
 			Invisibility.dispel();
