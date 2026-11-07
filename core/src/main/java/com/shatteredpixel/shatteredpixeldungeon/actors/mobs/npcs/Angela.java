@@ -93,6 +93,7 @@ import java.util.ArrayList;
 //and once that is overcome too one of three Dusk ordeals on floor 16.
 //In exchange for enkephalin boxes from the warehouse she also extracts or refines E.G.O, once each per game,
 //and for a beacon of returning her elevator takes the hero to her on another floor already reached.
+//On floor 26 another Angela stands at the top of the amulet's room, who does nothing but send the hero to a boss fight.
 public class Angela extends NPC {
 
 	{
@@ -107,6 +108,8 @@ public class Angela extends NPC {
 	public static final int DAWN = 1;
 	public static final int NOON = 2;
 	public static final int DUSK = 3;
+	//the Angela of floor 26, who only offers the boss fights
+	public static final int BOSS_GATE = 4;
 	private static final int NEXT = -1;
 
 	private int ordealTier = NEXT;
@@ -147,6 +150,11 @@ public class Angela extends NPC {
 
 		if (c != Dungeon.hero){
 			return super.interact(c);
+		}
+
+		if (ordealTier == BOSS_GATE){
+			Game.runOnRenderThread(this::showBossMenu);
+			return true;
 		}
 
 		//an Angela summoned with the testing tools (or from an older save) picks her ordeal on the spot
@@ -251,6 +259,39 @@ public class Angela extends NPC {
 				}
 			}
 		});
+	}
+
+	//the boss fights the Angela of floor 26 can send the hero to, by message key. None are ready yet
+	private static final String[] BOSS_FIGHTS = {};
+
+	private void showBossMenu(){
+		ArrayList<String> labels = new ArrayList<>();
+		for (String boss : BOSS_FIGHTS){
+			labels.add(Messages.get(Angela.class, "boss_" + boss));
+		}
+		boolean none = labels.isEmpty();
+		if (none) labels.add(Messages.get(Angela.class, "boss_preparing"));
+		labels.add(Messages.get(Angela.class, "menu_leave"));
+
+		GameScene.show(new WndOptions(
+				sprite(),
+				Messages.titleCase(name()),
+				Messages.get(Angela.class, "boss_menu"),
+				labels.toArray(new String[0])){
+			@Override
+			protected boolean enabled( int index ) {
+				return !none || index != 0;
+			}
+
+			@Override
+			protected void onSelect( int index ) {
+				if (!none && index < BOSS_FIGHTS.length) enterBossFight(BOSS_FIGHTS[index]);
+			}
+		});
+	}
+
+	//takes the hero to the chosen boss fight, filled in once there are any
+	private void enterBossFight( String boss ){
 	}
 
 	//the floors where Angela waits by the stairs
@@ -661,6 +702,30 @@ public class Angela extends NPC {
 		//places an Angela without an ordeal near the entrance stairs of floor 21
 		public static void spawnTrader( Level level, Room entranceRoom ){
 			placeNearEntrance(level, entranceRoom, NONE);
+		}
+
+		//places the Angela of floor 26 on the given cell, or next to it if someone already stands there
+		public static void spawnBossGate( Level level, int cell ){
+			for (Mob m : level.mobs){
+				if (m instanceof Angela) return;
+			}
+			int pos = cell;
+			if (level.findMob(pos) != null || (Dungeon.hero != null && Dungeon.hero.pos == pos)){
+				pos = -1;
+				for (int n : PathFinder.NEIGHBOURS8){
+					int c = cell + n;
+					if (level.passable[c] && !level.solid[c] && level.findMob(c) == null
+							&& (Dungeon.hero == null || Dungeon.hero.pos != c)){
+						pos = c;
+						break;
+					}
+				}
+				if (pos == -1) return;
+			}
+			Angela angela = new Angela();
+			angela.ordealTier = BOSS_GATE;
+			angela.pos = pos;
+			level.mobs.add(angela);
 		}
 
 		private static Angela placeNearEntrance( Level level, Room entranceRoom, int ordealTier ){

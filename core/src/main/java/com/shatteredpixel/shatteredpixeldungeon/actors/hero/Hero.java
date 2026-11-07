@@ -716,6 +716,11 @@ public class Hero extends Char {
 		//Tiphereth's physical interference shield: +0~2/0~4 armor
 		dr += TipherethTrackers.physicalShield(this);
 
+		//Netzach's resignation: +1/+1~2 armor at 50% health or less
+		if (hasTalent(Talent.RESIGNATION) && HP <= HT*0.5f){
+			dr += Random.NormalIntRange(1, pointsInTalent(Talent.RESIGNATION));
+		}
+
 		//the Golden Road trades armor for melee damage
 		GoldRush.GoldenRoad goldenRoad = buff(GoldRush.GoldenRoad.class);
 		if (goldenRoad != null){
@@ -1793,10 +1798,6 @@ public class Hero extends Char {
 			damage *= 1.5f;
 		}
 
-		//Netzach's resignation: 10/20% less damage taken at 50% health or less
-		if (hasTalent(Talent.RESIGNATION) && HP <= HT*0.5f){
-			damage *= 1f - 0.1f*pointsInTalent(Talent.RESIGNATION);
-		}
 		//Netzach's safety secured: less damage taken while paying back deferred damage
 		damage *= NetzachTrackers.damageTakenFactor(this, src);
 		//Netzach's trance: less damage taken while performing da capo

@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.items.Amulet;
 import com.shatteredpixel.shatteredpixeldungeon.levels.features.LevelTransition;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.Painter;
@@ -36,6 +37,7 @@ import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTileSheet;
 import com.watabou.noosa.Group;
 import com.watabou.noosa.Tilemap;
 import com.watabou.noosa.audio.Music;
+import com.watabou.utils.Bundle;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
@@ -118,6 +120,8 @@ public class LastLevel extends Level {
 	private static final int WIDTH = 16;
 	private static final int MID = WIDTH/2;
 	public static int AMULET_POS = 12*WIDTH + MID;
+	//Angela waits at the top of the amulet's room to send the hero to the boss fights
+	public static final int ANGELA_POS = 9*WIDTH + MID;
 
 	@Override
 	protected boolean build() {
@@ -178,6 +182,14 @@ public class LastLevel extends Level {
 
 	@Override
 	protected void createMobs() {
+		Angela.Quest.spawnBossGate(this, ANGELA_POS);
+	}
+
+	@Override
+	public void restoreFromBundle( Bundle bundle ) {
+		super.restoreFromBundle(bundle);
+		//floors reached before she came here get her too
+		Angela.Quest.spawnBossGate(this, ANGELA_POS);
 	}
 
 	public Actor addRespawner() {
