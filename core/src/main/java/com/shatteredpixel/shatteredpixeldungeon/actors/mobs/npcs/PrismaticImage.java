@@ -38,6 +38,8 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfAccuracy;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEvasion;
 import com.shatteredpixel.shatteredpixeldungeon.levels.features.Chasm;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageType;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.PrismaticSprite;
 import com.watabou.noosa.audio.Sample;
@@ -217,6 +219,9 @@ public class PrismaticImage extends NPC {
 		if (enemy instanceof Mob) {
 			((Mob)enemy).aggro( this );
 		}
+
+		//the same damage type as the hero's own attacks
+		damage = DamageType.apply(enemy, HeroDamageType.of(hero), damage);
 		
 		return super.attackProc( enemy, damage );
 	}

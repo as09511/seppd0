@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.ui.HealthBar;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.watabou.noosa.ui.Component;
+import com.watabou.utils.Reflection;
 
 public class WndInfoMob extends WndTitledMessage {
 	
@@ -54,7 +55,7 @@ public class WndInfoMob extends WndTitledMessage {
 			name.hardlight( TITLE_COLOR );
 			add( name );
 			
-			image = mob.sprite();
+			image = mob.shownSpriteClass() == mob.spriteClass ? mob.sprite() : Reflection.newInstance(mob.shownSpriteClass());
 			add( image );
 
 			health = new HealthBar();

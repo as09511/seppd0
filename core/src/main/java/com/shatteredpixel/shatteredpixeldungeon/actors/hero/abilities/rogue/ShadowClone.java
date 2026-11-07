@@ -49,6 +49,8 @@ import com.watabou.noosa.particles.Emitter;
 import com.watabou.noosa.tweeners.Tweener;
 import com.watabou.utils.BArray;
 import com.watabou.utils.Bundle;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageType;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
@@ -221,7 +223,8 @@ public class ShadowClone extends ArmorAbility {
 					&& Dungeon.hero.belongings.weapon() != null){
 				return Dungeon.hero.belongings.weapon().proc( this, enemy, damage );
 			} else {
-				return damage;
+				//the same damage type as the hero's own attacks (an E.G.O weapon's proc applies it above)
+				return DamageType.apply(enemy, HeroDamageType.of(Dungeon.hero), damage);
 			}
 		}
 

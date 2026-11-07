@@ -41,6 +41,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WornShortsword;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.MirrorSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
@@ -182,6 +183,8 @@ public class MirrorImage extends NPC {
 			}
 			return damage;
 		} else {
+			//bare-handed, it deals RED damage like the hero (an E.G.O weapon applies its own type in proc)
+			damage = DamageType.apply(enemy, DamageType.RED, damage);
 			//hero benefits from holy weapon and body form when unarmed, so do mirror images
 			boolean wasEnemy = enemy.alignment == Alignment.ENEMY;
 			if (hero.buff(BodyForm.BodyFormBuff.class) != null

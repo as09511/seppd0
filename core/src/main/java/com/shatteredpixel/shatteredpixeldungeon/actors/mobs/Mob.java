@@ -273,6 +273,12 @@ public abstract class Mob extends Char {
 	public CharSprite sprite() {
 		return Reflection.newInstance(spriteClass);
 	}
+
+	//the picture of this mob shown in its info window and on the attack button.
+	// The hidden cells of a monster that fills several cells show the monster itself
+	public Class<? extends CharSprite> shownSpriteClass(){
+		return spriteClass;
+	}
 	
 	@Override
 	protected boolean act() {

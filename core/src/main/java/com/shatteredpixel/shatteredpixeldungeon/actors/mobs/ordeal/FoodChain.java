@@ -42,6 +42,7 @@ import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.FoodChainSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
@@ -604,6 +605,11 @@ public class FoodChain extends OrdealMob {
 		public float damageMultiplier( DamageType type ) {
 			FoodChain o = owner();
 			return o != null ? o.damageMultiplier(type) : super.damageMultiplier(type);
+		}
+
+		@Override
+		public Class<? extends CharSprite> shownSpriteClass() {
+			return FoodChainSprite.class;
 		}
 
 		@Override

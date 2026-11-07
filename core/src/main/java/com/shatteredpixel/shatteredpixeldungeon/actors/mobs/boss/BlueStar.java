@@ -45,6 +45,7 @@ import com.shatteredpixel.shatteredpixeldungeon.lobotomy.RiskLevel;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.BlueStarSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BossHealthBar;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
@@ -345,6 +346,11 @@ public class BlueStar extends Mob {
 		public float damageMultiplier( DamageType type ) {
 			BlueStar o = owner();
 			return o != null ? o.damageMultiplier(type) : super.damageMultiplier(type);
+		}
+
+		@Override
+		public Class<? extends CharSprite> shownSpriteClass() {
+			return BlueStarSprite.class;
 		}
 
 		@Override

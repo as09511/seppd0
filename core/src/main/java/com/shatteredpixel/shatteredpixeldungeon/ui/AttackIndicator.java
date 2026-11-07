@@ -149,7 +149,7 @@ public class AttackIndicator extends Tag {
 			sprite = null;
 		}
 		
-		sprite = Reflection.newInstance(lastTarget.spriteClass);
+		sprite = Reflection.newInstance(lastTarget.shownSpriteClass());
 		active = true;
 		sprite.linkVisuals(lastTarget);
 		sprite.idle();
