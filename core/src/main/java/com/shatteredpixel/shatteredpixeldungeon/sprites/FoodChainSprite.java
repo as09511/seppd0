@@ -104,6 +104,11 @@ public class FoodChainSprite extends MobSprite {
 			visible = false;
 		}
 
+		//never drawn, even in a frame where the fog of war update has just made it visible again
+		@Override
+		public void draw() {
+		}
+
 		@Override
 		public int blood() {
 			return 0xFF6A4020;
