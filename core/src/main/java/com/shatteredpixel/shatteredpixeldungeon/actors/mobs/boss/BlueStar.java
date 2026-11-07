@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.boss;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -239,6 +240,7 @@ public class BlueStar extends Mob {
 		//L Corp headquarters opens again, the stairs in Malkuth's room lead back up
 		Dungeon.level.locked = false;
 		GLog.p(Messages.get(this, "suppressed"));
+		Badges.validateBlueStar();
 	}
 
 	//it is always aware of the hero, so only an invisible hero catches it off guard

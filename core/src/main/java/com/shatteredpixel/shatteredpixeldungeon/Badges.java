@@ -172,6 +172,7 @@ public class Badges {
 		HOPE_TO_BE_BETTER           ( 90 ), //victory as Hod
 		COURAGE_TO_LIVE_ON          ( 91 ), //victory as Netzach
 		EXPECTATION_OF_MEANING      ( 92 ), //victory as Tiphereth
+		BLUE_STAR                   ( 93 ), //suppressing the Blue Star
 
 		//platinum
 		MANY_BUFFS                  ( 96 ),
@@ -1081,6 +1082,11 @@ public class Badges {
 	public static void validateWelcomeToLobotomy() {
 		displayBadge( Badge.WELCOME_TO_LOBOTOMY );
 		saveGlobal();
+	}
+
+	//the Blue Star: suppressing it in its boss fight
+	public static void validateBlueStar() {
+		displayBadge( Badge.BLUE_STAR );
 	}
 
 	public static void validateGamesPlayed() {
