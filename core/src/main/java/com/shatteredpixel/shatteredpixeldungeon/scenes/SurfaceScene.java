@@ -417,7 +417,13 @@ public class SurfaceScene extends PixelScene {
 		
 		public Avatar( HeroClass cl ) {
 			super( Assets.Sprites.AVATARS );
-			frame( new TextureFilm( texture, WIDTH, HEIGHT ).get( cl.ordinal() ) );
+			//the testing classes look like the sephirah they copy
+			if (cl == HeroClass.TEST_NETZACH)   cl = HeroClass.NETZACH;
+			if (cl == HeroClass.TEST_TIPHERETH) cl = HeroClass.TIPHERETH;
+			TextureFilm film = new TextureFilm( texture, WIDTH, HEIGHT );
+			RectF f = film.get( cl.ordinal() );
+			//a class without an avatar of its own falls back to the first one rather than failing
+			frame( f != null ? f : film.get( 0 ) );
 		}
 	}
 	
