@@ -2190,7 +2190,9 @@ public class Hero extends Char {
 				&& (visibleEnemies.size() == 0 || cell == pos)
 				&& !Dungeon.level.locked
 				&& !Dungeon.level.plants.containsKey(cell)
-				&& (Dungeon.depth < 26 || Dungeon.level.getTransition(cell).type == LevelTransition.Type.REGULAR_ENTRANCE) ) {
+				//on floor 26 only the way up works, but L Corp headquarters (a branch of it) can always be left
+				&& (Dungeon.depth < 26 || Dungeon.branch != 0
+					|| Dungeon.level.getTransition(cell).type == LevelTransition.Type.REGULAR_ENTRANCE) ) {
 
 			curAction = new HeroAction.LvlTransition( cell );
 			
