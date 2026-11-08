@@ -76,12 +76,13 @@ public class HodTrackers {
 	//training results: +0.5/1/1.5% melee damage per stack
 	//literature floor librarian: +20% damage against rooted enemies
 	public static float attackMultiplier( Hero hero, Char enemy ){
+		//added together with every other damage dealt bonus
 		float mult = 1f;
 		if (hero.hasTalent(Talent.TRAINING_RESULT)){
-			mult *= 1f + HodManual.stacks(hero) * 0.005f * hero.pointsInTalent(Talent.TRAINING_RESULT);
+			mult += HodManual.stacks(hero) * 0.005f * hero.pointsInTalent(Talent.TRAINING_RESULT);
 		}
 		if (hero.subClass == HeroSubClass.LITERATURE_LIBRARIAN && enemy != null && enemy.buff(Roots.class) != null){
-			mult *= 1.2f;
+			mult += 0.2f;
 		}
 		return mult;
 	}

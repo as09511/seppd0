@@ -37,48 +37,60 @@ import com.shatteredpixel.shatteredpixeldungeon.items.ConcentratedEnkephalin;
 //damage dealt without an attack roll (splash, extra hits, beams, blasts) uses direct(). Allies never get them.
 public class HeroDamageBonus {
 
-	//bonuses that apply before armor: flat ones first, then the multipliers
-	public static float beforeArmor( Hero hero, Char target, float dmg ){
-		//Netzach's hangover: +2/+3 while taking delayed damage
+	//All of these apply after armor. The flat bonus is added first, then the percent bonuses of every
+	// source are added together into a single multiplier.
+
+	//flat bonus: Netzach's hangover, +2/+3 while taking delayed damage
+	public static int flatBonus( Hero hero ){
 		if (hero.hasTalent(Talent.HANGOVER) && hero.buff(Viscosity.DeferedDamage.class) != null){
-			dmg += 1 + hero.pointsInTalent(Talent.HANGOVER);
+			return 1 + hero.pointsInTalent(Talent.HANGOVER);
 		}
+		return 0;
+	}
+
+	//the percent bonuses, summed: 0.25 means +25%
+	public static float percentBonus( Hero hero, Char target ){
+		float bonus = 0f;
 		//Netzach's overdose: +15/25% for a while after concentrated enkephalin
-		dmg *= ConcentratedEnkephalin.Overdose.damageFactor(hero);
+		bonus += ConcentratedEnkephalin.Overdose.damageFactor(hero) - 1f;
 		//Hod's training result and the literature floor librarian's bonus on rooted enemies
 		if (hero.heroClass == HeroClass.HOD){
-			dmg *= HodTrackers.attackMultiplier(hero, target);
+			bonus += HodTrackers.attackMultiplier(hero, target) - 1f;
 		}
 		//Netzach's finale: more damage against enemies with two or more debuffs
 		if (hero.heroClass == HeroClass.NETZACH){
-			dmg *= NetzachTrackers.attackMultiplier(hero, target);
+			bonus += NetzachTrackers.attackMultiplier(hero, target) - 1f;
 		}
 		//Tiphereth's emptiness: more damage for each empty artifact or ring slot
 		if (hero.heroClass == HeroClass.TIPHERETH){
-			dmg *= TipherethTrackers.emptinessDealt(hero);
+			bonus += TipherethTrackers.emptinessDealt(hero) - 1f;
 		}
-		return dmg;
+		//Yesod's viper Yesod, charge and black flame
+		if (hero.heroClass == HeroClass.YESOD){
+			bonus += YesodTrackers.attackMultiplier(hero) - 1f;
+		}
+		return bonus;
 	}
 
-	//bonuses that apply after armor: Yesod's viper Yesod, charge and black flame, added together
-	public static int afterArmor( Hero hero, int dmg ){
-		if (hero.heroClass == HeroClass.YESOD){
-			dmg = Math.round(dmg * YesodTrackers.attackMultiplier(hero));
-		}
-		return dmg;
+	//applied to the damage left once armor is subtracted
+	public static int afterArmor( Hero hero, Char target, int dmg ){
+		int flat = flatBonus(hero);
+		float bonus = percentBonus(hero, target);
+		if (flat == 0 && bonus == 0f) return dmg;
+		return Math.max(0, Math.round((dmg + flat) * (1f + bonus)));
 	}
 
 	//damage dealt to a target without an attack roll, with the given armor roll subtracted (0 for none)
 	public static int direct( Char attacker, Char target, int dmg, int armor ){
 		if (!(attacker instanceof Hero) || dmg <= 0) return Math.max(0, dmg - armor);
 		Hero hero = (Hero) attacker;
-		float boosted = beforeArmor(hero, target, dmg);
+		float boosted = dmg;
 		//G.O visualization +2: analyzed enemies take 20% more, the same as from an attack
 		if (target != null && target.buff(Analyzed.class) != null && hero.pointsInTalent(Talent.GO_VISUALIZATION) >= 2){
 			boosted *= 1.2f;
 		}
 		int result = Math.max(0, Math.round(boosted) - armor);
-		return afterArmor(hero, result);
+		return afterArmor(hero, target, result);
 	}
 
 	public static int direct( Char attacker, Char target, int dmg ){

@@ -483,11 +483,6 @@ public abstract class Char extends Actor {
 				if (enemy.buff(Analyzed.class) != null && Dungeon.hero.pointsInTalent(Talent.GO_VISUALIZATION) >= 2) dmg *= 1.2f;
 			}
 
-			//the sephirot's damage dealt bonuses that apply before armor (Hod, Netzach)
-			if (this instanceof Hero){
-				dmg = HeroDamageBonus.beforeArmor((Hero) this, enemy, dmg);
-			}
-
 			if (buff( PowerOfMany.PowerBuff.class) != null){
 				if (buff( BeamingRay.BeamingRayBoost.class) != null
 					&& buff( BeamingRay.BeamingRayBoost.class).object == enemy.id()){
@@ -536,9 +531,9 @@ public abstract class Char extends Actor {
 			if (effectiveDamage >= 0) {
 				effectiveDamage = Math.max(effectiveDamage - dr, 0);
 
-				//the damage dealt bonuses that apply after armor (Yesod's viper Yesod, charge, black flame)
+				//the sephirot's damage dealt bonuses, after armor and added together
 				if (this instanceof Hero){
-					effectiveDamage = HeroDamageBonus.afterArmor((Hero) this, effectiveDamage);
+					effectiveDamage = HeroDamageBonus.afterArmor((Hero) this, enemy, effectiveDamage);
 				}
 
 				if (enemy.buff(Viscosity.ViscosityTracker.class) != null) {
