@@ -132,7 +132,8 @@ public class RedEyesPenitence extends EgoWeapon implements CombinedEgo {
 		if (white > 0 && defender.isAlive()){
 			defender.damage(white, attacker);
 			if (attacker instanceof Hero && attacker.isAlive()){
-				Buff.affect(attacker, Barrier.class).incShield((int)Math.ceil(white * ratio));
+				//the shield doesn't stack, it only goes up to the new amount if that is higher
+				Buff.affect(attacker, Barrier.class).setShield((int)Math.ceil(white * ratio));
 			}
 		}
 

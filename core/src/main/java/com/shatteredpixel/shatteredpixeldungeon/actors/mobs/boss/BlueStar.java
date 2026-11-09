@@ -55,6 +55,7 @@ import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 //the Blue Star (ALEPH), the first of the boss fights Angela offers on floor 26. It waits in the middle of the
 //Central Command lobby at L Corp headquarters, never moves, and from the moment the fight starts it sends a
@@ -329,9 +330,37 @@ public class BlueStar extends Mob {
 			o.incomingDamageType = type;
 		}
 
+		//buffs and debuffs put on a part go on the Blue Star itself
 		@Override
-		public boolean add( Buff buff ) {
-			return false;
+		public synchronized boolean add( Buff buff ) {
+			BlueStar o = owner();
+			if (o == null) return false;
+			buff.target = o;
+			return o.add(buff);
+		}
+
+		@Override
+		public synchronized <T extends Buff> T buff( Class<T> c ) {
+			BlueStar o = owner();
+			return o != null ? o.buff(c) : null;
+		}
+
+		@Override
+		public synchronized <T extends Buff> HashSet<T> buffs( Class<T> c ) {
+			BlueStar o = owner();
+			return o != null ? o.buffs(c) : new HashSet<T>();
+		}
+
+		@Override
+		public boolean isImmune( Class effect ) {
+			BlueStar o = owner();
+			return o != null ? o.isImmune(effect) : super.isImmune(effect);
+		}
+
+		@Override
+		public float resist( Class effect ) {
+			BlueStar o = owner();
+			return o != null ? o.resist(effect) : super.resist(effect);
 		}
 
 		@Override
