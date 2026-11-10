@@ -45,7 +45,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.boss.BlueStar;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.boss.NothingThere;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.BlueStarSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.NothingThereSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BossHealthBar;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.CheersForTheBeginning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.ClimaxThroes;
@@ -267,7 +269,8 @@ public class Angela extends NPC {
 	//the boss fights the Angela of floor 26 can send the hero to, by message key.
 	// Each one is fought at L Corp headquarters, which stays sealed until the boss falls
 	public static final String BLUE_STAR = "blue_star";
-	private static final String[] BOSS_FIGHTS = {BLUE_STAR};
+	public static final String NOTHING_THERE = "nothing_there";
+	private static final String[] BOSS_FIGHTS = {BLUE_STAR, NOTHING_THERE};
 
 	private void showBossMenu(){
 		ArrayList<String> labels = new ArrayList<>();
@@ -991,6 +994,7 @@ public class Angela extends NPC {
 		public static void beforeArrival( Level level ){
 			if (bossPending != null && level instanceof LCorpHQLevel){
 				if (bossPending.equals(BLUE_STAR)) BlueStar.spawn((LCorpHQLevel) level);
+				if (bossPending.equals(NOTHING_THERE)) NothingThere.spawn((LCorpHQLevel) level);
 				bossArrival = bossPending;
 				bossPending = null;
 				return;
@@ -1041,9 +1045,10 @@ public class Angela extends NPC {
 					protected boolean act() {
 						Actor.remove(this);
 						for (Mob m : Dungeon.level.mobs){
-							if (m instanceof BlueStar) BossHealthBar.assignBoss(m);
+							if (m instanceof BlueStar || m instanceof NothingThere) BossHealthBar.assignBoss(m);
 						}
-						Game.runOnRenderThread(() -> GameScene.show(new WndTitledMessage(new BlueStarSprite(),
+						Game.runOnRenderThread(() -> GameScene.show(new WndTitledMessage(
+								NOTHING_THERE.equals(boss) ? new NothingThereSprite() : new BlueStarSprite(),
 								Messages.get(Angela.class, "boss_" + boss), Messages.get(Angela.class, "boss_start_" + boss))));
 						return true;
 					}

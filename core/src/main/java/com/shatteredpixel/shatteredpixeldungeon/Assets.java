@@ -307,6 +307,7 @@ public class Assets {
 		public static final String CLIMAX_THROES = "sprites/climax_throes.png";
 		public static final String FOOD_CHAIN = "sprites/food_chain.png";
 		public static final String BLUE_STAR = "sprites/blue_star.png";
+		public static final String NOTHING_THERE = "sprites/nothing_there.png";
 		public static final String AVATARS  = "sprites/avatars.png";
 		public static final String PET      = "sprites/pet.png";
 		public static final String AMULET   = "sprites/amulet.png";
