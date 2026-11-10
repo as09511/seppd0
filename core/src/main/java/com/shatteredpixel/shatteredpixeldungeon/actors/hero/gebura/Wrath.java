@@ -30,7 +30,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ShieldBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
-import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Beam;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTilemap;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
@@ -44,7 +46,6 @@ import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
-import com.watabou.utils.Callback;
 
 //The disciplinary team sephirah's wrath: +1 for every hit she lands (melee or ranged) and every hit she takes,
 // +2.5% damage dealt each. At 20 or more she can go into a frenzy from the action button.
@@ -113,8 +114,14 @@ public class Wrath extends Buff implements ActionIndicator.Action {
 	public void gain( int amount ){
 		Hero hero = (Hero) target;
 		if (hero.buff(Frenzy.class) != null) return;
+		int before = stacks;
 		stacks = Math.min(maxStacks(hero), Math.max(stacks, minStacks(hero)) + amount);
 		grace = graceTurns(hero);
+		//the count shows over her head as it builds
+		if (stacks != before && hero.sprite != null && hero.sprite.visible){
+			hero.sprite.showStatus(stacks >= FRENZY_AT ? CharSprite.NEGATIVE : CharSprite.WARNING,
+					Messages.get(this, "status", stacks));
+		}
 		refreshAction();
 		BuffIndicator.refreshHero();
 	}
@@ -271,7 +278,7 @@ public class Wrath extends Buff implements ActionIndicator.Action {
 		GameScene.flash(0x660000);
 		refreshAction();
 		BuffIndicator.refreshHero();
-		hero.spendAndNext(Actor.TICK);
+		//going into a frenzy takes no time
 	}
 
 	private void aimBullet(){
@@ -289,31 +296,26 @@ public class Wrath extends Buff implements ActionIndicator.Action {
 		});
 	}
 
+	//a hitscan shot: it lands at once on any enemy she can see or sense, walls and anything in between don't stop it
 	private void fireBullet( int cell ){
 		Hero hero = (Hero) target;
 		Char enemy = Actor.findChar(cell);
+		boolean sensed = enemy instanceof Mob && hero.mindVisionEnemies.contains(enemy);
 		if (enemy == null || enemy == hero || enemy.alignment == hero.alignment
-				|| !Dungeon.level.heroFOV[cell] || !bulletReady()){
+				|| !(Dungeon.level.heroFOV[cell] || sensed) || !bulletReady()){
 			GLog.w(Messages.get(Wrath.class, "bullet_no_target"));
 			return;
 		}
 		bulletCooldown = bulletCooldown(hero);
 		refreshAction();
-		hero.busy();
 		hero.sprite.turnTo(hero.pos, cell);
-		Sample.INSTANCE.play(Assets.Sounds.HIT_STRONG, 1f, 0.8f);
-		MagicMissile.boltFromChar(hero.sprite.parent, MagicMissile.SHAMAN_RED, hero.sprite, cell, new Callback() {
-			@Override
-			public void call() {
-				if (enemy.isAlive()){
-					//fixed damage, no armor or damage bonuses
-					enemy.damage(BULLET_DAMAGE, hero);
-				}
-				Invisibility.dispel();
-				BuffIndicator.refreshHero();
-				hero.spendAndNext(Actor.TICK);
-			}
-		});
+		Sample.INSTANCE.play(Assets.Sounds.GUNSHOT, 1f, 0.75f);
+		hero.sprite.parent.add(new Beam.DeathRay(hero.sprite.center(), DungeonTilemap.raisedTileCenterToWorld(cell)));
+		//fixed damage, no armor or damage bonuses
+		enemy.damage(BULLET_DAMAGE, hero);
+		Invisibility.dispel();
+		BuffIndicator.refreshHero();
+		hero.spendAndNext(Actor.TICK);
 	}
 
 	private static final String STACKS = "stacks";

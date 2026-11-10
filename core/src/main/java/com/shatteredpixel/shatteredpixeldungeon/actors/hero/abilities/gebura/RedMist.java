@@ -86,7 +86,7 @@ public class RedMist extends ArmorAbility {
 
 		Buff.affect(hero, Form.class).set(duration(hero));
 		hero.sprite.showStatus(CharSprite.NEGATIVE, Messages.get(this, "name"));
-		Sample.INSTANCE.play(Assets.Sounds.CHALLENGE, 1f, 0.8f);
+		Sample.INSTANCE.play(Assets.Sounds.BURNING);
 		GameScene.flash(0x880000);
 		CellEmitter.center(hero.pos).burst(BloodParticle.BURST, 12);
 

@@ -33,6 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DamageType;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.RabbitSprite;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
@@ -103,6 +104,12 @@ public class RabbitMember extends Mob {
 		left--;
 		if (left <= 0){
 			withdraw();
+			//the last one out says the team is pulling back
+			boolean anyLeft = false;
+			for (Mob m : Dungeon.level.mobs){
+				if (m instanceof RabbitMember && m != this && m.isAlive()) anyLeft = true;
+			}
+			if (!anyLeft) GLog.i(Messages.get(RabbitMember.class, "withdrawn"));
 			return true;
 		}
 		return super.act();
@@ -156,7 +163,7 @@ public class RabbitMember extends Mob {
 		boolean visible = sprite != null && (Dungeon.level.heroFOV[pos] || Dungeon.level.heroFOV[enemy.pos]);
 		if (visible){
 			sprite.turnTo(pos, enemy.pos);
-			Sample.INSTANCE.play(Assets.Sounds.HIT_ARROW, 0.6f, 1.3f);
+			Sample.INSTANCE.play(Assets.Sounds.GUNSHOT, 0.7f, Random.Float(0.95f, 1.1f));
 			MagicMissile.boltFromChar(sprite.parent, boltType(), sprite, enemy.pos, new Callback() {
 				@Override
 				public void call() {

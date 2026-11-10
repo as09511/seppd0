@@ -30,7 +30,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
-import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
+import com.watabou.utils.BArray;
+import com.watabou.utils.PathFinder;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -47,7 +48,7 @@ import com.watabou.utils.Callback;
 
 //The language floor librarian: punches like a +0 ring of force, punches back when hit in melee.
 //Charge: each tile walked adds 10% to the next melee hit (50% at most), lost after 2 turns without moving.
-// At +2/+3 the action button dashes at an enemy 2/4 tiles away and hits it, 10 turn cooldown
+// At +2/+3 she can dash at an enemy with 1/3 tiles between them and hit it, 10 turn cooldown
 public class LanguageLibrarian extends Buff implements ActionIndicator.Action {
 
 	public static final int MAX_TILES = 5;
@@ -188,7 +189,7 @@ public class LanguageLibrarian extends Buff implements ActionIndicator.Action {
 
 			@Override
 			public String prompt() {
-				return Messages.get(LanguageLibrarian.class, "prompt", dashRange((Hero) target));
+				return Messages.get(LanguageLibrarian.class, "prompt", dashRange((Hero) target) - 1);
 			}
 		});
 	}
@@ -200,33 +201,45 @@ public class LanguageLibrarian extends Buff implements ActionIndicator.Action {
 			GLog.w(Messages.get(LanguageLibrarian.class, "no_target"));
 			return;
 		}
-		if (Dungeon.level.distance(hero.pos, cell) > dashRange(hero)){
-			GLog.w(Messages.get(LanguageLibrarian.class, "too_far"));
-			return;
-		}
 		if (hero.rooted){
 			PixelScene.shake(1, 1f);
 			return;
 		}
 
-		//she runs straight at the enemy and stops on the last free tile before it
-		int dest = hero.pos;
-		if (!Dungeon.level.adjacent(hero.pos, cell)){
-			Ballistica path = new Ballistica(hero.pos, cell, Ballistica.STOP_TARGET | Ballistica.STOP_SOLID | Ballistica.STOP_CHARS);
-			if (path.collisionPos != cell || path.dist < 1){
-				GLog.w(Messages.get(LanguageLibrarian.class, "blocked"));
-				return;
+		//she runs up to 1/3 tiles to a spot next to the enemy, around corners too,
+		// as long as no chasm, trap or obstacle is in the way
+		int steps = dashRange(hero) - 1;
+		int dest = -1;
+		if (Dungeon.level.adjacent(hero.pos, cell)){
+			dest = hero.pos;
+		} else {
+			boolean[] passable = BArray.and(Dungeon.level.passable, BArray.not(Dungeon.level.avoid, null), null);
+			for (int i = 0; i < passable.length; i++){
+				if (Dungeon.level.pit[i]) passable[i] = false;
 			}
-			dest = path.path.get(path.dist - 1);
-			if (!Dungeon.level.passable[dest] || (Actor.findChar(dest) != null && dest != hero.pos)){
-				GLog.w(Messages.get(LanguageLibrarian.class, "blocked"));
+			for (Char ch : Actor.chars()){
+				if (ch != hero) passable[ch.pos] = false;
+			}
+			PathFinder.buildDistanceMap(hero.pos, passable, steps);
+			for (int n : PathFinder.NEIGHBOURS8){
+				int c = cell + n;
+				if (c < 0 || c >= Dungeon.level.length() || !passable[c]) continue;
+				if (PathFinder.distance[c] > steps) continue;
+				if (dest == -1 || PathFinder.distance[c] < PathFinder.distance[dest]
+						|| (PathFinder.distance[c] == PathFinder.distance[dest]
+							&& Dungeon.level.trueDistance(c, hero.pos) < Dungeon.level.trueDistance(dest, hero.pos))){
+					dest = c;
+				}
+			}
+			if (dest == -1){
+				GLog.w(Messages.get(LanguageLibrarian.class, "too_far"));
 				return;
 			}
 		}
+		int run = dest == hero.pos ? 0 : PathFinder.distance[dest];
 
 		cooldown = DASH_COOLDOWN;
 		refreshAction();
-		int run = Dungeon.level.distance(hero.pos, dest);
 		tiles = Math.min(MAX_TILES, tiles + run);
 		idle = 0;
 
