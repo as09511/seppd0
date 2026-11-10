@@ -98,6 +98,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImag
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRage;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRemoveCurse;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfUpgrade;
+import com.shatteredpixel.shatteredpixeldungeon.items.spells.CurseInfusion;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfExperience;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfMagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
@@ -379,6 +380,8 @@ public enum HeroClass {
 		Dungeon.energy += 100;
 		new ScrollOfUpgrade().quantity(15).identify().collect();
 		new Dart().quantity(1).identify().collect();
+		new ScrollOfRemoveCurse().quantity(10).identify().collect();
+		new CurseInfusion().quantity(10).identify().collect();
 
 		//the class's own starting item keeps the first quickslot
 		EgoExtractor extractor = new EgoExtractor();
