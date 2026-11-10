@@ -172,9 +172,9 @@ public class Badges {
 		HOPE_TO_BE_BETTER           ( 90 ), //victory as Hod
 		COURAGE_TO_LIVE_ON          ( 91 ), //victory as Netzach
 		EXPECTATION_OF_MEANING      ( 92 ), //victory as Tiphereth
+		COURAGE_TO_PROTECT          ( 95 ), //victory as Gebura
 		BLUE_STAR                   ( 93 ), //suppressing the Blue Star
 		NOTHING_THERE               ( 94 ), //suppressing Nothing There
-		COURAGE_TO_PROTECT          ( 95 ), //victory as Gebura
 
 		//platinum
 		MANY_BUFFS                  ( 96 ),
