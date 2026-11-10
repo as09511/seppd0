@@ -420,6 +420,7 @@ public class SurfaceScene extends PixelScene {
 			//the testing classes look like the sephirah they copy
 			if (cl == HeroClass.TEST_NETZACH)   cl = HeroClass.NETZACH;
 			if (cl == HeroClass.TEST_TIPHERETH) cl = HeroClass.TIPHERETH;
+			if (cl == HeroClass.TEST_GEBURA)    cl = HeroClass.GEBURA;
 			TextureFilm film = new TextureFilm( texture, WIDTH, HEIGHT );
 			RectF f = film.get( cl.ordinal() );
 			//a class without an avatar of its own falls back to the first one rather than failing

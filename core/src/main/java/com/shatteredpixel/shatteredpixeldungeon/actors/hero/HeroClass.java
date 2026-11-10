@@ -154,11 +154,12 @@ public enum HeroClass {
 
 	//testing classes: start the run at level 30 with Tengu's mask, the dwarf king's crown and the testing tools
 	TEST_NETZACH( HeroSubClass.SAFETY_SEPHIRAH, HeroSubClass.ART_LIBRARIAN ),
-	TEST_TIPHERETH( HeroSubClass.HQ_SEPHIRAH, HeroSubClass.SCIENCE_LIBRARIAN );
+	TEST_TIPHERETH( HeroSubClass.HQ_SEPHIRAH, HeroSubClass.SCIENCE_LIBRARIAN ),
+	TEST_GEBURA( HeroSubClass.DISCIPLINE_SEPHIRAH, HeroSubClass.LANGUAGE_LIBRARIAN );
 
 	//debugging tools: only debug builds can show or start them
 	public boolean isDebugOnly(){
-		return this == TEST_NETZACH || this == TEST_TIPHERETH;
+		return this == TEST_NETZACH || this == TEST_TIPHERETH || this == TEST_GEBURA;
 	}
 
 	//Shattered's original six heroes can no longer be started. Their code and data stay, so old saves, rankings,
@@ -182,6 +183,7 @@ public enum HeroClass {
 		switch (this){
 			case TEST_NETZACH:   return NETZACH;
 			case TEST_TIPHERETH: return TIPHERETH;
+			case TEST_GEBURA:    return GEBURA;
 			default:             return this;
 		}
 	}
@@ -272,6 +274,11 @@ public enum HeroClass {
 
 			case GEBURA:
 				initGebura( hero );
+				break;
+
+			case TEST_GEBURA:
+				initGebura( hero );
+				initTestHero( hero );
 				break;
 		}
 
@@ -645,6 +652,7 @@ public enum HeroClass {
 				return Badges.isUnlocked(Badges.Badge.UNLOCK_CLERIC);
 			case TEST_NETZACH:
 			case TEST_TIPHERETH:
+			case TEST_GEBURA:
 				//testing classes are debugging tools, only debug builds can use them
 				return false;
 		}

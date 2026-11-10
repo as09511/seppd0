@@ -153,12 +153,7 @@ public class RedMist extends ArmorAbility {
 
 		@Override
 		public int icon() {
-			return BuffIndicator.FURY;
-		}
-
-		@Override
-		public void tintIcon( Image icon ) {
-			icon.hardlight(0.9f, 0f, 0.05f);
+			return BuffIndicator.RED_MIST;
 		}
 
 		@Override

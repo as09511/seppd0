@@ -141,6 +141,7 @@ public class BuffIndicator extends Component {
 	public static final int CHARGE      = 88;
 	public static final int MANUAL      = 89;
 	public static final int WARD        = 90;
+	public static final int RED_MIST    = 91;
 
 	public static final int SIZE_SMALL  = 7;
 	public static final int SIZE_LARGE  = 16;
