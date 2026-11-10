@@ -33,6 +33,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbili
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.BloodParticle;
+import com.shatteredpixel.shatteredpixeldungeon.effects.particles.RedMistParticle;
+import com.watabou.noosa.particles.Emitter;
 import com.shatteredpixel.shatteredpixeldungeon.items.AbilityCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -86,7 +88,10 @@ public class RedMist extends ArmorAbility {
 
 		Buff.affect(hero, Form.class).set(duration(hero));
 		hero.sprite.showStatus(CharSprite.NEGATIVE, Messages.get(this, "name"));
-		Sample.INSTANCE.play(Assets.Sounds.BURNING);
+		//the roar of catching fire, layered to be louder
+		Sample.INSTANCE.play(Assets.Sounds.BURNING, 1f, 1f);
+		Sample.INSTANCE.play(Assets.Sounds.BURNING, 1f, 0.9f);
+		Sample.INSTANCE.play(Assets.Sounds.BURNING, 1f, 0.8f);
 		GameScene.flash(0x880000);
 		CellEmitter.center(hero.pos).burst(BloodParticle.BURST, 12);
 
@@ -113,6 +118,7 @@ public class RedMist extends ArmorAbility {
 
 		private int left;
 		private int duration;
+		private Emitter mist;
 		private boolean usedVertical = false;
 		private boolean usedHorizontal = false;
 
@@ -136,10 +142,15 @@ public class RedMist extends ArmorAbility {
 		@Override
 		public void fx( boolean on ) {
 			if (on){
-				target.sprite.aura(0xDD1111, 5);
+				//red mist trails her while she is transformed
+				//(a new sprite after changing floors needs its own)
+				if (mist != null) mist.on = false;
+				mist = target.sprite.emitter();
+				mist.pour(RedMistParticle.FACTORY, 0.08f);
 				if (!usedVertical || !usedHorizontal) ActionIndicator.setAction(this);
-			} else {
-				target.sprite.clearAura();
+			} else if (mist != null){
+				mist.on = false;
+				mist = null;
 			}
 		}
 

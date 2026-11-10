@@ -350,7 +350,7 @@ public class BuffIndicator extends Component {
 		public void updateIcon(){
 			((BuffIcon)icon).refresh(buff);
 			//round up to the nearest pixel if <50% faded, otherwise round down
-			if (!large || buff.iconTextDisplay().isEmpty()) {
+			if ((!large && !buff.textOnSmallIcon()) || buff.iconTextDisplay().isEmpty()) {
 				text.visible = false;
 				grey.visible = true;
 				float fadeHeight = GameMath.gate(0, buff.iconFadePercent(), 1) * icon.height();
@@ -378,6 +378,14 @@ public class BuffIndicator extends Component {
 			grey.x = icon.x = this.x + (large ? 0 : 1);
 			grey.y = icon.y = this.y + (large ? 0 : 2) + topOffset;
 
+			if (!large){
+				//small icons: a half size count in the space under the icon
+				text.scale.set(PixelScene.align(0.5f));
+				text.x = this.x + width() - text.width();
+				text.y = icon.y + icon.height() - text.baseLine() + 1;
+				PixelScene.align(text);
+				return;
+			}
 			if (text.width > width()){
 				text.scale.set(PixelScene.align(0.5f));
 			} else {

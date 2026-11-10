@@ -111,6 +111,11 @@ public class Buff extends Actor {
 		return "";
 	}
 
+	//whether the text above is also shown on the small buff icons of the mobile UI, in place of the grey fade
+	public boolean textOnSmallIcon(){
+		return false;
+	}
+
 	//visual effect usually attached to the sprite of the character the buff is attacked to
 	public void fx(boolean on) {
 		//do nothing by default

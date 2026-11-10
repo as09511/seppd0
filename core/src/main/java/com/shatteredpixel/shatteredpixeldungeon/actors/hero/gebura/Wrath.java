@@ -207,6 +207,12 @@ public class Wrath extends Buff implements ActionIndicator.Action {
 		return Integer.toString(stacks);
 	}
 
+	//the wrath count shows on the small mobile icon too
+	@Override
+	public boolean textOnSmallIcon() {
+		return true;
+	}
+
 	@Override
 	public String desc() {
 		Hero hero = (Hero) target;
