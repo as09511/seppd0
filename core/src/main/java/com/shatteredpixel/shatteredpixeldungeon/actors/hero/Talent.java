@@ -24,6 +24,8 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.Wrath;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.LanguageLibrarian;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
@@ -300,6 +302,12 @@ public enum Talent {
 	CIGARETTE_TIME(256), EGO_MASTERY(257), FIXER(258), INDOMITABLE(259),
 	//Gebura T2
 	AFTER_MEAL_SMOKE(260), QLIPHOTH_FIELD(261), PROOF_OF_STRENGTH(262), STRONGEST(263), LEGEND(264),
+	//Gebura T3
+	BLADE(265, 3), KIAI(266, 3),
+	//Disciplinary Team Sephirah T3
+	DISPOSAL_BULLET(267, 3), PURPOSE_OF_PAIN(268, 3), OUR_WORK(269, 3),
+	//Language Floor Librarian T3
+	LUNGE(270, 3), VICIOUS_CLAW(271, 3), ABSORPTION(272, 3),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -624,8 +632,17 @@ public enum Talent {
 		if (talent == LEGEND){
 			hero.updateHT(false);
 		}
-		if (talent == PROOF_OF_STRENGTH){
+		if (talent == PROOF_OF_STRENGTH || talent == KIAI){
 			Item.updateQuickslot();
+		}
+		//Gebura's subclass actions show up right away
+		if (talent == DISPOSAL_BULLET || talent == PURPOSE_OF_PAIN){
+			GeburaTrackers.checkBuffs(hero);
+			if (hero.buff(Wrath.class) != null) hero.buff(Wrath.class).refreshAction();
+		}
+		if (talent == LUNGE){
+			GeburaTrackers.checkBuffs(hero);
+			if (hero.buff(LanguageLibrarian.class) != null) hero.buff(LanguageLibrarian.class).refreshAction();
 		}
 		//Gebura's E.G.O mastery: the wielded weapon right away, at +2 the level of carried weapons
 		if (talent == EGO_MASTERY && hero.belongings.weapon() != null && !ShardOfOblivion.passiveIDDisabled()){
@@ -1411,6 +1428,9 @@ public enum Talent {
 			case TIPHERETH:
 				Collections.addAll(tierTalents, NOT_A_KID, PROOF_OF_COMPETENCE);
 				break;
+			case GEBURA:
+				Collections.addAll(tierTalents, BLADE, KIAI);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1504,6 +1524,12 @@ public enum Talent {
 				break;
 			case SCIENCE_LIBRARIAN:
 				Collections.addAll(tierTalents, WARD, INTEMPERANCE, EMPTINESS);
+				break;
+			case DISCIPLINE_SEPHIRAH:
+				Collections.addAll(tierTalents, DISPOSAL_BULLET, PURPOSE_OF_PAIN, OUR_WORK);
+				break;
+			case LANGUAGE_LIBRARIAN:
+				Collections.addAll(tierTalents, LUNGE, VICIOUS_CLAW, ABSORPTION);
 				break;
 		}
 		for (Talent talent : tierTalents){

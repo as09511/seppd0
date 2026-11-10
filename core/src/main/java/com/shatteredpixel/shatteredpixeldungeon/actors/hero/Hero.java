@@ -964,6 +964,9 @@ public class Hero extends Char {
 			Buff.affect(this, HodManual.class);
 		}
 
+		//Gebura's subclass buffs
+		GeburaTrackers.checkBuffs(this);
+
 		//Malkuth's subclass abilities
 		if (subClass == HeroSubClass.CONTROL_SEPHIRAH && buff(EmployeeCall.class) == null){
 			Buff.affect(this, EmployeeCall.class);
@@ -1737,6 +1740,9 @@ public class Hero extends Char {
 
 		//Tiphereth's preemptive defense: shielding the first time each enemy lands a hit
 		TipherethTrackers.onHitBy(this, enemy);
+
+		//the language floor librarian punches back
+		GeburaTrackers.onHitBy(this, enemy);
 		
 		if (damage > 0 && subClass == HeroSubClass.BERSERKER){
 			Berserk berserk = Buff.affect(this, Berserk.class);
@@ -1864,6 +1870,7 @@ public class Hero extends Char {
 
 		int preHP = HP + shielding();
 		if (src instanceof Hunger) preHP -= shielding();
+		int hpBefore = HP;
 		super.damage( dmg, src );
 		int postHP = HP + shielding();
 		if (src instanceof Hunger) postHP -= shielding();
@@ -1894,6 +1901,9 @@ public class Hero extends Char {
 
 		//Hod's safety training
 		HodManual.onDamaged(this);
+
+		//Gebura's wrath and vicious claws
+		GeburaTrackers.onDamaged(this, src, hpBefore);
 
 		if (buff(Challenge.DuelParticipant.class) != null){
 			buff(Challenge.DuelParticipant.class).addDamage(effectiveDamage);
@@ -2547,6 +2557,9 @@ public class Hero extends Char {
 		boolean wasHighGrass = Dungeon.level.map[step] == Terrain.HIGH_GRASS;
 
 		super.move( step, travelling);
+
+		//the language floor librarian's charge
+		if (travelling) GeburaTrackers.onStep(this);
 
 		if (!flying && travelling) {
 			if (Dungeon.level.water[pos]) {

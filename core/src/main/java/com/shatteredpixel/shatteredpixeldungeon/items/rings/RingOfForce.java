@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.rings;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
+
 import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -94,6 +97,12 @@ public class RingOfForce extends Ring {
 		TipherethRibbon ribbon = TipherethRibbon.worn(hero);
 		if (ribbon != null && hero.buff(MonkEnergy.MonkAbility.UnarmedAbilityTracker.class) == null){
 			int level = Math.max(Math.max(0, ribbon.buffedLvl()), usingForce ? getBuffedBonus(hero, Force.class) : 0);
+			float tier = tier(hero.STR());
+			return Hero.heroDamageIntRange(min(level, tier), max(level, tier));
+		}
+		//the language floor librarian punches like a +0 ring of force, a worn ring of force counts if higher
+		if (hero.subClass == HeroSubClass.LANGUAGE_LIBRARIAN && hero.buff(MonkEnergy.MonkAbility.UnarmedAbilityTracker.class) == null){
+			int level = Math.max(0, usingForce ? getBuffedBonus(hero, Force.class) : 0);
 			float tier = tier(hero.STR());
 			return Hero.heroDamageIntRange(min(level, tier), max(level, tier));
 		}
@@ -272,6 +281,8 @@ public class RingOfForce extends Ring {
 	}
 
 	public static boolean fightingUnarmed( Hero hero ){
+		//the language floor librarian's counters are always punches
+		if (GeburaTrackers.counterAttacking) return true;
 		if (hero.belongings.attackingWeapon() == null
 			|| hero.buff(MonkEnergy.MonkAbility.UnarmedAbilityTracker.class) != null){
 			return true;

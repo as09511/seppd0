@@ -66,6 +66,10 @@ public class HeroDamageBonus {
 		if (hero.heroClass == HeroClass.TIPHERETH){
 			bonus += TipherethTrackers.emptinessDealt(hero) - 1f;
 		}
+		//Gebura's blade, wrath and frenzy
+		if (hero.heroClass == HeroClass.GEBURA){
+			bonus += GeburaTrackers.percentBonus(hero, target);
+		}
 		//Yesod's viper Yesod, charge and black flame
 		if (hero.heroClass == HeroClass.YESOD){
 			bonus += YesodTrackers.attackMultiplier(hero) - 1f;

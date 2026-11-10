@@ -20,7 +20,14 @@
  */
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura;
 
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bleeding;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
+import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
+import com.watabou.noosa.audio.Sample;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Adrenaline;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -54,9 +61,22 @@ public class GeburaTrackers {
 		return 1f + 0.1f*hero.pointsInTalent(Talent.LEGEND);
 	}
 
-	//proof of strength: +1 strength
+	//proof of strength: +1 strength. Kiai: +8/13/18% of her base strength, rounded down like the warrior's strongman
 	public static int strBonus( Hero hero ){
-		return hero.hasTalent(Talent.PROOF_OF_STRENGTH) ? 1 : 0;
+		int bonus = hero.hasTalent(Talent.PROOF_OF_STRENGTH) ? 1 : 0;
+		if (hero.hasTalent(Talent.KIAI)){
+			bonus += (int)Math.floor(hero.STR * (0.03f + 0.05f*hero.pointsInTalent(Talent.KIAI)));
+		}
+		return bonus;
+	}
+
+	//damage dealt bonuses on every kind of her damage: blade +10/20/30%, wrath +2.5% each, frenzy +100%
+	public static float percentBonus( Hero hero, Char target ){
+		float bonus = 0.1f*hero.pointsInTalent(Talent.BLADE);
+		Wrath wrath = hero.buff(Wrath.class);
+		if (wrath != null) bonus += wrath.damageBonus();
+		if (hero.buff(Wrath.Frenzy.class) != null) bonus += Wrath.Frenzy.DAMAGE_BONUS;
+		return bonus;
 	}
 
 	//fixer: +2/+3 accuracy
@@ -177,11 +197,28 @@ public class GeburaTrackers {
 		float bonus = 0f;
 		AfterMealSmoke meal = hero.buff(AfterMealSmoke.class);
 		if (meal != null) bonus += meal.use();
+		//the language floor librarian's charge, on melee attacks that aren't counters
+		LanguageLibrarian lib = hero.buff(LanguageLibrarian.class);
+		if (lib != null && !counterAttacking && !(hero.belongings.attackingWeapon() instanceof MissileWeapon)){
+			bonus += lib.useCharge();
+		}
 		return bonus;
 	}
 
 	//after a hit lands
-	public static void afterHit( Hero hero, Char enemy ){
+	public static void afterHit( Hero hero, Char enemy, int damage ){
+		//the disciplinary team sephirah's wrath, from melee and ranged hits alike
+		Wrath wrath = Wrath.get(hero);
+		if (wrath != null) wrath.gain(1);
+
+		//vicious claws: the first attack while hidden also bleeds for 33/67/100% of its damage
+		LanguageLibrarian.ClawReady claw = hero.buff(LanguageLibrarian.ClawReady.class);
+		if (claw != null){
+			claw.detach();
+			int bleed = Math.round(damage * hero.pointsInTalent(Talent.VICIOUS_CLAW) / 3f);
+			if (bleed > 0 && enemy.isAlive()) Buff.affect(enemy, Bleeding.class).set(bleed);
+		}
+
 		//qliphoth interference field: ranged hits cripple for 2/3 turns, 10 turn cooldown
 		if (hero.hasTalent(Talent.QLIPHOTH_FIELD) && enemy.isAlive()
 				&& hero.belongings.attackingWeapon() instanceof MissileWeapon
@@ -234,6 +271,74 @@ public class GeburaTrackers {
 				&& item instanceof com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon){
 			item.levelKnown = true;
 		}
+	}
+
+	//after she takes damage
+	public static void onDamaged( Hero hero, Object src, int preHP ){
+		if (!(src instanceof Char) || src == hero) return;
+		Wrath wrath = Wrath.get(hero);
+		if (wrath != null) wrath.gain(1);
+
+		//vicious claws: a hit that takes her to half health or less hides her for 5 turns, 100 turn cooldown
+		if (hero.hasTalent(Talent.VICIOUS_CLAW) && hero.isAlive()
+				&& hero.HP <= hero.HT/2 && preHP > hero.HT/2
+				&& hero.buff(LanguageLibrarian.ClawCooldown.class) == null){
+			Buff.affect(hero, LanguageLibrarian.ClawCooldown.class, 100f);
+			Buff.prolong(hero, Invisibility.class, 5f);
+			Buff.prolong(hero, LanguageLibrarian.ClawReady.class, 5f);
+			Sample.INSTANCE.play(Assets.Sounds.MELD);
+		}
+	}
+
+	//absorption: 2/4/6 health back on every kill
+	public static void onEnemySlain( Hero hero ){
+		if (hero.hasTalent(Talent.ABSORPTION) && hero.isAlive()){
+			int heal = Math.min(2*hero.pointsInTalent(Talent.ABSORPTION), hero.HT - hero.HP);
+			if (heal > 0){
+				hero.HP += heal;
+				hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(heal), FloatingText.HEALING);
+			}
+		}
+	}
+
+	//the language floor librarian punches back at whoever hits her in melee, right after their attack
+	public static boolean counterAttacking = false;
+
+	public static void onHitBy( Hero hero, Char enemy ){
+		if (hero.subClass != HeroSubClass.LANGUAGE_LIBRARIAN || enemy == null || enemy == hero) return;
+		if (!Dungeon.level.adjacent(hero.pos, enemy.pos)) return;
+		Actor.add(new Actor() {
+			{
+				actPriority = VFX_PRIO;
+			}
+
+			@Override
+			protected boolean act() {
+				Actor.remove(this);
+				if (hero.isAlive() && enemy.isAlive() && hero.paralysed <= 0
+						&& Dungeon.level.adjacent(hero.pos, enemy.pos) && enemy.alignment != hero.alignment){
+					LanguageLibrarian.showCounter(hero);
+					counterAttacking = true;
+					try {
+						hero.attack(enemy);
+					} finally {
+						counterAttacking = false;
+					}
+				}
+				return true;
+			}
+		});
+	}
+
+	public static void onStep( Hero hero ){
+		LanguageLibrarian lib = LanguageLibrarian.get(hero);
+		if (lib != null) lib.onStep();
+	}
+
+	//the subclass buffs, kept on the hero
+	public static void checkBuffs( Hero hero ){
+		if (hero.subClass == HeroSubClass.DISCIPLINE_SEPHIRAH) Wrath.get(hero);
+		if (hero.subClass == HeroSubClass.LANGUAGE_LIBRARIAN) LanguageLibrarian.get(hero);
 	}
 
 	//proof of strength +2: cursed equipment of +2 or less can be taken off by force, which destroys it

@@ -575,9 +575,9 @@ public abstract class Char extends Actor {
 				NetzachTrackers.afterHit((Hero) this, enemy);
 			}
 
-			//Gebura's qliphoth interference field
+			//Gebura's qliphoth interference field, wrath and vicious claws
 			if (this instanceof Hero){
-				GeburaTrackers.afterHit((Hero) this, enemy);
+				GeburaTrackers.afterHit((Hero) this, enemy, effectiveDamage);
 			}
 
 			if (buff(FireImbue.class) != null)  buff(FireImbue.class).proc(enemy);

@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -1059,6 +1060,8 @@ public abstract class Mob extends Char {
 		//Yesod learns from every new kind of enemy he kills
 		if (cause == Dungeon.hero && alignment == Alignment.ENEMY){
 			InfoPower.onEnemySlain(this);
+			//Gebura's absorption
+			GeburaTrackers.onEnemySlain(Dungeon.hero);
 		}
 
 		//worker bee: killing a burning enemy gives the notebook 0.1/0.2/0.3 of a charge
