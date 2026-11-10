@@ -60,10 +60,10 @@ import java.util.HashMap;
 import java.util.List;
 
 //Nothing There (ALEPH), the second boss fight Angela offers on floor 26. It appears in the middle of the Central
-//Command lobby at L Corp headquarters and comes for the hero. Besides its claws it has two patterns:
+//Command lobby at L Corp headquarters and comes for the hero. Besides its club it has two patterns:
 // "Hello?"  - every 5 turns, a spike down a straight line 8 cells long, through everyone on it
-// "Good Bye" - every 8 turns, the 1x3 cells in front of it are marked for a turn, then struck by its club
-//Good Bye goes first when both are ready. Hello? can be dodged like its claws, Good Bye always hits, armor counts.
+// "Good Bye" - every 8 turns its club turns into an axe, the 1x3 cells in front of it are marked for a turn, then cut
+//Good Bye goes first when both are ready. Hello? can be dodged like its club, Good Bye always hits, armor counts.
 //Neither starts counting down until it has first seen an enemy. Hello? goes at the enemy in sight it is most set on.
 public class NothingThere extends Mob {
 
@@ -75,7 +75,7 @@ public class NothingThere extends Mob {
 	{
 		spriteClass = NothingThereSprite.class;
 
-		HP = HT = 3000;
+		HP = HT = 2000;
 		defenseSkill = 20;
 		EXP = 0;
 		maxLvl = -2;
@@ -280,7 +280,7 @@ public class NothingThere extends Mob {
 		for (int cell : line){
 			Char ch = Actor.findChar(cell);
 			if (ch != null && ch != this && ch.isAlive()){
-				//aimed like its claws, so it can be dodged
+				//aimed like its club, so it can be dodged
 				strike(ch, Random.NormalIntRange(80, 100), false);
 			}
 		}

@@ -27,7 +27,8 @@ import com.watabou.noosa.TextureFilm;
 import com.watabou.utils.Callback;
 
 //Nothing There, ALEPH - a tall red thing of flesh, its head mostly a mouth, a spiked club of a fist on one arm
-// and long claws on the other. It stands on its own cell and reaches high above it.
+// and long claws on the other. The club turns into a crescent axe for Good Bye.
+// It stands on its own cell and reaches high above it.
 public class NothingThereSprite extends MobSprite {
 
 	private Animation windup;
@@ -46,14 +47,16 @@ public class NothingThereSprite extends MobSprite {
 		run = new Animation( 8, true );
 		run.frames( frames, 2, 3, 4, 5 );
 
+		//its basic attack is the spiked club brought down
 		attack = new Animation( 12, false );
-		attack.frames( frames, 6, 7, 8 );
+		attack.frames( frames, 6, 7, 7, 8 );
 
 		zap = new Animation( 10, false );
 		zap.frames( frames, 9, 9, 10 );
 
-		windup = new Animation( 10, false );
-		windup.frames( frames, 11 );
+		//Good Bye: the club turns into a great crescent axe, raised up
+		windup = new Animation( 8, false );
+		windup.frames( frames, 16, 11 );
 
 		swing = new Animation( 14, false );
 		swing.frames( frames, 11, 12, 12, 12 );
@@ -64,13 +67,13 @@ public class NothingThereSprite extends MobSprite {
 		play( idle );
 	}
 
-	//"Good Bye": the club goes up and stays there while the cells in front are marked
+	//"Good Bye": the club turns into an axe and goes up, staying there while the cells in front are marked
 	public void windup( int cell ){
 		turnTo( ch.pos, cell );
 		play( windup );
 	}
 
-	//and comes down on them
+	//and the axe comes down on them
 	public void swing( int cell ){
 		turnTo( ch.pos, cell );
 		play( swing );
