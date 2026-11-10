@@ -539,6 +539,12 @@ public class Hero extends Char {
 	}
 
 	@Override
+	//accuracy and evasion as if every level up to this one had been earned, for heroes that start above level 1
+	public void setLevelSkills( int level ){
+		attackSkill = 10 + (level - 1);
+		defenseSkill = 5 + (level - 1);
+	}
+
 	public int attackSkill( Char target ) {
 		KindOfWeapon wep = belongings.attackingWeapon();
 		

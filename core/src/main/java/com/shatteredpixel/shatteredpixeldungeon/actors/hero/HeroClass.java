@@ -354,6 +354,8 @@ public enum HeroClass {
 	private static void initTestHero( Hero hero ) {
 		hero.lvl = 30;
 		hero.exp = 0;
+		//the accuracy and evasion a hero gains on the way to level 30
+		hero.setLevelSkills(hero.lvl);
 		hero.updateHT(true);
 		hero.HP = hero.HT;
 		new TengusMask().collect();
