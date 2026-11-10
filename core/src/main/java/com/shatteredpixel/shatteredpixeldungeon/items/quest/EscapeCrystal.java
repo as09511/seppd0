@@ -172,7 +172,7 @@ public class EscapeCrystal extends Item {
 
 										@Override
 										public boolean itemSelectable(Item item) {
-											if (item instanceof EscapeCrystal){
+											if (item instanceof EscapeCrystal || item.vaultOnly){
 												return false;
 											}
 											//lowest reward, just a consumable

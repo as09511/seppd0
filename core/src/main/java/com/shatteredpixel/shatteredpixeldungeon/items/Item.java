@@ -93,6 +93,9 @@ public class Item implements Bundlable {
 	// Unique items persist through revival
 	public boolean unique = false;
 
+	//given by the vault mirror: only for use inside the vault, it can't be chosen to take out
+	public boolean vaultOnly = false;
+
 	// These items are preserved even if the hero's inventory is lost via unblessed ankh
 	// this is largely set by the resurrection window, items can override this to always be kept
 	public boolean keptThoughLostInvent = false;
@@ -603,6 +606,7 @@ public class Item implements Bundlable {
 	private static final String QUICKSLOT		= "quickslotpos";
 	private static final String KEPT_LOST       = "kept_lost";
 	private static final String CUSTOM_NOTE_ID = "custom_note_id";
+	private static final String VAULT_ONLY     = "vault_only";
 	
 	@Override
 	public void storeInBundle( Bundle bundle ) {
@@ -616,6 +620,7 @@ public class Item implements Bundlable {
 		}
 		bundle.put( KEPT_LOST, keptThoughLostInvent );
 		if (customNoteID != -1)     bundle.put(CUSTOM_NOTE_ID, customNoteID);
+		if (vaultOnly)              bundle.put(VAULT_ONLY, true);
 	}
 	
 	@Override
@@ -632,6 +637,7 @@ public class Item implements Bundlable {
 		}
 		
 		cursed	= bundle.getBoolean( CURSED );
+		vaultOnly = bundle.getBoolean( VAULT_ONLY );
 
 		//only want to populate slots when restoring belongings
 		if (Belongings.bundleRestoring) {

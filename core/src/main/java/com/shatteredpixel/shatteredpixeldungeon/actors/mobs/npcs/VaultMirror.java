@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
 import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
 import com.shatteredpixel.shatteredpixeldungeon.items.Cigarette;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.ego.Mimicry;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
@@ -122,8 +123,9 @@ public class VaultMirror extends NPC {
 					((TipherethRibbon) reward).setEnchantment(Weapon.Enchantment.random());
 					break;
 				case GEBURA:
-					//a full pack of her cigarettes
-					reward = new Cigarette().quantity(5);
+					//a +5 Mimicry, with a cigarette handed over alongside it (see interact). Both stay in the vault
+					reward = new Mimicry().upgrade(5).identify(false);
+					reward.vaultOnly = true;
 					break;
 			}
 		Random.popGenerator();
@@ -200,6 +202,12 @@ public class VaultMirror extends NPC {
 										GLog.i( Messages.capitalize(Messages.get(Dungeon.hero, "you_now_have", reward.name())) );
 									} else {
 										Dungeon.level.drop(reward, c.pos).sprite.drop();
+									}
+									//Gebura's cigarette comes with her Mimicry
+									if (reward instanceof Mimicry && ((Hero) c).heroClass == HeroClass.GEBURA){
+										Item cig = new Cigarette();
+										cig.vaultOnly = true;
+										if (!cig.doPickUp((Hero) c)) Dungeon.level.drop(cig, c.pos).sprite.drop();
 									}
 									Imp.Quest.mirrorUsed = true;
 									//Yesod's scarf comes with full info while in the vault

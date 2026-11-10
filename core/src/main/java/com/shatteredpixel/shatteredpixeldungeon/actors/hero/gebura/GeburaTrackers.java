@@ -224,15 +224,14 @@ public class GeburaTrackers {
 		return true;
 	}
 
-	//E.G.O mastery: +1 weapons are identified when wielded, +2 the level of weapons and armor is known on pickup
+	//E.G.O mastery: +1 weapons are identified when wielded, +2 the level of weapons is also known on pickup
 	public static boolean identifiesOnEquip( Hero hero, Item item ){
 		return hero.hasTalent(Talent.EGO_MASTERY) && item instanceof com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 	}
 
 	public static void onItemCollected( Hero hero, Item item ){
 		if (hero.pointsInTalent(Talent.EGO_MASTERY) >= 2 && !ShardOfOblivion.passiveIDDisabled()
-				&& (item instanceof com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon
-					|| item instanceof com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor)){
+				&& item instanceof com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon){
 			item.levelKnown = true;
 		}
 	}

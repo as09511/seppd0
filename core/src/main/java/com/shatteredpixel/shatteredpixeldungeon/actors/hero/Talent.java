@@ -627,7 +627,7 @@ public enum Talent {
 		if (talent == PROOF_OF_STRENGTH){
 			Item.updateQuickslot();
 		}
-		//Gebura's E.G.O mastery: the wielded weapon right away, at +2 the level of carried weapons and armor
+		//Gebura's E.G.O mastery: the wielded weapon right away, at +2 the level of carried weapons
 		if (talent == EGO_MASTERY && hero.belongings.weapon() != null && !ShardOfOblivion.passiveIDDisabled()){
 			hero.belongings.weapon.identify();
 		}
