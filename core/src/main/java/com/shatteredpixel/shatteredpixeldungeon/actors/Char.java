@@ -669,6 +669,11 @@ public abstract class Char extends Actor {
 				//TODO enemy.defenseSound? currently miss plays for monks/crab even when they parry
 				Sample.INSTANCE.play(Assets.Sounds.MISS);
 			}
+
+			//the language floor librarian punches back even when she dodges
+			if (enemy instanceof Hero){
+				GeburaTrackers.onHitBy((Hero) enemy, this);
+			}
 			
 			return false;
 			

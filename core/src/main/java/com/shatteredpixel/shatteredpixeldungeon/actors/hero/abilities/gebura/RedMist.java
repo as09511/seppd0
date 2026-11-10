@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
+import com.shatteredpixel.shatteredpixeldungeon.effects.GreatSplitSlash;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.BloodParticle;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.RedMistParticle;
 import com.watabou.noosa.particles.Emitter;
@@ -257,6 +258,7 @@ public class RedMist extends ArmorAbility {
 			hero.sprite.attack(cell, new Callback() {
 				@Override
 				public void call() {
+					GameScene.effect(GreatSplitSlash.vertical(cell));
 					PixelScene.shake(2, 0.3f);
 					Sample.INSTANCE.play(Assets.Sounds.HIT_STRONG, 1f, 0.8f);
 					if (hero.attack(enemy, 3f, 0f, Float.POSITIVE_INFINITY) && enemy.isAlive()){
@@ -304,6 +306,8 @@ public class RedMist extends ArmorAbility {
 			hero.sprite.attack(cell, new Callback() {
 				@Override
 				public void call() {
+					GameScene.effect(GreatSplitSlash.horizontal(hero.pos, cell));
+					GameScene.flash(0x550000);
 					PixelScene.shake(3, 0.4f);
 					Sample.INSTANCE.play(Assets.Sounds.HIT_SLASH, 1f, 0.7f);
 					for (int i : area){
