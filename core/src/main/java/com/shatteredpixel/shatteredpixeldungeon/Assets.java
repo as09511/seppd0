@@ -296,6 +296,7 @@ public class Assets {
 		public static final String TIPHERETH_B = "sprites/tiphereth_b.png";
 		public static final String GEBURA   = "sprites/gebura.png";
 		public static final String RABBIT_TEAM = "sprites/rabbit_team.png";
+		public static final String GEBURA_RED_MIST = "sprites/gebura_red_mist.png";
 		public static final String LCORP_EMPLOYEE = "sprites/lcorp_employee.png";
 		public static final String ANGELA   = "sprites/angela.png";
 		public static final String DOUBT    = "sprites/doubt.png";
