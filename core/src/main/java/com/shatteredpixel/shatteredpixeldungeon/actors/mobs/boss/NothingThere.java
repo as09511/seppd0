@@ -25,12 +25,15 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Charm;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dread;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicalSleep;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Sleep;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Terror;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.duelist.Feint;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.items.stones.StoneOfAggression;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Angela;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.OrdealMob;
 import com.shatteredpixel.shatteredpixeldungeon.levels.LCorpHQLevel;
@@ -51,13 +54,17 @@ import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 //Nothing There (ALEPH), the second boss fight Angela offers on floor 26. It appears in the middle of the Central
 //Command lobby at L Corp headquarters and comes for the hero. Besides its claws it has two patterns:
 // "Hello?"  - every 5 turns, a spike down a straight line 8 cells long, through everyone on it
 // "Good Bye" - every 8 turns, the 1x3 cells in front of it are marked for a turn, then struck by its club
-//Good Bye goes first when both are ready. Both always hit, armor still counts.
+//Good Bye goes first when both are ready. Hello? can be dodged like its claws, Good Bye always hits, armor counts.
+//Neither starts counting down until it has first seen an enemy. Hello? goes at the enemy in sight it is most set on.
 public class NothingThere extends Mob {
 
 	public static final int HELLO_TURNS    = 5;
@@ -126,6 +133,8 @@ public class NothingThere extends Mob {
 	// ---------- what it does ----------
 
 	private boolean announced = false;
+	//its patterns only start counting down once it has first seen an enemy
+	private boolean engaged = false;
 	private float helloCooldown = HELLO_TURNS;
 	private float goodbyeCooldown = GOODBYE_TURNS;
 	//the cells marked by Good Bye, struck on its next turn
@@ -151,8 +160,12 @@ public class NothingThere extends Mob {
 		}
 		Dungeon.level.updateFieldOfView(this, fieldOfView);
 
-		helloCooldown--;
-		goodbyeCooldown--;
+		if (engaged){
+			helloCooldown--;
+			goodbyeCooldown--;
+		} else if (!visibleEnemies().isEmpty()){
+			engaged = true;
+		}
 
 		if (goodbyeCells != null){
 			return goodbye();
@@ -160,7 +173,8 @@ public class NothingThere extends Mob {
 
 		//it always knows where the hero is
 		if (enemy == null || !enemy.isAlive() || !Actor.chars().contains(enemy)){
-			enemy = Dungeon.hero;
+			Char chosen = chooseEnemy();
+			enemy = chosen != null ? chosen : Dungeon.hero;
 		}
 		state = HUNTING;
 		target = enemy.pos;
@@ -170,9 +184,12 @@ public class NothingThere extends Mob {
 			return true;
 		}
 		if (helloCooldown <= 0){
-			List<Integer> line = helloLine(enemy);
-			if (line != null){
-				return hello(line);
+			//the spike goes at the enemy in sight it is most set on, the next one if that one can't be reached
+			for (Char t : byAggro(visibleEnemies())){
+				List<Integer> line = helloLine(t);
+				if (line != null){
+					return hello(line);
+				}
 			}
 		}
 
@@ -180,6 +197,52 @@ public class NothingThere extends Mob {
 	}
 
 	// ---------- Hello? ----------
+
+	//the hero and their allies that it can see
+	private ArrayList<Char> visibleEnemies(){
+		ArrayList<Char> enemies = new ArrayList<>();
+		for (Mob mob : Dungeon.level.mobs){
+			if (mob.alignment == Alignment.ALLY && fieldOfView[mob.pos] && mob.invisible <= 0) enemies.add(mob);
+		}
+		if (Dungeon.hero.isAlive() && fieldOfView[Dungeon.hero.pos] && Dungeon.hero.invisible <= 0){
+			enemies.add(Dungeon.hero);
+		}
+		return enemies;
+	}
+
+	//the same order a monster picks its enemy in: anything under aggression first, then an afterimage,
+	// then the closest one, the hero first among those just as close. Whatever is charming it comes last
+	private ArrayList<Char> byAggro( ArrayList<Char> enemies ){
+		PathFinder.buildDistanceMap(pos, Dungeon.findPassable(this, Dungeon.level.passable, fieldOfView, true));
+		final HashMap<Char, Integer> rank = new HashMap<>();
+		final HashMap<Char, Integer> distances = new HashMap<>();
+		Charm charm = buff(Charm.class);
+		for (Char ch : enemies){
+			int dist = Integer.MAX_VALUE;
+			for (int n : PathFinder.NEIGHBOURS8){
+				dist = Math.min(dist, PathFinder.distance[ch.pos + n]);
+			}
+			int group;
+			if (charm != null && charm.object == ch.id())                          group = 3;
+			else if (ch.buff(StoneOfAggression.Aggression.class) != null)         group = 0;
+			else if (ch instanceof Feint.AfterImage)                              group = 1;
+			else                                                                  group = 2;
+			rank.put(ch, group);
+			distances.put(ch, dist);
+		}
+		ArrayList<Char> sorted = new ArrayList<>(enemies);
+		Collections.sort(sorted, new Comparator<Char>() {
+			@Override
+			public int compare( Char a, Char b ) {
+				int g = Integer.compare(rank.get(a), rank.get(b));
+				if (g != 0) return g;
+				int d = Integer.compare(distances.get(a), distances.get(b));
+				if (d != 0) return d;
+				return Boolean.compare(b == Dungeon.hero, a == Dungeon.hero);
+			}
+		});
+		return sorted;
+	}
 
 	//the cells a spike at the given enemy flies through, or null if it can't be reached in a straight line
 	private List<Integer> helloLine( Char target ){
@@ -217,7 +280,8 @@ public class NothingThere extends Mob {
 		for (int cell : line){
 			Char ch = Actor.findChar(cell);
 			if (ch != null && ch != this && ch.isAlive()){
-				strike(ch, Random.NormalIntRange(80, 100));
+				//aimed like its claws, so it can be dodged
+				strike(ch, Random.NormalIntRange(80, 100), false);
 			}
 		}
 	}
@@ -267,16 +331,16 @@ public class NothingThere extends Mob {
 		for (int cell : cells){
 			Char ch = Actor.findChar(cell);
 			if (ch != null && ch != this && ch.isAlive()){
-				strike(ch, GOODBYE_DAMAGE);
+				strike(ch, GOODBYE_DAMAGE, true);
 			}
 		}
 		spend(attackDelay());
 		return true;
 	}
 
-	//a hit from one of its patterns: it always lands, armor and RED resistance still count
-	private void strike( Char ch, int damage ){
-		sureHit = true;
+	//a hit from one of its patterns, armor and RED resistance still count
+	private void strike( Char ch, int damage, boolean sure ){
+		sureHit = sure;
 		attack(ch, 0f, damage, 1f);
 		sureHit = false;
 	}
@@ -303,6 +367,7 @@ public class NothingThere extends Mob {
 	}
 
 	private static final String ANNOUNCED      = "announced";
+	private static final String ENGAGED        = "engaged";
 	private static final String HELLO_CD       = "hello_cd";
 	private static final String GOODBYE_CD     = "goodbye_cd";
 	private static final String GOODBYE_CELLS  = "goodbye_cells";
@@ -312,6 +377,7 @@ public class NothingThere extends Mob {
 	public void storeInBundle( Bundle bundle ) {
 		super.storeInBundle(bundle);
 		bundle.put(ANNOUNCED, announced);
+		bundle.put(ENGAGED, engaged);
 		bundle.put(HELLO_CD, helloCooldown);
 		bundle.put(GOODBYE_CD, goodbyeCooldown);
 		if (goodbyeCells != null) bundle.put(GOODBYE_CELLS, goodbyeCells);
@@ -322,6 +388,7 @@ public class NothingThere extends Mob {
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle(bundle);
 		announced = bundle.getBoolean(ANNOUNCED);
+		engaged = bundle.getBoolean(ENGAGED);
 		helloCooldown = bundle.getFloat(HELLO_CD);
 		goodbyeCooldown = bundle.getFloat(GOODBYE_CD);
 		goodbyeCells = bundle.contains(GOODBYE_CELLS) ? bundle.getIntArray(GOODBYE_CELLS) : null;
