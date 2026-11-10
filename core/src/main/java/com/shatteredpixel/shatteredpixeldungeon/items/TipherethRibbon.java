@@ -298,8 +298,9 @@ public class TipherethRibbon extends MeleeWeapon {
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle(bundle);
 		carried = (Weapon.Enchantment) bundle.get(CARRIED);
-		//ribbons from the first build kept their enchantment under the weapon's own key
-		if (carried == null && enchantment != null){
+		//ribbons from the first build kept their enchantment under the weapon's own key.
+		// A curse there was infused while the librarian wore it and stays on the ribbon itself
+		if (carried == null && enchantment != null && !enchantment.curse() && !curseInfusionBonus){
 			carried = enchantment;
 			enchantment = null;
 		}

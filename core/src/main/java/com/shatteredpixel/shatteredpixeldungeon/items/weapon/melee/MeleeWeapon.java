@@ -79,7 +79,7 @@ public class MeleeWeapon extends Weapon {
 
 	public void affixRibbon( TipherethRibbon ribbon ){
 		this.ribbon = ribbon;
-		if (ribbon.level() > 0){
+		if (ribbon.trueLevel() > 0){
 			//doesn't trigger upgrading logic such as affecting curses/enchantments
 			level(trueLevel() + 1);
 		}
@@ -93,7 +93,7 @@ public class MeleeWeapon extends Weapon {
 		if (ribbon == null) return null;
 		TipherethRibbon detaching = ribbon;
 		ribbon = null;
-		if (detaching.level() > 0){
+		if (detaching.trueLevel() > 0){
 			degrade();
 		}
 		if (detaching.canTransferEnchantment()){
@@ -115,8 +115,9 @@ public class MeleeWeapon extends Weapon {
 
 	@Override
 	public Item upgrade( boolean enchant ) {
-		//the ribbon soaks up the first upgrade of the weapon it is tied to
-		if (ribbon != null && ribbon.level() == 0) ribbon.upgrade();
+		//the ribbon soaks up the first upgrade of the weapon it is tied to.
+		//Its own level is what counts there, a curse infused while worn only matters while it is worn
+		if (ribbon != null && ribbon.trueLevel() == 0) ribbon.upgrade();
 		return super.upgrade(enchant);
 	}
 
