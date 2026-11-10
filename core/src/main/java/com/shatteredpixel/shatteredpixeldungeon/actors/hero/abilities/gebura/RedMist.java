@@ -40,7 +40,6 @@ import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
-import com.shatteredpixel.shatteredpixeldungeon.sprites.HeroSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ActionIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.ui.HeroIcon;
@@ -136,11 +135,11 @@ public class RedMist extends ArmorAbility {
 
 		@Override
 		public void fx( boolean on ) {
-			if (target.sprite instanceof HeroSprite){
-				((HeroSprite) target.sprite).redMist(on);
-			}
 			if (on){
+				target.sprite.aura(0xDD1111, 5);
 				if (!usedVertical || !usedHorizontal) ActionIndicator.setAction(this);
+			} else {
+				target.sprite.clearAura();
 			}
 		}
 

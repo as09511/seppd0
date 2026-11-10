@@ -67,12 +67,6 @@ public class HeroSprite extends CharSprite {
 		texture( cls.spritesheet() );
 		updateArmor();
 	}
-
-	//Gebura takes on the Red Mist's look while transformed, and her own back afterwards
-	public void redMist( boolean on ){
-		texture( on ? Assets.Sprites.GEBURA_RED_MIST : Dungeon.hero.heroClass.spritesheet() );
-		updateArmor();
-	}
 	
 	public void updateArmor() {
 
