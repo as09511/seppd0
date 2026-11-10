@@ -174,6 +174,7 @@ public class Badges {
 		EXPECTATION_OF_MEANING      ( 92 ), //victory as Tiphereth
 		BLUE_STAR                   ( 93 ), //suppressing the Blue Star
 		NOTHING_THERE               ( 94 ), //suppressing Nothing There
+		COURAGE_TO_PROTECT          ( 95 ), //victory as Gebura
 
 		//platinum
 		MANY_BUFFS                  ( 96 ),
@@ -837,6 +838,7 @@ public class Badges {
 		victoryClassBadges.put(HeroClass.HOD, Badge.HOPE_TO_BE_BETTER);
 		victoryClassBadges.put(HeroClass.NETZACH, Badge.COURAGE_TO_LIVE_ON);
 		victoryClassBadges.put(HeroClass.TIPHERETH, Badge.EXPECTATION_OF_MEANING);
+		victoryClassBadges.put(HeroClass.GEBURA, Badge.COURAGE_TO_PROTECT);
 	}
 
 	private static LinkedHashMap<HeroSubClass, Badge> thirdBossSubclassBadges = new LinkedHashMap<>();
@@ -1026,7 +1028,7 @@ public class Badges {
 		}
 
 		//the seed of light badge of the sephirah: 똑바로 설 수 있는 의지, 분별할 수 있는 이성,
-		// 더 나은 존재가 될 수 있다는 희망, 삶을 이어나갈 것이라는 용기, 존재의 의미에 대한 기대
+		// 더 나은 존재가 될 수 있다는 희망, 삶을 이어나갈 것이라는 용기, 존재의 의미에 대한 기대, 지켜내는 용기
 		badge = victoryClassBadges.get(Dungeon.hero.heroClass);
 		if (badge == null) return;
 		local.add( badge );
