@@ -173,6 +173,7 @@ public class Badges {
 		COURAGE_TO_LIVE_ON          ( 91 ), //victory as Netzach
 		EXPECTATION_OF_MEANING      ( 92 ), //victory as Tiphereth
 		BLUE_STAR                   ( 93 ), //suppressing the Blue Star
+		NOTHING_THERE               ( 94 ), //suppressing Nothing There
 
 		//platinum
 		MANY_BUFFS                  ( 96 ),
@@ -1087,6 +1088,11 @@ public class Badges {
 	//the Blue Star: suppressing it in its boss fight
 	public static void validateBlueStar() {
 		displayBadge( Badge.BLUE_STAR );
+	}
+
+	//Nothing There: suppressing it in its boss fight
+	public static void validateNothingThere() {
+		displayBadge( Badge.NOTHING_THERE );
 	}
 
 	public static void validateGamesPlayed() {

@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.boss;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -359,6 +360,7 @@ public class NothingThere extends Mob {
 		Dungeon.level.locked = false;
 		GLog.p(Messages.get(this, "suppressed"));
 		Angela.Quest.onBossSuppressed(Angela.NOTHING_THERE);
+		Badges.validateNothingThere();
 	}
 
 	@Override

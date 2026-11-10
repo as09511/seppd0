@@ -81,6 +81,7 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.HarmonyOfSkinSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.PerfectFoodSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ProcessOfUnderstandingSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.SweeperSprite;
+import com.shatteredpixel.shatteredpixeldungeon.lobotomy.DummySummoner;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndQuest;
@@ -276,12 +277,15 @@ public class Angela extends NPC {
 		ArrayList<String> labels = new ArrayList<>();
 		for (String boss : BOSS_FIGHTS){
 			String label = Messages.get(Angela.class, "boss_" + boss);
-			//each boss fight can be taken on once per game
+			//only one boss fight can be taken on per game, whichever it is
 			if (Quest.bossChallenged(boss)) label = Messages.get(Angela.class, "boss_done", label);
 			labels.add(label);
 		}
 		boolean none = labels.isEmpty();
 		if (none) labels.add(Messages.get(Angela.class, "boss_preparing"));
+		//the testing heroes (the only ones with the dummy summoner) can start the boss fights over
+		final int resetIndex = Dungeon.hero.belongings.getItem(DummySummoner.class) != null ? labels.size() : -1;
+		if (resetIndex >= 0) labels.add(Messages.get(Angela.class, "boss_reset"));
 		labels.add(Messages.get(Angela.class, "menu_leave"));
 
 		GameScene.show(new WndOptions(
@@ -291,12 +295,18 @@ public class Angela extends NPC {
 				labels.toArray(new String[0])){
 			@Override
 			protected boolean enabled( int index ) {
+				if (index == resetIndex) return Quest.anyBossChallenged();
 				if (none) return index != 0;
-				return index >= BOSS_FIGHTS.length || !Quest.bossChallenged(BOSS_FIGHTS[index]);
+				return index >= BOSS_FIGHTS.length || !Quest.anyBossChallenged();
 			}
 
 			@Override
 			protected void onSelect( int index ) {
+				if (index == resetIndex){
+					Quest.resetBossFights();
+					GLog.p(Messages.get(Angela.class, "boss_reset_done"));
+					return;
+				}
 				if (!none && index < BOSS_FIGHTS.length) enterBossFight(BOSS_FIGHTS[index]);
 			}
 		});
@@ -574,8 +584,9 @@ public class Angela extends NPC {
 		public static final int ORDEAL_REWARD = 10;
 		public static final int NOON_REWARD   = 20;
 		public static final int DUSK_REWARD   = 30;
-		//enkephalin boxes given for suppressing the Blue Star, only the first time in a game
+		//enkephalin boxes given for suppressing a boss of the floor 26 Angela
 		public static final int BLUE_STAR_REWARD = 40;
+		public static final int NOTHING_THERE_REWARD = 40;
 
 		private static boolean spawned;
 		private static int type;
@@ -682,11 +693,22 @@ public class Angela extends NPC {
 
 		public static int bossReward( String boss ){
 			if (BLUE_STAR.equals(boss)) return BLUE_STAR_REWARD;
+			if (NOTHING_THERE.equals(boss)) return NOTHING_THERE_REWARD;
 			return 0;
 		}
 
 		public static boolean bossChallenged( String boss ){
 			return bossesChallenged.contains(boss);
+		}
+
+		//the bosses share one challenge: once any of them has been taken on, none can be anymore
+		public static boolean anyBossChallenged(){
+			return !bossesChallenged.isEmpty();
+		}
+
+		//testing heroes only: every boss fight can be taken on again
+		public static void resetBossFights(){
+			bossesChallenged.clear();
 		}
 
 		//called when a boss of the floor 26 Angela falls, giving its enkephalin boxes
@@ -695,7 +717,8 @@ public class Angela extends NPC {
 			int reward = bossReward(boss);
 			if (reward <= 0) return;
 			Warehouse.addEnkephalin(reward);
-			GLog.p(Messages.get(Angela.class, "boss_reward", reward, Warehouse.enkephalin()));
+			GLog.p(Messages.get(Angela.class, "boss_reward", reward, Warehouse.enkephalin(),
+					Messages.get(Angela.class, "boss_" + boss)));
 		}
 
 		public static boolean extracted(){
@@ -1019,7 +1042,7 @@ public class Angela extends NPC {
 		//off to L Corp headquarters for one of the boss fights of floor 26
 		public static void startBossFight( String boss ){
 			Level level = Dungeon.level;
-			if (level.locked || !Dungeon.hero.isAlive() || bossChallenged(boss)) return;
+			if (level.locked || !Dungeon.hero.isAlive() || anyBossChallenged()) return;
 			bossPending = boss;
 			bossesChallenged.add(boss);
 			Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
