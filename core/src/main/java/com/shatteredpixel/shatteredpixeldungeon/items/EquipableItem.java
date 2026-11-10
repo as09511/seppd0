@@ -26,6 +26,9 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Document;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -87,7 +90,11 @@ public abstract class EquipableItem extends Item {
 				updateQuickslot();
 			}
 		} else if (action.equals( AC_UNEQUIP )) {
-			doUnequip( hero, true );
+			if (cursed && hero.buff(MagicImmune.class) == null && GeburaTrackers.canForceRemove(hero, this)){
+				confirmForceRemoval( hero );
+			} else {
+				doUnequip( hero, true );
+			}
 		}
 	}
 
@@ -121,13 +128,43 @@ public abstract class EquipableItem extends Item {
 
 	public abstract boolean doEquip( Hero hero );
 
+	//Gebura's proof of strength: the cursed item being torn off, it is destroyed instead of put away
+	private static EquipableItem forcedOff = null;
+
+	private void confirmForceRemoval( Hero hero ){
+		GameScene.show(new WndOptions(new ItemSprite(this),
+				Messages.titleCase(name()),
+				Messages.get(EquipableItem.class, "force_remove_desc"),
+				Messages.get(EquipableItem.class, "force_remove_yes"),
+				Messages.get(EquipableItem.class, "force_remove_no")){
+			@Override
+			protected void onSelect( int index ) {
+				if (index != 0 || !isEquipped(hero)) return;
+				forcedOff = EquipableItem.this;
+				try {
+					if (doUnequip(hero, false)){
+						hero.sprite.emitter().burst( ShadowParticle.CURSE, 8 );
+						Sample.INSTANCE.play( Assets.Sounds.SHATTER );
+						GLog.w(Messages.get(EquipableItem.class, "force_removed", name()));
+					}
+				} finally {
+					forcedOff = null;
+				}
+			}
+		});
+	}
+
 	public boolean doUnequip( Hero hero, boolean collect, boolean single ) {
 
 		if (cursed
+				&& forcedOff != this
 				&& hero.buff(MagicImmune.class) == null
 				&& (!hero.belongings.lostInventory() || keptThroughLostInventory())) {
 			GLog.w(Messages.get(EquipableItem.class, "unequip_cursed"));
 			return false;
+		}
+		if (forcedOff == this){
+			collect = false;
 		}
 
 		if (single) {

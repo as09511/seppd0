@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ordeal.FoodChain;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.AnomalyManual;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
@@ -284,8 +285,8 @@ public class Hero extends Char {
 	public void updateHT( boolean boostHP ){
 		int curHT = HT;
 		
-		HT = 20 + 5*(lvl-1) + HTBoost + HodManual.bonusHT(this);
-		float multiplier = RingOfMight.HTMultiplier(this);
+		HT = 20 + 5*(lvl-1) + HTBoost + HodManual.bonusHT(this) + GeburaTrackers.bonusHT(this);
+		float multiplier = RingOfMight.HTMultiplier(this) * GeburaTrackers.htMultiplier(this);
 		HT = Math.round(multiplier * HT);
 		
 		if (buff(ElixirOfMight.HTBoost.class) != null){
@@ -302,6 +303,7 @@ public class Hero extends Char {
 		int strBonus = 0;
 
 		strBonus += RingOfMight.strengthBonus( this );
+		strBonus += GeburaTrackers.strBonus( this );
 		
 		AdrenalineSurge buff = buff(AdrenalineSurge.class);
 		if (buff != null){
@@ -595,10 +597,13 @@ public class Hero extends Char {
 			accuracy *= 1.50f;
 		}
 		
+		//Gebura's fixer: +2/+3 accuracy
+		int skill = attackSkill + GeburaTrackers.accuracyBonus(this);
+
 		if (!RingOfForce.fightingUnarmed(this)) {
-			return Math.max(1, Math.round(attackSkill * accuracy * wep.accuracyFactor( this, target )));
+			return Math.max(1, Math.round(skill * accuracy * wep.accuracyFactor( this, target )));
 		} else {
-			return Math.max(1, Math.round(attackSkill * accuracy));
+			return Math.max(1, Math.round(skill * accuracy));
 		}
 	}
 	
@@ -1854,6 +1859,9 @@ public class Hero extends Char {
 		//Tiphereth B takes her share of the health damage
 		dmg = TipherethTrackers.shareWithB(this, dmg, src);
 
+		//Gebura's indomitable: a hit that would kill her leaves her at 1 health
+		dmg = GeburaTrackers.indomitable(this, dmg, src);
+
 		int preHP = HP + shielding();
 		if (src instanceof Hunger) preHP -= shielding();
 		super.damage( dmg, src );
@@ -2576,7 +2584,10 @@ public class Hero extends Char {
 		boolean hit = attack(attackTarget);
 		
 		Invisibility.dispel();
-		spend( attackDelay() );
+		float delay = attackDelay();
+		//Gebura's the strongest: a melee kill takes no time
+		if (GeburaTrackers.strongestKill(this, attackTarget, hit, wasEnemy)) delay = 0;
+		spend( delay );
 
 		if (belongings.attackingWeapon() instanceof EgoWeapon){
 			((EgoWeapon) belongings.attackingWeapon()).onAttackComplete(this, attackTarget, targetPos, hit);

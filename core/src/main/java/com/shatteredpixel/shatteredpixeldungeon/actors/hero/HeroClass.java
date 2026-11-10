@@ -146,6 +146,9 @@ public enum HeroClass {
 	//Tiphereth, the Central Command Team's sephirah
 	TIPHERETH( HeroSubClass.HQ_SEPHIRAH, HeroSubClass.SCIENCE_LIBRARIAN ),
 
+	//Gebura, the Disciplinary Team's sephirah
+	GEBURA( HeroSubClass.DISCIPLINE_SEPHIRAH, HeroSubClass.LANGUAGE_LIBRARIAN ),
+
 	//testing classes: start the run at level 30 with Tengu's mask, the dwarf king's crown and the testing tools
 	TEST_NETZACH( HeroSubClass.SAFETY_SEPHIRAH, HeroSubClass.ART_LIBRARIAN ),
 	TEST_TIPHERETH( HeroSubClass.HQ_SEPHIRAH, HeroSubClass.SCIENCE_LIBRARIAN );
@@ -263,6 +266,10 @@ public enum HeroClass {
 				initTiphereth( hero );
 				initTestHero( hero );
 				break;
+
+			case GEBURA:
+				initGebura( hero );
+				break;
 		}
 
 		if (SPDSettings.quickslotWaterskin()) {
@@ -349,6 +356,19 @@ public enum HeroClass {
 
 		new ScrollOfMirrorImage().identify();
 		new PotionOfLevitation().identify();
+	}
+
+	//Gebura starts 1 strength and 10 health above the others (see Hero.updateHT)
+	private static void initGebura( Hero hero ) {
+		hero.STR += 1;
+		hero.updateHT(true);
+
+		ThrowingStone stones = new ThrowingStone();
+		stones.identify().collect();
+		Dungeon.quickslot.setSlot(0, stones);
+
+		new ScrollOfRage().identify();
+		new PotionOfStrength().identify();
 	}
 
 	//level 30 right away, with both the subclass and the armor ability items ready to use, and the testing tools
@@ -567,6 +587,8 @@ public enum HeroClass {
 				return Assets.Sprites.NETZACH;
 			case TIPHERETH:
 				return Assets.Sprites.TIPHERETH;
+			case GEBURA:
+				return Assets.Sprites.GEBURA;
 		}
 	}
 
@@ -594,6 +616,8 @@ public enum HeroClass {
 				return Assets.Splashes.NETZACH;
 			case TIPHERETH:
 				return Assets.Splashes.TIPHERETH;
+			case GEBURA:
+				return Assets.Splashes.GEBURA;
 		}
 	}
 	

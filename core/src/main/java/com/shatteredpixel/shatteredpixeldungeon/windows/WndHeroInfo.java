@@ -91,6 +91,9 @@ public class WndHeroInfo extends WndTabbed {
 			case TIPHERETH:
 				tabIcon = new ItemSprite(ItemSpriteSheet.TIPHERETH_RIBBON, null);
 				break;
+			case GEBURA:
+				tabIcon = new ItemSprite(ItemSpriteSheet.CIGARETTE, null);
+				break;
 		}
 
 		int finalHeight = MIN_HEIGHT;
@@ -244,6 +247,11 @@ public class WndHeroInfo extends WndTabbed {
 					break;
 				case TIPHERETH:
 					icons = new Image[]{ new ItemSprite(ItemSpriteSheet.TIPHERETH_RIBBON),
+							new ItemSprite(ItemSpriteSheet.BATON),
+							new ItemSprite(ItemSpriteSheet.SCROLL_ISAZ)};
+					break;
+				case GEBURA:
+					icons = new Image[]{ new ItemSprite(ItemSpriteSheet.CIGARETTE),
 							new ItemSprite(ItemSpriteSheet.BATON),
 							new ItemSprite(ItemSpriteSheet.SCROLL_ISAZ)};
 					break;

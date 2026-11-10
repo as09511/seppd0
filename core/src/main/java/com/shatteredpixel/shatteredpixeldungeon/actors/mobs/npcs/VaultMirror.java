@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
 import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
+import com.shatteredpixel.shatteredpixeldungeon.items.Cigarette;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
@@ -120,6 +121,10 @@ public class VaultMirror extends NPC {
 					reward = new TipherethRibbon().upgrade().identify(false);
 					((TipherethRibbon) reward).setEnchantment(Weapon.Enchantment.random());
 					break;
+				case GEBURA:
+					//a full pack of her cigarettes
+					reward = new Cigarette().quantity(5);
+					break;
 			}
 		Random.popGenerator();
 	}
@@ -166,6 +171,9 @@ public class VaultMirror extends NPC {
 								break;
 							case TIPHERETH:
 								sceneText += Messages.get(VaultMirror.class, "scene_tiphereth");
+								break;
+							case GEBURA:
+								sceneText += Messages.get(VaultMirror.class, "scene_gebura");
 								break;
 						}
 						sceneText += "\n\n" + Messages.get(VaultMirror.class, "scene_final");

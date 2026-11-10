@@ -21,6 +21,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.lobotomy;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Viscosity;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -76,6 +77,14 @@ public class HeroDamageBonus {
 	public static int afterArmor( Hero hero, Char target, int dmg ){
 		int flat = flatBonus(hero);
 		float bonus = percentBonus(hero, target);
+		if (flat == 0 && bonus == 0f) return dmg;
+		return Math.max(0, Math.round((dmg + flat) * (1f + bonus)));
+	}
+
+	//an attack's damage after armor: the bonuses above, plus the ones only an attack gets (and uses up)
+	public static int afterArmorAttack( Hero hero, Char target, int dmg ){
+		int flat = flatBonus(hero);
+		float bonus = percentBonus(hero, target) + GeburaTrackers.attackBonus(hero);
 		if (flat == 0 && bonus == 0f) return dmg;
 		return Math.max(0, Math.round((dmg + flat) * (1f + bonus)));
 	}

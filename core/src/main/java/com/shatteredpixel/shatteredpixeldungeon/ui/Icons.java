@@ -489,6 +489,8 @@ public enum Icons {
 				return new ItemSprite(ItemSpriteSheet.CONCENTRATED_ENKEPHALIN);
 			case TIPHERETH:
 				return new ItemSprite(ItemSpriteSheet.TIPHERETH_RIBBON);
+			case GEBURA:
+				return new ItemSprite(ItemSpriteSheet.CIGARETTE);
 			default:
 				return null;
 		}

@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors;
 
 import com.shatteredpixel.shatteredpixeldungeon.lobotomy.HeroDamageBonus;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.Prediction;
@@ -533,7 +534,7 @@ public abstract class Char extends Actor {
 
 				//the sephirot's damage dealt bonuses, after armor and added together
 				if (this instanceof Hero){
-					effectiveDamage = HeroDamageBonus.afterArmor((Hero) this, enemy, effectiveDamage);
+					effectiveDamage = HeroDamageBonus.afterArmorAttack((Hero) this, enemy, effectiveDamage);
 				}
 
 				if (enemy.buff(Viscosity.ViscosityTracker.class) != null) {
@@ -572,6 +573,11 @@ public abstract class Char extends Actor {
 			//the art floor librarian's debuffs
 			if (this instanceof Hero && ((Hero) this).heroClass == HeroClass.NETZACH){
 				NetzachTrackers.afterHit((Hero) this, enemy);
+			}
+
+			//Gebura's qliphoth interference field
+			if (this instanceof Hero){
+				GeburaTrackers.afterHit((Hero) this, enemy);
 			}
 
 			if (buff(FireImbue.class) != null)  buff(FireImbue.class).proc(enemy);

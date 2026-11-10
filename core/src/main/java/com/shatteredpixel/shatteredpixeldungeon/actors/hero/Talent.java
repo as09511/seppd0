@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImage;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.tiphereth.TipherethTrackers;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.gebura.GeburaTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.YesodTrackers;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.yesod.InfoPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.hod.HodManual;
@@ -294,6 +295,11 @@ public enum Talent {
 	GOLDEN_DASH(247, 4), GOLDEN_STRIKE(248, 4), ENDLESS_ROAD(249, 4),
 	//Nihil T4
 	DEEP_VOID(250, 4), DECEPTION(251, 4), VOID_ECHO(252, 4),
+
+	//Gebura T1
+	CIGARETTE_TIME(256), EGO_MASTERY(257), FIXER(258), INDOMITABLE(259),
+	//Gebura T2
+	AFTER_MEAL_SMOKE(260), QLIPHOTH_FIELD(261), PROOF_OF_STRENGTH(262), STRONGEST(263), LEGEND(264),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -576,6 +582,7 @@ public enum Talent {
 				case HOD:
 				case NETZACH:
 				case TIPHERETH:
+				case GEBURA:
 					return 154; //borrowed for now
 			}
 		} else {
@@ -609,6 +616,26 @@ public enum Talent {
 	}
 
 	public static void onTalentUpgraded( Hero hero, Talent talent ){
+		//Gebura's cigarette time: a cigarette for each point
+		if (talent == CIGARETTE_TIME){
+			GeburaTrackers.giveCigarette(hero);
+		}
+		//Gebura's legend raises max HP and proof of strength her strength right away
+		if (talent == LEGEND){
+			hero.updateHT(false);
+		}
+		if (talent == PROOF_OF_STRENGTH){
+			Item.updateQuickslot();
+		}
+		//Gebura's E.G.O mastery: the wielded weapon right away, at +2 the level of carried weapons and armor
+		if (talent == EGO_MASTERY && hero.belongings.weapon() != null && !ShardOfOblivion.passiveIDDisabled()){
+			hero.belongings.weapon.identify();
+		}
+		if (talent == EGO_MASTERY && hero.pointsInTalent(EGO_MASTERY) == 2){
+			for (Item item : hero.belongings){
+				GeburaTrackers.onItemCollected(hero, item);
+			}
+		}
 		//Hod's basic fitness raises max HP right away
 		if (talent == BASIC_FITNESS){
 			hero.updateHT(false);
@@ -801,6 +828,8 @@ public enum Talent {
 		if (hero.hasTalent(BEER_VENDING)){
 			ConcentratedEnkephalin.heal(hero, Math.round(hero.HT * (0.05f + 0.05f*hero.pointsInTalent(BEER_VENDING))));
 		}
+		//Gebura's after-meal smoke: the next 1/2 attacks deal 30% more damage
+		GeburaTrackers.onFoodEaten(hero);
 		//Tiphereth's shared meal: 1/2 mirror images join her at the table
 		if (hero.hasTalent(SHARED_MEAL)){
 			ScrollOfMirrorImage.spawnImages(hero, hero.pointsInTalent(SHARED_MEAL));
@@ -1092,6 +1121,10 @@ public enum Talent {
 		if (hero.pointsInTalent(ADVENTURERS_INTUITION) == 2 && item instanceof Weapon){
 			identify = true;
 		}
+		//Gebura's E.G.O mastery: weapons are identified as soon as they're wielded
+		if (GeburaTrackers.identifiesOnEquip(hero, item)){
+			identify = true;
+		}
 
 		if (identify) {
 			if (ShardOfOblivion.passiveIDDisabled()) {
@@ -1122,6 +1155,8 @@ public enum Talent {
 		if (hero.pointsInTalent(THIEFS_INTUITION) == 2){
 			if (item instanceof Ring) ((Ring) item).setKnown();
 		}
+		//Gebura's E.G.O mastery +2: the level of weapons and armor is known on pickup
+		GeburaTrackers.onItemCollected(hero, item);
 	}
 
 	public static int onAttackProc( Hero hero, Char enemy, int dmg ){
@@ -1282,6 +1317,9 @@ public enum Talent {
 			case TIPHERETH:
 				Collections.addAll(tierTalents, PRIDE, PRECISE_INSPECTION, PREEMPTIVE_DEFENSE, SNEAKY);
 				break;
+			case GEBURA:
+				Collections.addAll(tierTalents, CIGARETTE_TIME, EGO_MASTERY, FIXER, INDOMITABLE);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			if (replacements.containsKey(talent)){
@@ -1325,6 +1363,9 @@ public enum Talent {
 				break;
 			case TIPHERETH:
 				Collections.addAll(tierTalents, SHARED_MEAL, EXPECTATION, MAINTENANCE, PHYSICAL_SHIELD, TRAUMA_SHIELD);
+				break;
+			case GEBURA:
+				Collections.addAll(tierTalents, AFTER_MEAL_SMOKE, QLIPHOTH_FIELD, PROOF_OF_STRENGTH, STRONGEST, LEGEND);
 				break;
 		}
 		for (Talent talent : tierTalents){

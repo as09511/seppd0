@@ -949,6 +949,12 @@ public class ItemSpriteSheet {
 		assignItemRect(TIPHERETH_RIBBON, 16, 16);
 	}
 
+	//Gebura's cigarette, in a free slot on the last row
+	public static final int CIGARETTE = xy(9, 32);
+	static{
+		assignItemRect(CIGARETTE, 16, 16);
+	}
+
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots
 	public static final int GUIDE_PAGE  = DOCUMENTS+0;
 	public static final int ALCH_PAGE   = DOCUMENTS+1;
