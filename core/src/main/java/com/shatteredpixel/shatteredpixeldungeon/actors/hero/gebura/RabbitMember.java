@@ -163,7 +163,8 @@ public class RabbitMember extends Mob {
 		boolean visible = sprite != null && (Dungeon.level.heroFOV[pos] || Dungeon.level.heroFOV[enemy.pos]);
 		if (visible){
 			sprite.turnTo(pos, enemy.pos);
-			Sample.INSTANCE.play(Assets.Sounds.GUNSHOT, 0.7f, Random.Float(0.95f, 1.1f));
+			//the same shot as the firearm E.G.O
+			Sample.INSTANCE.play(Assets.Sounds.HIT_CRUSH, 0.8f, 0.8f);
 			MagicMissile.boltFromChar(sprite.parent, boltType(), sprite, enemy.pos, new Callback() {
 				@Override
 				public void call() {

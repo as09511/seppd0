@@ -30,9 +30,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ShieldBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
-import com.shatteredpixel.shatteredpixeldungeon.effects.Beam;
+import com.shatteredpixel.shatteredpixeldungeon.effects.ScopeReticle;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
-import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTilemap;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
@@ -117,11 +116,7 @@ public class Wrath extends Buff implements ActionIndicator.Action {
 		int before = stacks;
 		stacks = Math.min(maxStacks(hero), Math.max(stacks, minStacks(hero)) + amount);
 		grace = graceTurns(hero);
-		//the count shows over her head as it builds
-		if (stacks != before && hero.sprite != null && hero.sprite.visible){
-			hero.sprite.showStatus(stacks >= FRENZY_AT ? CharSprite.NEGATIVE : CharSprite.WARNING,
-					Messages.get(this, "status", stacks));
-		}
+		if (stacks != before) BuffIndicator.refreshHero();
 		refreshAction();
 		BuffIndicator.refreshHero();
 	}
@@ -308,9 +303,9 @@ public class Wrath extends Buff implements ActionIndicator.Action {
 		}
 		bulletCooldown = bulletCooldown(hero);
 		refreshAction();
-		hero.sprite.turnTo(hero.pos, cell);
-		Sample.INSTANCE.play(Assets.Sounds.GUNSHOT, 1f, 0.75f);
-		hero.sprite.parent.add(new Beam.DeathRay(hero.sprite.center(), DungeonTilemap.raisedTileCenterToWorld(cell)));
+		//no shot leaves Gebura: a scope's crosshair closes in on the target, and it is hit
+		GameScene.effectOverFog(new ScopeReticle(cell));
+		Sample.INSTANCE.play(Assets.Sounds.HIT_CRUSH, 1f, 0.8f);
 		//fixed damage, no armor or damage bonuses
 		enemy.damage(BULLET_DAMAGE, hero);
 		Invisibility.dispel();

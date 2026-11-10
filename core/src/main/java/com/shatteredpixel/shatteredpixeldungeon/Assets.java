@@ -218,7 +218,6 @@ public class Assets {
 		public static final String PUFF     = "sounds/puff.mp3";
 		public static final String ROCKS    = "sounds/rocks.mp3";
 		public static final String BURNING  = "sounds/burning.mp3";
-		public static final String GUNSHOT  = "sounds/gunshot.mp3";
 		public static final String FALLING  = "sounds/falling.mp3";
 		public static final String GHOST    = "sounds/ghost.mp3";
 		public static final String SECRET   = "sounds/secret.mp3";
@@ -240,7 +239,7 @@ public class Assets {
 				OPEN, UNLOCK, ITEM, DEWDROP, STEP, WATER, GRASS, TRAMPLE, STURDY,
 
 				HIT, MISS, HIT_SLASH, HIT_STAB, HIT_CRUSH, HIT_MAGIC, HIT_STRONG, HIT_PARRY,
-				HIT_ARROW, ATK_SPIRITBOW, ATK_CROSSBOW, GUNSHOT, HEALTH_WARN, HEALTH_CRITICAL,
+				HIT_ARROW, ATK_SPIRITBOW, ATK_CROSSBOW, HEALTH_WARN, HEALTH_CRITICAL,
 
 				DESCEND, EAT, READ, LULLABY, DRINK, SHATTER, ZAP, LIGHTNING, LEVELUP, DEATH,
 				CHALLENGE, CURSED, TRAP, EVOKE, TOMB, ALERT, MELD, BOSS, BLAST, PLANT, RAY, BEACON,
