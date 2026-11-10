@@ -834,6 +834,9 @@ public class Hero extends Char {
 			speed *= (2f + 0.25f*pointsInTalent(Talent.GROWING_POWER));
 		}
 
+		//Gebura's Red Mist
+		speed *= GeburaTrackers.speedFactor(this);
+
 		speed = AscensionChallenge.modifyHeroSpeed(speed);
 		
 		return speed;
@@ -1825,6 +1828,9 @@ public class Hero extends Char {
 
 		//Hod's field guidance: less damage taken next to her manager
 		damage *= ManagerCall.guidanceFactor(this, this);
+
+		//Gebura's Red Mist
+		damage *= GeburaTrackers.damageTakenFactor(this);
 
 		//Tiphereth's emptiness and ward
 		damage *= TipherethTrackers.emptinessTaken(this);

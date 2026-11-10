@@ -229,7 +229,7 @@ public class Wrath extends Buff implements ActionIndicator.Action {
 
 	@Override
 	public int actionIcon() {
-		return frenzyReady() ? HeroIcon.BERSERK : HeroIcon.SNIPERS_MARK;
+		return frenzyReady() ? HeroIcon.FRENZY : HeroIcon.DISPOSAL_BULLET;
 	}
 
 	@Override

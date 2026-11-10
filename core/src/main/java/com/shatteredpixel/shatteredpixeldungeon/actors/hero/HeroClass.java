@@ -25,6 +25,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.tiphereth.
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.tiphereth.GoldRushDash;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.tiphereth.ShieldBarrage;
 import com.shatteredpixel.shatteredpixeldungeon.items.TipherethRibbon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.gebura.RabbitCall;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.gebura.RedMist;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.gebura.MimicryStrike;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLevitation;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.yesod.SolemnLamentVolley;
@@ -560,6 +563,8 @@ public enum HeroClass {
 				return new ArmorAbility[]{new NeutralizingGas(), new OurGalaxy(), new DaCapoMovement()};
 			case TIPHERETH:
 				return new ArmorAbility[]{new ShieldBarrage(), new GoldRushDash(), new Nihil()};
+			case GEBURA:
+				return new ArmorAbility[]{new RabbitCall(), new RedMist(), new MimicryStrike()};
 		}
 	}
 

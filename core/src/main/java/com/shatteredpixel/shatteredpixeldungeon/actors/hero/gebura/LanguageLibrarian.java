@@ -170,7 +170,7 @@ public class LanguageLibrarian extends Buff implements ActionIndicator.Action {
 
 	@Override
 	public int actionIcon() {
-		return HeroIcon.MOMENTUM;
+		return HeroIcon.LUNGE;
 	}
 
 	@Override

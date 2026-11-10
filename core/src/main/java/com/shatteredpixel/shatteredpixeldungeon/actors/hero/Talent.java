@@ -308,6 +308,12 @@ public enum Talent {
 	DISPOSAL_BULLET(267, 3), PURPOSE_OF_PAIN(268, 3), OUR_WORK(269, 3),
 	//Language Floor Librarian T3
 	LUNGE(270, 3), VICIOUS_CLAW(271, 3), ABSORPTION(272, 3),
+	//Rabbit Team Call T4
+	REINFORCEMENT(273, 4), EXTENDED_OPERATION(274, 4), ELITE_SQUAD(275, 4),
+	//The Red Mist T4
+	EGO_SENSITIVITY(276, 4), BLOOD_MIST(277, 4), COURAGE(278, 4),
+	//Mimicry T4
+	GOOD_BYE(279, 4), HELLO(280, 4), HUSK(281, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one

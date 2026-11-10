@@ -88,6 +88,17 @@ public class HeroIcon extends Image {
 	public static final int GOLD_RUSH       = 70;
 	public static final int NIHIL           = 71;
 	public static final int HQ_SEPHIRAH       = 111;
+	//Gebura
+	public static final int RABBIT_CALL       = 99;
+	public static final int RED_MIST          = 100;
+	public static final int MIMICRY_STRIKE    = 101;
+	public static final int DISCIPLINE_SEPHIRAH = 102;
+	public static final int LANGUAGE_LIBRARIAN_GEBURA = 103;
+	//Gebura's action buttons
+	public static final int FRENZY            = 112;
+	public static final int DISPOSAL_BULLET   = 113;
+	public static final int LUNGE             = 114;
+	public static final int GREAT_SPLIT       = 115;
 	public static final int SCIENCE_LIBRARIAN = 119;
 
 	//cleric spells

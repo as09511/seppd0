@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Bleeding;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.gebura.RedMist;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.watabou.noosa.audio.Sample;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -76,7 +77,24 @@ public class GeburaTrackers {
 		Wrath wrath = hero.buff(Wrath.class);
 		if (wrath != null) bonus += wrath.damageBonus();
 		if (hero.buff(Wrath.Frenzy.class) != null) bonus += Wrath.Frenzy.DAMAGE_BONUS;
+		//the Red Mist: +50% (62.5/75/87.5/100% with blood mist)
+		if (hero.buff(RedMist.Form.class) != null) bonus += RedMist.damageBonus(hero);
 		return bonus;
+	}
+
+	//the Red Mist: twice as fast, and 20% (25/30/35/40% with courage) less damage taken
+	public static float speedFactor( Hero hero ){
+		return hero.buff(RedMist.Form.class) != null ? 2f : 1f;
+	}
+
+	public static float damageTakenFactor( Hero hero ){
+		return hero.buff(RedMist.Form.class) != null ? RedMist.damageTaken(hero) : 1f;
+	}
+
+	//gives the action button back to the subclass, after the Red Mist's great splits are gone
+	public static void refreshActions( Hero hero ){
+		if (hero.buff(Wrath.class) != null) hero.buff(Wrath.class).refreshAction();
+		if (hero.buff(LanguageLibrarian.class) != null) hero.buff(LanguageLibrarian.class).refreshAction();
 	}
 
 	//fixer: +2/+3 accuracy
