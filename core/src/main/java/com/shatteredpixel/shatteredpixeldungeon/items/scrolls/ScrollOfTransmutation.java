@@ -21,6 +21,14 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.scrolls;
 
+import java.util.ArrayList;
+
+import com.watabou.utils.Random;
+
+import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
+
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
+
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
@@ -89,6 +97,10 @@ public class ScrollOfTransmutation extends InventoryScroll {
 		} else if (item instanceof Artifact) {
 			return !item.unique;
 
+		//E.G.O armor, when its tier has another armor to become. No class armor
+		} else if (item instanceof Armor) {
+			return !Generator.otherArmorsOfTier(item.getClass()).isEmpty();
+
 		//all rings, wands, trinkets, seeds, and runestones
 		} else {
 			return item instanceof Ring || item instanceof Wand || item instanceof Trinket
@@ -155,12 +167,23 @@ public class ScrollOfTransmutation extends InventoryScroll {
 	}
 
 	public static Item changeItem( Item item ){
+		Item result = transmute(item);
+		//an item that can't leave the vault stays that way
+		if (result != null && result != item && item.vaultOnly){
+			result.vaultOnly = true;
+		}
+		return result;
+	}
+
+	private static Item transmute( Item item ){
 		if (item instanceof MagesStaff) {
 			return changeStaff((MagesStaff) item);
 		}else if (item instanceof TippedDart){
 			return changeTippedDart( (TippedDart)item );
 		} else if (item instanceof MeleeWeapon || item instanceof MissileWeapon) {
 			return changeWeapon( (Weapon)item );
+		} else if (item instanceof Armor) {
+			return changeArmor( (Armor)item );
 		} else if (item instanceof Scroll) {
 			return changeScroll( (Scroll)item );
 		} else if (item instanceof Potion) {
@@ -270,6 +293,43 @@ public class ScrollOfTransmutation extends InventoryScroll {
 		
 	}
 	
+	//becomes another E.G.O armor of the same tier, keeping its upgrades, glyph, curse and attached seal
+	private static Armor changeArmor( Armor a ) {
+		ArrayList<Class<?>> options = Generator.otherArmorsOfTier(a.getClass());
+		if (options.isEmpty()) return null;
+		Armor n;
+		int tries = 100;
+		do {
+			n = (Armor) Reflection.newInstance(Random.element(options));
+		} while (Challenges.isItemBlocked(n) && --tries > 0);
+
+		//the seal comes off first so its upgrade and glyph aren't counted twice
+		BrokenSeal seal = a.detachSeal();
+
+		n.level(0);
+		int level = a.trueLevel();
+		if (level > 0) {
+			n.upgrade( level );
+		} else if (level < 0) {
+			n.degrade( -level );
+		}
+
+		n.glyph = a.glyph;
+		n.glyphHardened = a.glyphHardened;
+		n.curseInfusionBonus = a.curseInfusionBonus;
+		n.masteryPotionBonus = a.masteryPotionBonus;
+		n.levelKnown = a.levelKnown;
+		n.cursedKnown = a.cursedKnown;
+		n.cursed = a.cursed;
+		n.augment = a.augment;
+
+		if (seal != null){
+			n.affixSeal(seal);
+		}
+
+		return n;
+	}
+
 	private static Ring changeRing( Ring r ) {
 		Ring n;
 		do {

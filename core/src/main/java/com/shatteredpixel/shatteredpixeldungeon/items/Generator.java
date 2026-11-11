@@ -828,6 +828,20 @@ public class Generator {
 			{JustitiaArmor.class, DaCapoArmor.class, MimicryArmor.class, LaughterArmor.class}
 	};
 
+	//the other armors in the same tier as the given one, used by the scroll of transmutation
+	//empty if the armor isn't a regular drop or is alone in its tier
+	public static ArrayList<Class<?>> otherArmorsOfTier(Class<?> armorClass){
+		ArrayList<Class<?>> others = new ArrayList<>();
+		for (Class<?>[] tier : ARMOR_BY_TIER){
+			if (Arrays.asList(tier).contains(armorClass)){
+				for (Class<?> c : tier){
+					if (c != armorClass) others.add(c);
+				}
+			}
+		}
+		return others;
+	}
+
 	//a new, unidentified armor of the given tier (1-5), picked at random among that tier's armors
 	//used where the game used to create a specific armor
 	public static Armor armorOfTier(int tier){
